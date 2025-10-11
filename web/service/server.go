@@ -515,7 +515,7 @@ func (s *ServerService) sampleCPUUtilization() (float64, error) {
 
 func (s *ServerService) GetXrayVersions() ([]string, error) {
 	const (
-		XrayURL    = "https://api.github.com/repos/XTLS/Xray-core/releases"
+		XrayURL    = "https://api.github.com/repos/GFW-knocker/Xray-core/releases"
 		bufferSize = 8192
 	)
 
@@ -538,8 +538,15 @@ func (s *ServerService) GetXrayVersions() ([]string, error) {
 
 	var versions []string
 	for _, release := range releases {
-		tagVersion := strings.TrimPrefix(release.TagName, "v")
+
+		var mytag = release.TagName
+		if i := strings.Index(mytag, "-"); i != -1 {
+			mytag = mytag[:i]
+		}
+
+		tagVersion := strings.TrimPrefix(mytag, "v")
 		tagParts := strings.Split(tagVersion, ".")
+
 		if len(tagParts) != 3 {
 			continue
 		}
@@ -551,7 +558,7 @@ func (s *ServerService) GetXrayVersions() ([]string, error) {
 			continue
 		}
 
-		if major > 25 || (major == 25 && minor > 9) || (major == 25 && minor == 9 && patch >= 11) {
+		if major > 25 || (major == 1 && minor > 25) || (major == 1 && minor == 25 && patch >= 8) {
 			versions = append(versions, release.TagName)
 		}
 	}
@@ -605,7 +612,7 @@ func (s *ServerService) downloadXRay(version string) (string, error) {
 	}
 
 	fileName := fmt.Sprintf("Xray-%s-%s.zip", osName, arch)
-	url := fmt.Sprintf("https://github.com/XTLS/Xray-core/releases/download/%s/%s", version, fileName)
+	url := fmt.Sprintf("https://github.com/GFW-knocker/Xray-core/releases/download/%s/%s", version, fileName)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err

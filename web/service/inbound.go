@@ -1569,21 +1569,20 @@ func (s *InboundService) ToggleClientEnableByEmail(clientEmail string) (bool, bo
 	return !clientOldEnabled, needRestart, nil
 }
 
-
 // SetClientEnableByEmail sets client enable state to desired value; returns (changed, needRestart, error)
 func (s *InboundService) SetClientEnableByEmail(clientEmail string, enable bool) (bool, bool, error) {
-    current, err := s.checkIsEnabledByEmail(clientEmail)
-    if err != nil {
-        return false, false, err
-    }
-    if current == enable {
-        return false, false, nil
-    }
-    newEnabled, needRestart, err := s.ToggleClientEnableByEmail(clientEmail)
-    if err != nil {
-        return false, needRestart, err
-    }
-    return newEnabled == enable, needRestart, nil
+	current, err := s.checkIsEnabledByEmail(clientEmail)
+	if err != nil {
+		return false, false, err
+	}
+	if current == enable {
+		return false, false, nil
+	}
+	newEnabled, needRestart, err := s.ToggleClientEnableByEmail(clientEmail)
+	if err != nil {
+		return false, needRestart, err
+	}
+	return newEnabled == enable, needRestart, nil
 }
 
 func (s *InboundService) ResetClientIpLimitByEmail(clientEmail string, count int) (bool, error) {
@@ -2204,7 +2203,7 @@ func (s *InboundService) MigrationRequirements() {
 
 	// Fix inbounds based problems
 	var inbounds []*model.Inbound
-	err = tx.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "trojan"}).Find(&inbounds).Error
+	err = tx.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "mvless", "trojan"}).Find(&inbounds).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return
 	}
@@ -2284,7 +2283,7 @@ func (s *InboundService) MigrationRequirements() {
 	}
 	err = tx.Raw(`select id, port, stream_settings
 	from inbounds
-	WHERE protocol in ('vmess','vless','trojan')
+	WHERE protocol in ('vmess','vless','mvless','trojan')
 	  AND json_extract(stream_settings, '$.security') = 'tls'
 	  AND json_extract(stream_settings, '$.tlsSettings.settings.domains') IS NOT NULL`).Scan(&externalProxy).Error
 	if err != nil || len(externalProxy) == 0 {

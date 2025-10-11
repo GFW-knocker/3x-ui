@@ -98,6 +98,12 @@
     {{template "form/vless"}}
 </template>
 
+
+<!-- mvless settings -->
+<template v-if="inbound.protocol === Protocols.MVLESS">
+    {{template "form/vless"}}
+</template>
+
 <!-- trojan settings -->
 <template v-if="inbound.protocol === Protocols.TROJAN">
     {{template "form/trojan"}}

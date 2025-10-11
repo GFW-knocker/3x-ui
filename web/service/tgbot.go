@@ -1952,7 +1952,7 @@ func (t *Tgbot) BuildInboundClientDataMessage(inbound_remark string, protocol mo
 	}
 
 	switch protocol {
-	case model.VMESS, model.VLESS:
+	case model.VMESS, model.VLESS, model.MVLESS:
 		message = t.I18nBot("tgbot.messages.inbound_client_data_id", "InboundRemark=="+inbound_remark, "ClientId=="+client_Id, "ClientEmail=="+client_Email, "ClientTraffic=="+traffic_value, "ClientExp=="+expiryTime, "IpLimit=="+ip_limit, "ClientComment=="+client_Comment)
 
 	case model.Trojan:
@@ -1991,6 +1991,23 @@ func (t *Tgbot) BuildJSONForProtocol(protocol model.Protocol) (string, error) {
         }`, client_Id, client_Security, client_Email, client_LimitIP, client_TotalGB, client_ExpiryTime, client_Enable, client_TgID, client_SubID, client_Comment, client_Reset)
 
 	case model.VLESS:
+		jsonString = fmt.Sprintf(`{
+            "clients": [{
+                "id": "%s",
+                "flow": "%s",
+                "email": "%s",
+                "limitIp": %d,
+                "totalGB": %d,
+                "expiryTime": %d,
+                "enable": %t,
+                "tgId": "%s",
+                "subId": "%s",
+                "comment": "%s",
+                "reset": %d
+            }]
+        }`, client_Id, client_Flow, client_Email, client_LimitIP, client_TotalGB, client_ExpiryTime, client_Enable, client_TgID, client_SubID, client_Comment, client_Reset)
+
+	case model.MVLESS:
 		jsonString = fmt.Sprintf(`{
             "clients": [{
                 "id": "%s",

@@ -211,7 +211,7 @@
       </template>
 
   <!-- VLESS/VMess user settings -->
-      <template v-if="[Protocols.VMess, Protocols.VLESS].includes(outbound.protocol)">
+      <template v-if="[Protocols.VMess, Protocols.VLESS, Protocols.MVLESS].includes(outbound.protocol)">
         <a-form-item label='ID'>
           <a-input v-model.trim="outbound.settings.id"></a-input>
         </a-form-item>
@@ -231,6 +231,13 @@
             <a-input v-model.trim="outbound.settings.encryption"></a-input>
           </a-form-item>
         </template>
+
+        <template v-if="outbound.protocol === Protocols.MVLESS">
+          <a-form-item label='encryption'>
+            <a-input v-model.trim="outbound.settings.encryption"></a-input>
+          </a-form-item>
+        </template>
+
         <template v-if="outbound.canEnableTlsFlow()">
           <a-form-item label='Flow'>
             <a-select v-model="outbound.settings.flow" :dropdown-class-name="themeSwitcher.currentTheme">
@@ -526,7 +533,7 @@
   </a-tab-pane>
   <a-tab-pane key="2" tab="JSON" force-render="true">
     <a-space direction="vertical" :size="10" :style="{ marginTop: '10px' }">
-      <a-input addon-before='{{ i18n "pages.xray.outbound.link" }}' v-model.trim="outModal.link" placeholder="vmess:// vless:// trojan:// ss://">
+      <a-input addon-before='{{ i18n "pages.xray.outbound.link" }}' v-model.trim="outModal.link" placeholder="vmess:// vless:// mvless:// trojan:// ss://">
         <a-icon slot="addonAfter" type="form" @click="convertLink"></a-icon>
       </a-input>
       <textarea :style="{ position: 'absolute', left: '-800px' }" id="outboundJson"></textarea>

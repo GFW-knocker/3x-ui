@@ -260,7 +260,7 @@
                     </template>
                     <template slot="protocol" slot-scope="text, dbInbound">
                       <a-tag :style="{ margin: '0' }" color="purple">[[ dbInbound.protocol ]]</a-tag>
-                      <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan || dbInbound.isSS">
+                      <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isMVLess || dbInbound.isTrojan || dbInbound.isSS">
                         <a-tag :style="{ margin: '0' }" color="green">[[ dbInbound.toInbound().stream.network ]]</a-tag>
                         <a-tag :style="{ margin: '0' }" v-if="dbInbound.toInbound().stream.isTls"
                           color="blue">TLS</a-tag>
@@ -413,7 +413,7 @@
                               <td>
                                 <a-tag :style="{ margin: '0' }" color="purple">[[ dbInbound.protocol ]]</a-tag>
                                 <template
-                                  v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan || dbInbound.isSS">
+                                  v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isMVLess || dbInbound.isTrojan || dbInbound.isSS">
                                   <a-tag :style="{ margin: '0' }" color="blue">[[ dbInbound.toInbound().stream.network
                                     ]]</a-tag>
                                   <a-tag :style="{ margin: '0' }" v-if="dbInbound.toInbound().stream.isTls"
@@ -814,7 +814,7 @@
           to_inbound = dbInbound.toInbound()
           this.inbounds.push(to_inbound);
           this.dbInbounds.push(dbInbound);
-          if ([Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(inbound.protocol)) {
+          if ([Protocols.VMESS, Protocols.VLESS, Protocols.MVLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(inbound.protocol)) {
             if (dbInbound.isSS && (!to_inbound.isSSMultiUser)) {
               continue;
             }
@@ -1256,7 +1256,7 @@
         if (dbInbound.listen.startsWith("@")) {
           rootInbound = this.inbounds.find((i) =>
             i.isTcp &&
-            ['trojan', 'vless'].includes(i.protocol) &&
+            ['trojan', 'vless', 'mvless'].includes(i.protocol) &&
             i.settings.fallbacks.find(f => f.dest === dbInbound.listen)
           );
           if (rootInbound) {

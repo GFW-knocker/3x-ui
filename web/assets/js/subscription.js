@@ -64,7 +64,7 @@
         const json = JSON.parse(atob(link.replace('vmess://', '')));
         if (json.ps) return json.ps;
         if (json.add && json.id) return json.add; // fallback host
-      } else if (link.startsWith('vless://') || link.startsWith('trojan://')) {
+      } else if ( link.startsWith('vless://') || link.startsWith('mvless://') || link.startsWith('trojan://') ) {
         const hashIdx = link.indexOf('#');
         if (hashIdx !== -1) return decodeURIComponent(link.substring(hashIdx + 1));
         const qIdx = link.indexOf('?');

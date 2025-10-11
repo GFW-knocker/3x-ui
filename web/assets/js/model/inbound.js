@@ -1,6 +1,7 @@
 const Protocols = {
     VMESS: 'vmess',
     VLESS: 'vless',
+    MVLESS: 'mvless',
     TROJAN: 'trojan',
     SHADOWSOCKS: 'shadowsocks',
     TUNNEL: 'tunnel',
@@ -1069,6 +1070,7 @@ class Inbound extends XrayCommonClass {
         switch (this.protocol) {
             case Protocols.VMESS: return this.settings.vmesses;
             case Protocols.VLESS: return this.settings.vlesses;
+            case Protocols.MVLESS: return this.settings.vlesses;
             case Protocols.TROJAN: return this.settings.trojans;
             case Protocols.SHADOWSOCKS: return this.isSSMultiUser ? this.settings.shadowsockses : null;
             default: return null;
@@ -1194,25 +1196,25 @@ class Inbound extends XrayCommonClass {
     }
 
     canEnableTls() {
-        if (![Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol)) return false;
+        if (![Protocols.VMESS, Protocols.VLESS, Protocols.MVLESS , Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol)) return false;
         return ["tcp", "ws", "http", "grpc", "httpupgrade", "xhttp"].includes(this.network);
     }
 
     //this is used for xtls-rprx-vision
     canEnableTlsFlow() {
         if (((this.stream.security === 'tls') || (this.stream.security === 'reality')) && (this.network === "tcp")) {
-            return this.protocol === Protocols.VLESS;
+            return ( this.protocol === Protocols.VLESS || this.protocol === Protocols.MVLESS );
         }
         return false;
     }
 
     canEnableReality() {
-        if (![Protocols.VLESS, Protocols.TROJAN].includes(this.protocol)) return false;
+        if (![Protocols.VLESS, Protocols.MVLESS, Protocols.TROJAN].includes(this.protocol)) return false;
         return ["tcp", "http", "grpc", "xhttp"].includes(this.network);
     }
 
     canEnableStream() {
-        return [Protocols.VMESS, Protocols.VLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol);
+        return [Protocols.VMESS, Protocols.VLESS, Protocols.MVLESS, Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol);
     }
 
     reset() {
@@ -1390,7 +1392,7 @@ class Inbound extends XrayCommonClass {
             params.set("security", "none");
         }
 
-        const link = `vless://${uuid}@${address}:${port}`;
+        const link = `${Inbound.protocol}://${uuid}@${address}:${port}`;
         const url = new URL(link);
         for (const [key, value] of params) {
             url.searchParams.set(key, value)
@@ -1607,6 +1609,8 @@ class Inbound extends XrayCommonClass {
                 return this.genVmessLink(address, port, forceTls, remark, client.id, client.security);
             case Protocols.VLESS:
                 return this.genVLESSLink(address, port, forceTls, remark, client.id, client.flow);
+            case Protocols.MVLESS:
+                return this.genVLESSLink(address, port, forceTls, remark, client.id, client.flow);
             case Protocols.SHADOWSOCKS:
                 return this.genSSLink(address, port, forceTls, remark, this.isSSMultiUser ? client.password : '');
             case Protocols.TROJAN:
@@ -1710,6 +1714,7 @@ Inbound.Settings = class extends XrayCommonClass {
         switch (protocol) {
             case Protocols.VMESS: return new Inbound.VmessSettings(protocol);
             case Protocols.VLESS: return new Inbound.VLESSSettings(protocol);
+            case Protocols.MVLESS: return new Inbound.VLESSSettings(protocol);
             case Protocols.TROJAN: return new Inbound.TrojanSettings(protocol);
             case Protocols.SHADOWSOCKS: return new Inbound.ShadowsocksSettings(protocol);
             case Protocols.TUNNEL: return new Inbound.TunnelSettings(protocol);
@@ -1724,6 +1729,7 @@ Inbound.Settings = class extends XrayCommonClass {
         switch (protocol) {
             case Protocols.VMESS: return Inbound.VmessSettings.fromJson(json);
             case Protocols.VLESS: return Inbound.VLESSSettings.fromJson(json);
+            case Protocols.MVLESS: return Inbound.VLESSSettings.fromJson(json);
             case Protocols.TROJAN: return Inbound.TrojanSettings.fromJson(json);
             case Protocols.SHADOWSOCKS: return Inbound.ShadowsocksSettings.fromJson(json);
             case Protocols.TUNNEL: return Inbound.TunnelSettings.fromJson(json);
@@ -1881,7 +1887,7 @@ Inbound.VLESSSettings = class extends Inbound.Settings {
 
     static fromJson(json = {}) {
         const obj = new Inbound.VLESSSettings(
-            Protocols.VLESS,
+            Inbound.protocol,
             (json.clients || []).map(client => Inbound.VLESSSettings.VLESS.fromJson(client)),
             json.decryption,
             json.encryption,

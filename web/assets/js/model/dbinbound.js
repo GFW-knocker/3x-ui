@@ -43,6 +43,10 @@ class DBInbound {
         return this.protocol === Protocols.VLESS;
     }
 
+    get isMVLess() {
+        return this.protocol === Protocols.MVLESS;
+    }
+
     get isTrojan() {
         return this.protocol === Protocols.TROJAN;
     }
@@ -123,6 +127,7 @@ class DBInbound {
         switch (this.protocol) {
             case Protocols.VMESS:
             case Protocols.VLESS:
+            case Protocols.MVLESS:
             case Protocols.TROJAN:
                 return true;
             case Protocols.SHADOWSOCKS:
@@ -136,6 +141,7 @@ class DBInbound {
         switch (this.protocol) {
             case Protocols.VMESS:
             case Protocols.VLESS:
+            case Protocols.MVLESS:
             case Protocols.TROJAN:
             case Protocols.SHADOWSOCKS:
                 return true;

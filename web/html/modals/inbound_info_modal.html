@@ -26,7 +26,7 @@
       </table>
     </a-col>
     <a-col :xs="24" :md="12">
-      <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan || dbInbound.isSS">
+      <template v-if="dbInbound.isVMess || dbInbound.isVLess || dbInbound.isMVLess || dbInbound.isTrojan || dbInbound.isSS">
         <table>
           <tr>
             <td>{{ i18n "transmission" }}</td>
@@ -533,6 +533,7 @@
         [
           Protocols.VMESS, 
           Protocols.VLESS,
+          Protocols.MVLESS,
           Protocols.TROJAN, 
           Protocols.SHADOWSOCKS
         ].includes(this.inbound.protocol)

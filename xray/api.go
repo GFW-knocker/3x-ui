@@ -14,16 +14,17 @@ import (
 	"github.com/mhsanaei/3x-ui/v2/logger"
 	"github.com/mhsanaei/3x-ui/v2/util/common"
 
-	"github.com/xtls/xray-core/app/proxyman/command"
-	statsService "github.com/xtls/xray-core/app/stats/command"
-	"github.com/xtls/xray-core/common/protocol"
-	"github.com/xtls/xray-core/common/serial"
-	"github.com/xtls/xray-core/infra/conf"
-	"github.com/xtls/xray-core/proxy/shadowsocks"
-	"github.com/xtls/xray-core/proxy/shadowsocks_2022"
-	"github.com/xtls/xray-core/proxy/trojan"
-	"github.com/xtls/xray-core/proxy/vless"
-	"github.com/xtls/xray-core/proxy/vmess"
+	"github.com/GFW-knocker/Xray-core/app/proxyman/command"
+	statsService "github.com/GFW-knocker/Xray-core/app/stats/command"
+	"github.com/GFW-knocker/Xray-core/common/protocol"
+	"github.com/GFW-knocker/Xray-core/common/serial"
+	"github.com/GFW-knocker/Xray-core/infra/conf"
+	"github.com/GFW-knocker/Xray-core/proxy/mvless"
+	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks"
+	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks_2022"
+	"github.com/GFW-knocker/Xray-core/proxy/trojan"
+	"github.com/GFW-knocker/Xray-core/proxy/vless"
+	"github.com/GFW-knocker/Xray-core/proxy/vmess"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -111,6 +112,11 @@ func (x *XrayAPI) AddUser(Protocol string, inboundTag string, user map[string]an
 		})
 	case "vless":
 		account = serial.ToTypedMessage(&vless.Account{
+			Id:   user["id"].(string),
+			Flow: user["flow"].(string),
+		})
+	case "mvless":
+		account = serial.ToTypedMessage(&mvless.Account{
 			Id:   user["id"].(string),
 			Flow: user["flow"].(string),
 		})

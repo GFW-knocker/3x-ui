@@ -120,7 +120,7 @@ func (s *SubService) getInboundsBySubId(subId string) ([]*model.Inbound, error) 
 		FROM inbounds,
 			JSON_EACH(JSON_EXTRACT(inbounds.settings, '$.clients')) AS client 
 		WHERE
-			protocol in ('vmess','vless','trojan','shadowsocks')
+			protocol in ('vmess','vless','mvless','trojan','shadowsocks')
 			AND JSON_EXTRACT(client.value, '$.subId') = ? AND enable = ?
 	)`, subId, true).Find(&inbounds).Error
 	if err != nil {
@@ -166,6 +166,8 @@ func (s *SubService) getLink(inbound *model.Inbound, email string) string {
 	case "vmess":
 		return s.genVmessLink(inbound, email)
 	case "vless":
+		return s.genVlessLink(inbound, email)
+	case "mvless":
 		return s.genVlessLink(inbound, email)
 	case "trojan":
 		return s.genTrojanLink(inbound, email)
@@ -318,7 +320,7 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 
 func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 	address := s.address
-	if inbound.Protocol != model.VLESS {
+	if (inbound.Protocol != model.VLESS) && (inbound.Protocol != model.MVLESS) {
 		return ""
 	}
 	var stream map[string]any
@@ -478,7 +480,7 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 			newSecurity, _ := ep["forceTls"].(string)
 			dest, _ := ep["dest"].(string)
 			port := int(ep["port"].(float64))
-			link := fmt.Sprintf("vless://%s@%s:%d", uuid, dest, port)
+			link := fmt.Sprintf("%s://%s@%s:%d", inbound.Protocol, uuid, dest, port)
 
 			if newSecurity != "same" {
 				params["security"] = newSecurity
@@ -507,7 +509,7 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 		return links
 	}
 
-	link := fmt.Sprintf("vless://%s@%s:%d", uuid, address, port)
+	link := fmt.Sprintf("%s://%s@%s:%d", inbound.Protocol, uuid, address, port)
 	url, _ := url.Parse(link)
 	q := url.Query()
 

@@ -4,6 +4,7 @@ const Protocols = {
     DNS: "dns",
     VMess: "vmess",
     VLESS: "vless",
+    MVLESS: "mvless",
     Trojan: "trojan",
     Shadowsocks: "shadowsocks",
     Socks: "socks",
@@ -602,25 +603,25 @@ class Outbound extends CommonClass {
     }
 
     canEnableTls() {
-        if (![Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol)) return false;
+        if (![Protocols.VMess, Protocols.VLESS, Protocols.MVLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol)) return false;
         return ["tcp", "ws", "http", "grpc", "httpupgrade", "xhttp"].includes(this.stream.network);
     }
 
     //this is used for xtls-rprx-vision
     canEnableTlsFlow() {
         if ((this.stream.security != 'none') && (this.stream.network === "tcp")) {
-            return this.protocol === Protocols.VLESS;
+            return ( this.protocol === Protocols.VLESS || this.protocol === Protocols.MVLESS );
         }
         return false;
     }
 
     canEnableReality() {
-        if (![Protocols.VLESS, Protocols.Trojan].includes(this.protocol)) return false;
+        if (![Protocols.VLESS, Protocols.MVLESS, Protocols.Trojan].includes(this.protocol)) return false;
         return ["tcp", "http", "grpc", "xhttp"].includes(this.stream.network);
     }
 
     canEnableStream() {
-        return [Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol);
+        return [Protocols.VMess, Protocols.VLESS, Protocols.MVLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol);
     }
 
     canEnableMux() {
@@ -640,6 +641,7 @@ class Outbound extends CommonClass {
         return [
             Protocols.VMess,
             Protocols.VLESS,
+            Protocols.MVLESS,
             Protocols.Trojan,
             Protocols.Shadowsocks,
             Protocols.HTTP,
@@ -656,6 +658,7 @@ class Outbound extends CommonClass {
             Protocols.DNS,
             Protocols.VMess,
             Protocols.VLESS,
+            Protocols.MVLESS,
             Protocols.Trojan,
             Protocols.Shadowsocks,
             Protocols.Socks,
@@ -705,6 +708,7 @@ class Outbound extends CommonClass {
             case Protocols.VMess:
                 return this.fromVmessLink(JSON.parse(Base64.decode(data[1])));
             case Protocols.VLESS:
+                case Protocols.MVLESS:
             case Protocols.Trojan:
             case 'ss':
                 return this.fromParamLink(link);
@@ -813,6 +817,9 @@ class Outbound extends CommonClass {
             case Protocols.VLESS:
                 settings = new Outbound.VLESSSettings(address, port, userData, url.searchParams.get('flow') ?? '', url.searchParams.get('encryption') ?? 'none');
                 break;
+            case Protocols.MVLESS:
+                settings = new Outbound.VLESSSettings(address, port, userData, url.searchParams.get('flow') ?? '', url.searchParams.get('encryption') ?? 'none');
+                break;
             case Protocols.Trojan:
                 settings = new Outbound.TrojanSettings(address, port, userData);
                 break;
@@ -843,6 +850,7 @@ Outbound.Settings = class extends CommonClass {
             case Protocols.DNS: return new Outbound.DNSSettings();
             case Protocols.VMess: return new Outbound.VmessSettings();
             case Protocols.VLESS: return new Outbound.VLESSSettings();
+            case Protocols.MVLESS: return new Outbound.VLESSSettings();
             case Protocols.Trojan: return new Outbound.TrojanSettings();
             case Protocols.Shadowsocks: return new Outbound.ShadowsocksSettings();
             case Protocols.Socks: return new Outbound.SocksSettings();
@@ -859,6 +867,7 @@ Outbound.Settings = class extends CommonClass {
             case Protocols.DNS: return Outbound.DNSSettings.fromJson(json);
             case Protocols.VMess: return Outbound.VmessSettings.fromJson(json);
             case Protocols.VLESS: return Outbound.VLESSSettings.fromJson(json);
+            case Protocols.MVLESS: return Outbound.VLESSSettings.fromJson(json);
             case Protocols.Trojan: return Outbound.TrojanSettings.fromJson(json);
             case Protocols.Shadowsocks: return Outbound.ShadowsocksSettings.fromJson(json);
             case Protocols.Socks: return Outbound.SocksSettings.fromJson(json);

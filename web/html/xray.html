@@ -540,6 +540,8 @@
             break;
           case Protocols.VLESS:
             return [o.settings?.address + ':' + o.settings?.port];
+          case Protocols.MVLESS:
+            return [o.settings?.address + ':' + o.settings?.port];
           case Protocols.HTTP:
           case Protocols.Socks:
           case Protocols.Shadowsocks:

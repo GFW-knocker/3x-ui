@@ -155,32 +155,8 @@
                   </template>
                 </a-card>
               </a-col>
-              <a-col :sm="24" :lg="12">
-                <a-card title='3X-UI' hoverable>
-                  <a rel="noopener" href="https://github.com/MHSanaei/3x-ui/releases" target="_blank">
-                    <a-tag color="green">
-                      <span>v{{ .cur_ver }}</span>
-                    </a-tag>
-                  </a>
-                  <a rel="noopener" href="https://t.me/XrayUI" target="_blank">
-                    <a-tag color="green">
-                      <span>@XrayUI</span>
-                    </a-tag>
-                  </a>
-                  <a rel="noopener" href="https://github.com/MHSanaei/3x-ui/wiki" target="_blank">
-                    <a-tag color="purple">
-                      <span>{{ i18n "pages.index.documentation" }}</span>
-                    </a-tag>
-                  </a>
-                </a-card>
-              </a-col>
-              <a-col :sm="24" :lg="12">
-                <a-card title='{{ i18n "pages.index.operationHours" }}' hoverable>
-                  <a-tag :color="status.xray.color">Xray: [[ TimeFormatter.formatSecond(status.appStats.uptime)
-                    ]]</a-tag>
-                  <a-tag color="green">OS: [[ TimeFormatter.formatSecond(status.uptime) ]]</a-tag>
-                </a-card>
-              </a-col>
+              
+              
               <a-col :sm="24" :lg="12">
                 <a-card title='{{ i18n "pages.index.systemLoad" }}' hoverable>
                   <a-tag color="green">
@@ -193,13 +169,18 @@
                   </a-tag>
                 </a-card>
               </a-col>
+              
+              
               <a-col :sm="24" :lg="12">
-                <a-card title='{{ i18n "usage"}}' hoverable>
-                  <a-tag color="green"> {{ i18n "pages.index.memory" }}: [[
-                    SizeFormatter.sizeFormat(status.appStats.mem) ]] </a-tag>
-                  <a-tag color="green"> {{ i18n "pages.index.threads" }}: [[ status.appStats.threads ]] </a-tag>
+                <a-card title='{{ i18n "pages.index.operationHours" }}' hoverable>
+                  <a-tag :color="status.xray.color">Xray: [[ TimeFormatter.formatSecond(status.appStats.uptime)
+                    ]]</a-tag>
+                  <a-tag color="green">OS: [[ TimeFormatter.formatSecond(status.uptime) ]]</a-tag>
                 </a-card>
               </a-col>
+
+              
+
               <a-col :sm="24" :lg="12">
                 <a-card title='{{ i18n "pages.index.overallSpeed" }}' hoverable>
                   <a-row :gutter="isMobile ? [8,8] : 0">
@@ -299,6 +280,36 @@
                   </a-row>
                 </a-card>
               </a-col>
+
+              <a-col :sm="24" :lg="12">
+                <a-card title='3X-UI' hoverable>
+                  <a rel="noopener" href="https://github.com/MHSanaei/3x-ui/releases" target="_blank">
+                    <a-tag color="green">
+                      <span>v{{ .cur_ver }}</span>
+                    </a-tag>
+                  </a>
+                  <a rel="noopener" href="https://t.me/XrayUI" target="_blank">
+                    <a-tag color="green">
+                      <span>@XrayUI</span>
+                    </a-tag>
+                  </a>
+                  <a rel="noopener" href="https://github.com/MHSanaei/3x-ui/wiki" target="_blank">
+                    <a-tag color="purple">
+                      <span>{{ i18n "pages.index.documentation" }}</span>
+                    </a-tag>
+                  </a>
+                </a-card>
+              </a-col>
+
+              <a-col :sm="24" :lg="12">
+                <a-card title='{{ i18n "usage"}}' hoverable>
+                  <a-tag color="green"> {{ i18n "pages.index.memory" }}: [[
+                    SizeFormatter.sizeFormat(status.appStats.mem) ]] </a-tag>
+                  <a-tag color="green"> {{ i18n "pages.index.threads" }}: [[ status.appStats.threads ]] </a-tag>
+                </a-card>
+              </a-col>
+
+
             </a-row>
           </template>
         </transition>

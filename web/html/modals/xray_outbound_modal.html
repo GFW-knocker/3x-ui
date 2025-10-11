@@ -100,7 +100,7 @@
         },
         methods: {
             streamNetworkChange() {
-                if (this.outModal.outbound.protocol == Protocols.VLESS && !outModal.outbound.canEnableTlsFlow()) {
+                if ( (this.outModal.outbound.protocol == Protocols.VLESS || this.outModal.outbound.protocol == Protocols.MVLESS) && !outModal.outbound.canEnableTlsFlow()) {
                     delete this.outModal.outbound.settings.flow;
                 }
             },

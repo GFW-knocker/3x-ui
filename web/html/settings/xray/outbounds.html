@@ -61,7 +61,7 @@
         <template slot="protocol" slot-scope="text, outbound, index">
             <a-tag :style="{ margin: '0' }" color="purple">[[ outbound.protocol ]]</a-tag>
             <template
-                v-if="[Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(outbound.protocol)">
+                v-if="[Protocols.VMess, Protocols.VLESS, Protocols.MVLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(outbound.protocol)">
                 <a-tag :style="{ margin: '0' }" color="blue">[[ outbound.streamSettings.network ]]</a-tag>
                 <a-tag :style="{ margin: '0' }" v-if="outbound.streamSettings.security=='tls'" color="green">tls</a-tag>
                 <a-tag :style="{ margin: '0' }" v-if="outbound.streamSettings.security=='reality'"

@@ -191,6 +191,8 @@ func (s *SubJsonService) getConfig(inbound *model.Inbound, client model.Client, 
 			newOutbounds = append(newOutbounds, s.genVnext(inbound, streamSettings, client))
 		case "vless":
 			newOutbounds = append(newOutbounds, s.genVless(inbound, streamSettings, client))
+		case "mvless":
+			newOutbounds = append(newOutbounds, s.genVless(inbound, streamSettings, client))
 		case "trojan", "shadowsocks":
 			newOutbounds = append(newOutbounds, s.genServer(inbound, streamSettings, client))
 		}
