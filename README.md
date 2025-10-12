@@ -12,4 +12,5 @@ bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/insta
 ```
 
 ## Install on Windows
-run .exe binary release
+download & run .exe binary from release<br>
+follow readme to open panel on browser
