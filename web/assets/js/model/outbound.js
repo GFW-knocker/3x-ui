@@ -708,7 +708,7 @@ class Outbound extends CommonClass {
             case Protocols.VMess:
                 return this.fromVmessLink(JSON.parse(Base64.decode(data[1])));
             case Protocols.VLESS:
-                case Protocols.MVLESS:
+            case Protocols.MVLESS:
             case Protocols.Trojan:
             case 'ss':
                 return this.fromParamLink(link);

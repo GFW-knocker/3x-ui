@@ -282,10 +282,10 @@
               </a-col>
 
               <a-col :sm="24" :lg="12">
-                <a-card title='M3X-UI' hoverable>
+                <a-card title='Mahsa X-UI' hoverable>
                   <a rel="noopener" href="https://github.com/GFW-knocker/3x-ui/releases/" target="_blank">
                     <a-tag color="green">
-                      <span>M3X-UI v{{ .cur_ver }}</span>
+                      <span>MX-UI v{{ .cur_ver }}</span>
                     </a-tag>
                   </a>
                   <a rel="noopener" href="https://github.com/GFW-knocker/Xray-core/releases/" target="_blank">
@@ -324,7 +324,7 @@
   <a-modal id="version-modal" v-model="versionModal.visible" title='{{ i18n "pages.index.xraySwitch" }}'
     :closable="true" @ok="() => versionModal.visible = false" :class="themeSwitcher.currentTheme" footer="">
     <a-collapse default-active-key="1">
-      <a-collapse-panel key="1" header='Xray'>
+      <a-collapse-panel key="1" header='Mahsa Xray-Core'>
         <a-alert type="warning" class="mb-12 w-100" message='{{ i18n "pages.index.xraySwitchClickDesk" }}'
           show-icon></a-alert>
         <a-list class="ant-version-list w-100" bordered>

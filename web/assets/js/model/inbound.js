@@ -1392,7 +1392,7 @@ class Inbound extends XrayCommonClass {
             params.set("security", "none");
         }
 
-        const link = `${Inbound.protocol}://${uuid}@${address}:${port}`;
+        const link = `${this.protocol}://${uuid}@${address}:${port}`;
         const url = new URL(link);
         for (const [key, value] of params) {
             url.searchParams.set(key, value)
@@ -1887,7 +1887,7 @@ Inbound.VLESSSettings = class extends Inbound.Settings {
 
     static fromJson(json = {}) {
         const obj = new Inbound.VLESSSettings(
-            Inbound.protocol,
+            Protocols.VLESS,
             (json.clients || []).map(client => Inbound.VLESSSettings.VLESS.fromJson(client)),
             json.decryption,
             json.encryption,
