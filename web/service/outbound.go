@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/mhsanaei/3x-ui/v2/database"
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/GFW-knocker/3x-ui/v2/database"
+	"github.com/GFW-knocker/3x-ui/v2/database/model"
+	"github.com/GFW-knocker/3x-ui/v2/logger"
+	"github.com/GFW-knocker/3x-ui/v2/xray"
 
 	"gorm.io/gorm"
 )

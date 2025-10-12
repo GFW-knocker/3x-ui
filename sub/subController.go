@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v2/config"
+	"github.com/GFW-knocker/3x-ui/v2/config"
 
 	"github.com/gin-gonic/gin"
 )

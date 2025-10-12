@@ -3,11 +3,11 @@ package service
 import (
 	"errors"
 
-	"github.com/mhsanaei/3x-ui/v2/database"
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/util/crypto"
-    ldaputil "github.com/mhsanaei/3x-ui/v2/util/ldap"
+	"github.com/GFW-knocker/3x-ui/v2/database"
+	"github.com/GFW-knocker/3x-ui/v2/database/model"
+	"github.com/GFW-knocker/3x-ui/v2/logger"
+	"github.com/GFW-knocker/3x-ui/v2/util/crypto"
+	ldaputil "github.com/GFW-knocker/3x-ui/v2/util/ldap"
 	"github.com/xlzd/gotp"
 	"gorm.io/gorm"
 )
@@ -49,38 +49,38 @@ func (s *UserService) CheckUser(username string, password string, twoFactorCode 
 		return nil
 	}
 
-    // If LDAP enabled and local password check fails, attempt LDAP auth
-    if !crypto.CheckPasswordHash(user.Password, password) {
-        ldapEnabled, _ := s.settingService.GetLdapEnable()
-        if !ldapEnabled {
-            return nil
-        }
+	// If LDAP enabled and local password check fails, attempt LDAP auth
+	if !crypto.CheckPasswordHash(user.Password, password) {
+		ldapEnabled, _ := s.settingService.GetLdapEnable()
+		if !ldapEnabled {
+			return nil
+		}
 
-        host, _ := s.settingService.GetLdapHost()
-        port, _ := s.settingService.GetLdapPort()
-        useTLS, _ := s.settingService.GetLdapUseTLS()
-        bindDN, _ := s.settingService.GetLdapBindDN()
-        ldapPass, _ := s.settingService.GetLdapPassword()
-        baseDN, _ := s.settingService.GetLdapBaseDN()
-        userFilter, _ := s.settingService.GetLdapUserFilter()
-        userAttr, _ := s.settingService.GetLdapUserAttr()
+		host, _ := s.settingService.GetLdapHost()
+		port, _ := s.settingService.GetLdapPort()
+		useTLS, _ := s.settingService.GetLdapUseTLS()
+		bindDN, _ := s.settingService.GetLdapBindDN()
+		ldapPass, _ := s.settingService.GetLdapPassword()
+		baseDN, _ := s.settingService.GetLdapBaseDN()
+		userFilter, _ := s.settingService.GetLdapUserFilter()
+		userAttr, _ := s.settingService.GetLdapUserAttr()
 
-        cfg := ldaputil.Config{
-            Host: host,
-            Port: port,
-            UseTLS: useTLS,
-            BindDN: bindDN,
-            Password: ldapPass,
-            BaseDN: baseDN,
-            UserFilter: userFilter,
-            UserAttr: userAttr,
-        }
-        ok, err := ldaputil.AuthenticateUser(cfg, username, password)
-        if err != nil || !ok {
-            return nil
-        }
-        // On successful LDAP auth, continue 2FA checks below
-    }
+		cfg := ldaputil.Config{
+			Host:       host,
+			Port:       port,
+			UseTLS:     useTLS,
+			BindDN:     bindDN,
+			Password:   ldapPass,
+			BaseDN:     baseDN,
+			UserFilter: userFilter,
+			UserAttr:   userAttr,
+		}
+		ok, err := ldaputil.AuthenticateUser(cfg, username, password)
+		if err != nil || !ok {
+			return nil
+		}
+		// On successful LDAP auth, continue 2FA checks below
+	}
 
 	twoFactorEnable, err := s.settingService.GetTwoFactorEnable()
 	if err != nil {

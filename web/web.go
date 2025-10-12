@@ -16,15 +16,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v2/config"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/util/common"
-	"github.com/mhsanaei/3x-ui/v2/web/controller"
-	"github.com/mhsanaei/3x-ui/v2/web/job"
-	"github.com/mhsanaei/3x-ui/v2/web/locale"
-	"github.com/mhsanaei/3x-ui/v2/web/middleware"
-	"github.com/mhsanaei/3x-ui/v2/web/network"
-	"github.com/mhsanaei/3x-ui/v2/web/service"
+	"github.com/GFW-knocker/3x-ui/v2/config"
+	"github.com/GFW-knocker/3x-ui/v2/logger"
+	"github.com/GFW-knocker/3x-ui/v2/util/common"
+	"github.com/GFW-knocker/3x-ui/v2/web/controller"
+	"github.com/GFW-knocker/3x-ui/v2/web/job"
+	"github.com/GFW-knocker/3x-ui/v2/web/locale"
+	"github.com/GFW-knocker/3x-ui/v2/web/middleware"
+	"github.com/GFW-knocker/3x-ui/v2/web/network"
+	"github.com/GFW-knocker/3x-ui/v2/web/service"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
@@ -314,17 +314,16 @@ func (s *Server) startTask() {
 	// Run once a month, midnight, first of month
 	s.cron.AddJob("@monthly", job.NewPeriodicTrafficResetJob("monthly"))
 
-    // LDAP sync scheduling
-    if ldapEnabled, _ := s.settingService.GetLdapEnable(); ldapEnabled {
-        runtime, err := s.settingService.GetLdapSyncCron()
-        if err != nil || runtime == "" {
-            runtime = "@every 1m"
-        }
-        j := job.NewLdapSyncJob()
-        // job has zero-value services with method receivers that read settings on demand
-        s.cron.AddJob(runtime, j)
-    }
-
+	// LDAP sync scheduling
+	if ldapEnabled, _ := s.settingService.GetLdapEnable(); ldapEnabled {
+		runtime, err := s.settingService.GetLdapSyncCron()
+		if err != nil || runtime == "" {
+			runtime = "@every 1m"
+		}
+		j := job.NewLdapSyncJob()
+		// job has zero-value services with method receivers that read settings on demand
+		s.cron.AddJob(runtime, j)
+	}
 
 	// Make a traffic condition every day, 8:30
 	var entry cron.EntryID

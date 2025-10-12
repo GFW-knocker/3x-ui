@@ -4,8 +4,8 @@ package model
 import (
 	"fmt"
 
-	"github.com/mhsanaei/3x-ui/v2/util/json_util"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/GFW-knocker/3x-ui/v2/util/json_util"
+	"github.com/GFW-knocker/3x-ui/v2/xray"
 )
 
 // Protocol represents the protocol type for Xray inbounds.

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/mhsanaei/3x-ui/v2/web/service"
+	"github.com/GFW-knocker/3x-ui/v2/web/service"
 
 	"github.com/gin-gonic/gin"
 )

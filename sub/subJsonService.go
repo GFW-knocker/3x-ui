@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v2/database/model"
-	"github.com/mhsanaei/3x-ui/v2/logger"
-	"github.com/mhsanaei/3x-ui/v2/util/json_util"
-	"github.com/mhsanaei/3x-ui/v2/util/random"
-	"github.com/mhsanaei/3x-ui/v2/web/service"
-	"github.com/mhsanaei/3x-ui/v2/xray"
+	"github.com/GFW-knocker/3x-ui/v2/database/model"
+	"github.com/GFW-knocker/3x-ui/v2/logger"
+	"github.com/GFW-knocker/3x-ui/v2/util/json_util"
+	"github.com/GFW-knocker/3x-ui/v2/util/random"
+	"github.com/GFW-knocker/3x-ui/v2/web/service"
+	"github.com/GFW-knocker/3x-ui/v2/xray"
 )
 
 //go:embed default.json

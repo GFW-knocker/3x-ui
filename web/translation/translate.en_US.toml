@@ -118,7 +118,7 @@
 "storage" = "Storage"
 "memory" = "RAM"
 "threads" = "Threads"
-"xrayStatus" = "Xray"
+"xrayStatus" = "Mahsa-Core"
 "stopXray" = "Stop"
 "restartXray" = "Restart"
 "xraySwitch" = "Version"
