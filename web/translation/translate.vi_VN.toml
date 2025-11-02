@@ -307,6 +307,9 @@
 "requestHeader" = "Header yêu cầu"
 "responseHeader" = "Header phản hồi"
 
+[pages.inbounds.stream.quic]
+"encryption" = "Mã hóa"
+
 [pages.settings]
 "title" = "Cài đặt"
 "save" = "Lưu"

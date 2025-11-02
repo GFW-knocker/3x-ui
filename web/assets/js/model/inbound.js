@@ -416,6 +416,37 @@ class WsStreamSettings extends XrayCommonClass {
     }
 }
 
+class QuicStreamSettings extends XrayCommonClass {
+    constructor(
+        security = 'none',
+        key = RandomUtil.randomSeq(10),
+        type = 'none'
+    ) {
+        super();
+        this.security = security;
+        this.key = key;
+        this.type = type;
+    }
+
+    static fromJson(json = {}) {
+        return new QuicStreamSettings(
+            json.security,
+            json.key,
+            json.header ? json.header.type : 'none',
+        );
+    }
+
+    toJson() {
+        return {
+            security: this.security,
+            key: this.key,
+            header: {
+                type: this.type,
+            }
+        }
+    }
+}
+
 class GrpcStreamSettings extends XrayCommonClass {
     constructor(
         serviceName = "",
@@ -923,6 +954,7 @@ class StreamSettings extends XrayCommonClass {
         tcpSettings = new TcpStreamSettings(),
         kcpSettings = new KcpStreamSettings(),
         wsSettings = new WsStreamSettings(),
+        quicSettings = new QuicStreamSettings(),
         grpcSettings = new GrpcStreamSettings(),
         httpupgradeSettings = new HTTPUpgradeStreamSettings(),
         xhttpSettings = new xHTTPStreamSettings(),
@@ -937,6 +969,7 @@ class StreamSettings extends XrayCommonClass {
         this.tcp = tcpSettings;
         this.kcp = kcpSettings;
         this.ws = wsSettings;
+        this.quic = quicSettings;
         this.grpc = grpcSettings;
         this.httpupgrade = httpupgradeSettings;
         this.xhttp = xhttpSettings;
@@ -986,6 +1019,7 @@ class StreamSettings extends XrayCommonClass {
             TcpStreamSettings.fromJson(json.tcpSettings),
             KcpStreamSettings.fromJson(json.kcpSettings),
             WsStreamSettings.fromJson(json.wsSettings),
+            QuicStreamSettings.fromJson(json.quicSettings),
             GrpcStreamSettings.fromJson(json.grpcSettings),
             HTTPUpgradeStreamSettings.fromJson(json.httpupgradeSettings),
             xHTTPStreamSettings.fromJson(json.xhttpSettings),
@@ -1004,6 +1038,7 @@ class StreamSettings extends XrayCommonClass {
             tcpSettings: network === 'tcp' ? this.tcp.toJson() : undefined,
             kcpSettings: network === 'kcp' ? this.kcp.toJson() : undefined,
             wsSettings: network === 'ws' ? this.ws.toJson() : undefined,
+            quicSettings: network === 'quic' ? this.quic.toJson() : undefined,
             grpcSettings: network === 'grpc' ? this.grpc.toJson() : undefined,
             httpupgradeSettings: network === 'httpupgrade' ? this.httpupgrade.toJson() : undefined,
             xhttpSettings: network === 'xhttp' ? this.xhttp.toJson() : undefined,
@@ -1109,6 +1144,10 @@ class Inbound extends XrayCommonClass {
         return this.network === "kcp";
     }
 
+    get isQuic() {
+        return this.network === "quic"
+    }
+
     get isGrpc() {
         return this.network === "grpc";
     }
@@ -1178,6 +1217,18 @@ class Inbound extends XrayCommonClass {
         return null;
     }
 
+    get quicSecurity() {
+        return this.stream.quic.security;
+    }
+
+    get quicKey() {
+        return this.stream.quic.key;
+    }
+
+    get quicType() {
+        return this.stream.quic.type;
+    }
+
     get kcpType() {
         return this.stream.kcp.type;
     }
@@ -1197,7 +1248,7 @@ class Inbound extends XrayCommonClass {
 
     canEnableTls() {
         if (![Protocols.VMESS, Protocols.VLESS, Protocols.MVLESS , Protocols.TROJAN, Protocols.SHADOWSOCKS].includes(this.protocol)) return false;
-        return ["tcp", "ws", "http", "grpc", "httpupgrade", "xhttp"].includes(this.network);
+        return ["tcp", "ws", "http", "quic", "grpc", "httpupgrade", "xhttp"].includes(this.network);
     }
 
     //this is used for xtls-rprx-vision
@@ -1260,6 +1311,10 @@ class Inbound extends XrayCommonClass {
             const ws = this.stream.ws;
             obj.path = ws.path;
             obj.host = ws.host?.length > 0 ? ws.host : this.getHeader(ws, 'host');
+        } else if (network === 'quic') {
+            obj.type = this.stream.quic.type;
+            obj.host = this.stream.quic.security;
+            obj.path = this.stream.quic.key;
         } else if (network === 'grpc') {
             obj.path = this.stream.grpc.serviceName;
             obj.authority = this.stream.grpc.authority;
@@ -1325,6 +1380,12 @@ class Inbound extends XrayCommonClass {
                 const ws = this.stream.ws;
                 params.set("path", ws.path);
                 params.set("host", ws.host?.length > 0 ? ws.host : this.getHeader(ws, 'host'));
+                break;
+            case "quic":
+                const quic = this.stream.quic;
+                params.set("quicSecurity", quic.security);
+                params.set("key", quic.key);
+                params.set("headerType", quic.type);
                 break;
             case "grpc":
                 const grpc = this.stream.grpc;
@@ -1431,6 +1492,12 @@ class Inbound extends XrayCommonClass {
                 params.set("path", ws.path);
                 params.set("host", ws.host?.length > 0 ? ws.host : this.getHeader(ws, 'host'));
                 break;
+            case "quic":
+                const quic = this.stream.quic;
+                params.set("quicSecurity", quic.security);
+                params.set("key", quic.key);
+                params.set("headerType", quic.type);
+                break;
             case "grpc":
                 const grpc = this.stream.grpc;
                 params.set("serviceName", grpc.serviceName);
@@ -1511,6 +1578,12 @@ class Inbound extends XrayCommonClass {
                 const ws = this.stream.ws;
                 params.set("path", ws.path);
                 params.set("host", ws.host?.length > 0 ? ws.host : this.getHeader(ws, 'host'));
+                break;
+            case "quic":
+                const quic = this.stream.quic;
+                params.set("quicSecurity", quic.security);
+                params.set("key", quic.key);
+                params.set("headerType", quic.type);
                 break;
             case "grpc":
                 const grpc = this.stream.grpc;

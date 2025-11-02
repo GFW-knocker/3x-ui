@@ -218,6 +218,12 @@ func (s *SubService) genVmessLink(inbound *model.Inbound, email string) string {
 			headers, _ := ws["headers"].(map[string]any)
 			obj["host"] = searchHost(headers)
 		}
+	case "quic":
+		quic, _ := stream["quicSettings"].(map[string]interface{})
+		header := quic["header"].(map[string]interface{})
+		obj["type"], _ = header["type"].(string)
+		obj["host"], _ = quic["security"].(string)
+		obj["path"], _ = quic["key"].(string)
 	case "grpc":
 		grpc, _ := stream["grpcSettings"].(map[string]any)
 		obj["path"] = grpc["serviceName"].(string)
@@ -373,6 +379,12 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 			headers, _ := ws["headers"].(map[string]any)
 			params["host"] = searchHost(headers)
 		}
+	case "quic":
+		quic, _ := stream["quicSettings"].(map[string]interface{})
+		params["quicSecurity"] = quic["security"].(string)
+		params["key"] = quic["key"].(string)
+		header := quic["header"].(map[string]interface{})
+		params["headerType"] = header["type"].(string)
 	case "grpc":
 		grpc, _ := stream["grpcSettings"].(map[string]any)
 		params["serviceName"] = grpc["serviceName"].(string)
@@ -572,6 +584,12 @@ func (s *SubService) genTrojanLink(inbound *model.Inbound, email string) string 
 			headers, _ := ws["headers"].(map[string]any)
 			params["host"] = searchHost(headers)
 		}
+	case "quic":
+		quic, _ := stream["quicSettings"].(map[string]interface{})
+		params["quicSecurity"] = quic["security"].(string)
+		params["key"] = quic["key"].(string)
+		header := quic["header"].(map[string]interface{})
+		params["headerType"] = header["type"].(string)
 	case "grpc":
 		grpc, _ := stream["grpcSettings"].(map[string]any)
 		params["serviceName"] = grpc["serviceName"].(string)
@@ -771,6 +789,12 @@ func (s *SubService) genShadowsocksLink(inbound *model.Inbound, email string) st
 			headers, _ := ws["headers"].(map[string]any)
 			params["host"] = searchHost(headers)
 		}
+	case "quic":
+		quic, _ := stream["quicSettings"].(map[string]interface{})
+		params["quicSecurity"] = quic["security"].(string)
+		params["key"] = quic["key"].(string)
+		header := quic["header"].(map[string]interface{})
+		params["headerType"] = header["type"].(string)
 	case "grpc":
 		grpc, _ := stream["grpcSettings"].(map[string]any)
 		params["serviceName"] = grpc["serviceName"].(string)

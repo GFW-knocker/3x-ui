@@ -307,6 +307,9 @@
 "requestHeader" = "Request Header"
 "responseHeader" = "Response Header"
 
+[pages.inbounds.stream.quic]
+"encryption" = "Encryption"
+
 [pages.settings]
 "title" = "Panel Settings"
 "save" = "Save"

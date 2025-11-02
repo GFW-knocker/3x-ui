@@ -489,6 +489,7 @@ class StreamSettings extends CommonClass {
         this.tcp = tcpSettings;
         this.kcp = kcpSettings;
         this.ws = wsSettings;
+        this.quic = quicSettings;
         this.grpc = grpcSettings;
         this.httpupgrade = httpupgradeSettings;
         this.xhttp = xhttpSettings;
@@ -537,6 +538,7 @@ class StreamSettings extends CommonClass {
             tcpSettings: network === 'tcp' ? this.tcp.toJson() : undefined,
             kcpSettings: network === 'kcp' ? this.kcp.toJson() : undefined,
             wsSettings: network === 'ws' ? this.ws.toJson() : undefined,
+            quicSettings: network === 'quic' ? this.quic.toJson() : undefined,
             grpcSettings: network === 'grpc' ? this.grpc.toJson() : undefined,
             httpupgradeSettings: network === 'httpupgrade' ? this.httpupgrade.toJson() : undefined,
             xhttpSettings: network === 'xhttp' ? this.xhttp.toJson() : undefined,
@@ -604,7 +606,7 @@ class Outbound extends CommonClass {
 
     canEnableTls() {
         if (![Protocols.VMess, Protocols.VLESS, Protocols.MVLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(this.protocol)) return false;
-        return ["tcp", "ws", "http", "grpc", "httpupgrade", "xhttp"].includes(this.stream.network);
+        return ["tcp", "ws", "http", "quic", "grpc", "httpupgrade", "xhttp"].includes(this.stream.network);
     }
 
     //this is used for xtls-rprx-vision
@@ -732,6 +734,11 @@ class Outbound extends CommonClass {
             stream.seed = json.path;
         } else if (network === 'ws') {
             stream.ws = new WsStreamSettings(json.path, json.host);
+        } else if (network === 'quic') {
+            stream.quic = new QuicStreamSettings(
+                json.host ? json.host : 'none',
+                json.path,
+                json.type ? json.type : 'none');
         } else if (network === 'grpc') {
             stream.grpc = new GrpcStreamSettings(json.path, json.authority, json.type == 'multi');
         } else if (network === 'httpupgrade') {
@@ -772,6 +779,11 @@ class Outbound extends CommonClass {
             stream.kcp.seed = path;
         } else if (type === 'ws') {
             stream.ws = new WsStreamSettings(path, host);
+        } else if (type === 'quic') {
+            stream.quic = new QuicStreamSettings(
+                url.searchParams.get('quicSecurity') ?? 'none',
+                url.searchParams.get('key') ?? '',
+                headerType ?? 'none');
         } else if (type === 'grpc') {
             stream.grpc = new GrpcStreamSettings(
                 url.searchParams.get('serviceName') ?? '',

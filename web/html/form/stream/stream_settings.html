@@ -7,6 +7,7 @@
             <a-select-option value="tcp">TCP (RAW)</a-select-option>
             <a-select-option value="kcp">mKCP</a-select-option>
             <a-select-option value="ws">WebSocket</a-select-option>
+            <a-select-option value="quic">QUIC</a-select-option>
             <a-select-option value="grpc">gRPC</a-select-option>
             <a-select-option value="httpupgrade">HTTPUpgrade</a-select-option>
             <a-select-option value="xhttp">XHTTP</a-select-option>
@@ -27,6 +28,11 @@
 <!-- ws -->
 <template v-if="inbound.stream.network === 'ws'">
     {{template "form/streamWS"}}
+</template>
+
+<!-- quic -->
+<template v-if="inbound.stream.network === 'quic'">
+    {{template "form/streamQUIC"}}
 </template>
 
 <!-- grpc -->

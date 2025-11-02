@@ -307,6 +307,9 @@
 "requestHeader" = "Header Permintaan"
 "responseHeader" = "Header Respons"
 
+[pages.inbounds.stream.quic]
+"encryption" = "Enkripsi"
+
 [pages.settings]
 "title" = "Pengaturan Panel"
 "save" = "Simpan"
