@@ -3,6 +3,7 @@
 - All ordinary protocols<br>
 - <b>MVLESS</b> (designed for [MahsaNG](https://github.com/GFW-knocker/MahsaNG))<br>
 - <b>QUIC</b> (udp-based protocol removed from xray-core in 2024-Q4 but remain in [Mahsa-Core](https://github.com/GFW-knocker/Xray-core))<br>
+(note: QUIC take too much RAM in high traffic)
 
 
 
@@ -23,5 +24,5 @@ download & run .exe binary from release<br>
 follow readme to open panel on browser
 
 ## Encounter Bug?
-- clear cookies and site data for the panel (on the left side of address-bar)
+- <b>clear cookies and site data</b> from the browser (on the left side of address-bar)
 - reinstall panel on vps instead of upgrading
