@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/xtls/xray-core/infra/conf"
+	"github.com/GFW-knocker/Xray-core/infra/conf"
 )
 
 const completeXmcProfile = `{"username":"Notch","uuid":"069a79f4-44e9-4726-a5be-fca90e38aaf5","texturesValue":"dmFsdWU=","texturesSignature":"c2ln"}`

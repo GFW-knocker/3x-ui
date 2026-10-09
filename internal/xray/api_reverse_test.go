@@ -3,7 +3,7 @@ package xray
 import (
 	"testing"
 
-	"github.com/xtls/xray-core/proxy/vless"
+	"github.com/GFW-knocker/Xray-core/proxy/vless"
 	"google.golang.org/protobuf/proto"
 )
 

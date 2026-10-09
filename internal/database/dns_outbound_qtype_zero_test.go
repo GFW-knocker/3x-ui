@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xtls/xray-core/infra/conf"
-	"github.com/xtls/xray-core/proxy/dns"
+	"github.com/GFW-knocker/Xray-core/infra/conf"
+	"github.com/GFW-knocker/Xray-core/proxy/dns"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/mhsanaei/3x-ui/v3/internal/config"

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	corelog "github.com/xtls/xray-core/common/log"
+	corelog "github.com/GFW-knocker/Xray-core/common/log"
 
 	"github.com/mhsanaei/3x-ui/v3/internal/config"
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"

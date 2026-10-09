@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/apernet/quic-go"
-	xraycongestion "github.com/xtls/xray-core/transport/internet/hysteria/congestion"
-	"github.com/xtls/xray-core/transport/internet/hysteria/congestion/bbr"
+	xraycongestion "github.com/GFW-knocker/Xray-core/transport/internet/hysteria/congestion"
+	"github.com/GFW-knocker/Xray-core/transport/internet/hysteria/congestion/bbr"
 
 	"github.com/mhsanaei/3x-ui/v3/internal/logger"
 )

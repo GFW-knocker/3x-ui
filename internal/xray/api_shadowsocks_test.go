@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/xtls/xray-core/proxy/shadowsocks"
-	"github.com/xtls/xray-core/proxy/shadowsocks_2022"
+	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks"
+	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks_2022"
 	"google.golang.org/protobuf/proto"
 )
 

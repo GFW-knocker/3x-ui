@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	xraygeodata "github.com/xtls/xray-core/common/geodata"
+	xraygeodata "github.com/GFW-knocker/Xray-core/common/geodata"
 	"google.golang.org/protobuf/proto"
 )
 

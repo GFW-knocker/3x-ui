@@ -13,7 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
-	xraygeodata "github.com/xtls/xray-core/common/geodata"
+	xraygeodata "github.com/GFW-knocker/Xray-core/common/geodata"
 	"google.golang.org/protobuf/proto"
 
 	xuilogger "github.com/mhsanaei/3x-ui/v3/internal/logger"

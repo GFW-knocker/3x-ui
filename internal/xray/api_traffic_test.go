@@ -5,7 +5,7 @@ import (
 	"net"
 	"testing"
 
-	statsService "github.com/xtls/xray-core/app/stats/command"
+	statsService "github.com/GFW-knocker/Xray-core/app/stats/command"
 	"google.golang.org/grpc"
 )
 

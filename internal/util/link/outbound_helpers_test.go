@@ -9,7 +9,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/xtls/xray-core/infra/conf"
+	"github.com/GFW-knocker/Xray-core/infra/conf"
 )
 
 func TestDefaultPort(t *testing.T) {

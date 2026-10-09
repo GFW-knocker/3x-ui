@@ -19,7 +19,7 @@ import (
 // Skipped unless XRAY_E2E_BINARY points at an xray executable built from the
 // same xray-core version as go.mod, e.g.:
 //
-//	go install github.com/xtls/xray-core/main@<version from go.mod>
+//	go install github.com/GFW-knocker/Xray-core/main@<version from go.mod>
 //	XRAY_E2E_BINARY=$GOBIN/main go test ./internal/xray -run TestXrayAPI_E2E -v
 func TestXrayAPI_E2E(t *testing.T) {
 	bin := os.Getenv("XRAY_E2E_BINARY")

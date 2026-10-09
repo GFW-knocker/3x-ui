@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	wireguard "github.com/xtls/xray-core/proxy/wireguard"
+	wireguard "github.com/GFW-knocker/Xray-core/proxy/wireguard"
 	"google.golang.org/protobuf/proto"
 )
 

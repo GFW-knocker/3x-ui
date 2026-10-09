@@ -19,7 +19,7 @@ import (
 
 	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
 
-	"github.com/xtls/xray-core/infra/conf"
+	"github.com/GFW-knocker/Xray-core/infra/conf"
 )
 
 // The frontend's golden fixtures are the panel's model of an xray config: the

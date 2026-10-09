@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	xraygeodata "github.com/xtls/xray-core/common/geodata"
+	xraygeodata "github.com/GFW-knocker/Xray-core/common/geodata"
 )
 
 // DefaultSiteFile and DefaultIPFile are the databases the geosite: and geoip:

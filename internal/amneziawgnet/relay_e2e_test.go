@@ -40,7 +40,7 @@ import (
 // the same xray-core version as go.mod, matching internal/xray's own
 // TestXrayAPI_E2E convention:
 //
-//	go install github.com/xtls/xray-core/main@<version from go.mod>
+//	go install github.com/GFW-knocker/Xray-core/main@<version from go.mod>
 //	XRAY_E2E_BINARY=$GOBIN/main go test ./internal/amneziawgnet -run TestSocksRelayAgainstRealXray -v
 func TestSocksRelayAgainstRealXray(t *testing.T) {
 	bin := os.Getenv("XRAY_E2E_BINARY")
