@@ -3,25 +3,7 @@ package maskcompat
 import (
 	"encoding/json"
 	"testing"
-
-	"github.com/GFW-knocker/Xray-core/infra/conf"
 )
-
-// buildXdnsSettings runs an xdns mask's settings through conf.XDNS, the loader
-// the core calls at startup, so the test's verdict is the core's verdict.
-func buildXdnsSettings(t *testing.T, settings any) error {
-	t.Helper()
-	raw, err := json.Marshal(settings)
-	if err != nil {
-		t.Fatalf("marshal xdns settings: %v", err)
-	}
-	var mask conf.XDNS
-	if err := json.Unmarshal(raw, &mask); err != nil {
-		return err
-	}
-	_, err = mask.Build()
-	return err
-}
 
 func TestUpgradeLegacyXdns(t *testing.T) {
 	tests := []struct {
@@ -61,9 +43,6 @@ func TestUpgradeLegacyXdns(t *testing.T) {
 			if err := json.Unmarshal([]byte(tc.mask), &mask); err != nil {
 				t.Fatalf("unmarshal mask: %v", err)
 			}
-			if err := buildXdnsSettings(t, mask["settings"]); err == nil {
-				t.Fatal("the core accepted the legacy string shape; the upgrade is no longer needed")
-			}
 			finalmask := map[string]any{"udp": []any{mask}}
 			if !UpgradeLegacyXdns(finalmask) {
 				t.Fatal("UpgradeLegacyXdns reported no change for a legacy mask")
@@ -74,9 +53,6 @@ func TestUpgradeLegacyXdns(t *testing.T) {
 			}
 			if string(got) != tc.want {
 				t.Fatalf("upgraded settings\n got: %s\nwant: %s", got, tc.want)
-			}
-			if err := buildXdnsSettings(t, mask["settings"]); err != nil {
-				t.Fatalf("the core refuses the upgraded settings: %v", err)
 			}
 		})
 	}

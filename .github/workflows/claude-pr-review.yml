@@ -117,7 +117,7 @@ jobs:
           GOMODCACHE: ${{ github.workspace }}/.upstream/gomod
         run: |
           set -euo pipefail
-          dir=$(go mod download -json github.com/xtls/xray-core | jq -r .Dir)
+          dir=$(go mod download -json github.com/GFW-knocker/Xray-core | jq -r .Dir)
           echo "xray=${dir}" >> "$GITHUB_OUTPUT"
       - uses: anthropics/claude-code-action@v1
         id: review

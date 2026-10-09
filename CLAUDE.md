@@ -10,7 +10,8 @@ file locations when it can answer in one hop.
 ## Stack
 - Backend: Go 1.27 (`module github.com/mhsanaei/3x-ui/v3`), Gin, GORM.
   Runs Xray-core as a managed child process (`internal/xray/process.go`) and
-  imports `github.com/xtls/xray-core` for config types + gRPC stats/handler/router
+  imports `github.com/GFW-knocker/Xray-core` (Mahsa-Core, a fork of `xtls/xray-core`)
+  for config types + gRPC stats/handler/router
   API. MTProto inbounds run a second managed child — the `mtg-multi` binary
   (a multi-secret mtg fork — NOT a Go dependency; `tools/build-mtg-multi.sh`
   builds it from a pinned GFW-knocker/mtg-multi commit at image/release build

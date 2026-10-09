@@ -872,9 +872,42 @@ const (
 	maxXrayDigestBytes = 64 << 10
 )
 
+// xrayCoreRepo publishes Mahsa-Core, the Xray-core fork this panel bundles.
+const xrayCoreRepo = "GFW-knocker/Xray-core"
+
+var mahsaCoreTag = regexp.MustCompile(`^v(\d+)\.(\d+)\.(\d+)-mahsa-r\d+$`)
+
+// selectXrayVersions keeps Mahsa-Core builds new enough for this panel. Tags use
+// v1.26.N or the XTLS date scheme (v26.8.30); both floors include XTLS 26.6.27.
+func selectXrayVersions(releases []Release) []string {
+	var versions []string
+	for _, release := range releases {
+		m := mahsaCoreTag.FindStringSubmatch(release.TagName)
+		if m == nil {
+			continue
+		}
+		var v [3]int
+		for i := range v {
+			n, err := strconv.Atoi(m[i+1])
+			if err != nil {
+				break
+			}
+			v[i] = n
+		}
+		floor := [3]int{26, 6, 27}
+		if v[0] == 1 {
+			floor = [3]int{1, 26, 9}
+		}
+		if slices.Compare(v[:], floor[:]) >= 0 {
+			versions = append(versions, release.TagName)
+		}
+	}
+	return versions
+}
+
 func (s *ServerService) GetXrayVersions() ([]string, error) {
 	const (
-		XrayURL    = "https://api.github.com/repos/XTLS/Xray-core/releases"
+		XrayURL    = "https://api.github.com/repos/" + xrayCoreRepo + "/releases"
 		bufferSize = 8192
 	)
 
@@ -911,26 +944,7 @@ func (s *ServerService) GetXrayVersions() ([]string, error) {
 		return nil, err
 	}
 
-	var versions []string
-	for _, release := range releases {
-		tagVersion := strings.TrimPrefix(release.TagName, "v")
-		tagParts := strings.Split(tagVersion, ".")
-		if len(tagParts) != 3 {
-			continue
-		}
-
-		major, err1 := strconv.Atoi(tagParts[0])
-		minor, err2 := strconv.Atoi(tagParts[1])
-		patch, err3 := strconv.Atoi(tagParts[2])
-		if err1 != nil || err2 != nil || err3 != nil {
-			continue
-		}
-
-		if major > 26 || (major == 26 && minor > 6) || (major == 26 && minor == 6 && patch >= 27) {
-			versions = append(versions, release.TagName)
-		}
-	}
-	return versions, nil
+	return selectXrayVersions(releases), nil
 }
 
 func (s *ServerService) StopXrayService() error {
@@ -980,7 +994,7 @@ func (s *ServerService) downloadXRay(version string) (string, error) {
 	}
 
 	fileName := fmt.Sprintf("Xray-%s-%s.zip", osName, arch)
-	url := fmt.Sprintf("https://github.com/XTLS/Xray-core/releases/download/%s/%s", version, fileName)
+	url := fmt.Sprintf("https://github.com/%s/releases/download/%s/%s", xrayCoreRepo, version, fileName)
 	client := s.settingService.NewProxiedHTTPClient(60 * time.Second)
 	req, reqErr := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
 	if reqErr != nil {
@@ -1045,7 +1059,7 @@ func (s *ServerService) downloadXRay(version string) (string, error) {
 	return path, nil
 }
 
-// fetchXrayDigestSHA256 downloads the .dgst sidecar XTLS publishes next to each
+// fetchXrayDigestSHA256 downloads the .dgst sidecar the core release publishes next to each
 // release asset and returns the SHA2-256 hex digest it lists.
 func (s *ServerService) fetchXrayDigestSHA256(client *http.Client, dgstURL string) (string, error) {
 	req, reqErr := http.NewRequestWithContext(context.Background(), http.MethodGet, dgstURL, nil)
@@ -1067,7 +1081,7 @@ func (s *ServerService) fetchXrayDigestSHA256(client *http.Client, dgstURL strin
 	return parseXrayDigestSHA256(raw)
 }
 
-// parseXrayDigestSHA256 extracts the lowercase SHA2-256 hex from an XTLS .dgst
+// parseXrayDigestSHA256 extracts the lowercase SHA2-256 hex from a core release .dgst
 // file, whose lines are "ALGO= <hex>" (the relevant one being "SHA2-256= ...").
 func parseXrayDigestSHA256(dgst []byte) (string, error) {
 	for line := range strings.SplitSeq(string(dgst), "\n") {

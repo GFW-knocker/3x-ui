@@ -225,10 +225,10 @@ func TestOutboundSubscriptionRefreshKeepsTagsOfRepeatedLink(t *testing.T) {
 
 func TestOutboundSubscriptionRefreshAlignsPositionsPastCoreRejectedLink(t *testing.T) {
 	setupSettingTestDB(t)
-	// The unencrypted first link is dropped by the core; B and C then rotate their UUID.
+	// The core refuses the first link's flow, so it is dropped; B and C then rotate their UUID.
 	subID := serveOutboundSubscription(t, "p-", func(n int) string {
 		uuid := fmt.Sprintf("00000000-0000-4000-8000-%012d", n)
-		return "vless://00000000-0000-4000-8000-000000000000@1.1.1.1:443?security=none&type=tcp#Plain\n" +
+		return "vless://00000000-0000-4000-8000-000000000000@1.1.1.1:443?security=tls&type=tcp&flow=xtls-rprx-bogus#Plain\n" +
 			"vless://" + uuid + "@8.8.8.8:443?security=tls&type=tcp#B\n" +
 			"vless://" + uuid + "@9.9.9.9:443?security=tls&type=tcp#C"
 	})

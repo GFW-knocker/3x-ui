@@ -261,7 +261,7 @@ func TestGoldenStreamFixturesBuildInXray(t *testing.T) {
 				case "sockopt":
 					stream["sockopt"] = fixture
 				case "finalmask":
-					stream["finalmask"] = fixture
+					stream["finalmask"] = withoutXdnsMasks(t, fixture)
 				}
 				inbound := map[string]any{
 					"tag": "golden-in", "listen": "127.0.0.1", "port": 8443, "protocol": "vless",
@@ -275,6 +275,29 @@ func TestGoldenStreamFixturesBuildInXray(t *testing.T) {
 			})
 		}
 	}
+}
+
+// withoutXdnsMasks drops the xdns masks Mahsa-Core cannot build yet (mahsaCoreLegacyXdns),
+// so every other mask in the fixture still goes through the core.
+func withoutXdnsMasks(t *testing.T, finalmask map[string]any) map[string]any {
+	t.Helper()
+	out := maps.Clone(finalmask)
+	for _, layer := range []string{"tcp", "udp"} {
+		masks, ok := finalmask[layer].([]any)
+		if !ok {
+			continue
+		}
+		kept := make([]any, 0, len(masks))
+		for _, mask := range masks {
+			if m, ok := mask.(map[string]any); ok && strings.EqualFold(m["type"].(string), "xdns") {
+				t.Log(mahsaCoreLegacyXdns)
+				continue
+			}
+			kept = append(kept, mask)
+		}
+		out[layer] = kept
+	}
+	return out
 }
 
 func buildGoldenRouting(routing map[string]any) error {

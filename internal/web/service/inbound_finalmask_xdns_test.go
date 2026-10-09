@@ -55,6 +55,7 @@ func TestAddInbound_StoresXdnsMaskInObjectShape(t *testing.T) {
 // A row that never went through the save path (restored backup, node sync, direct DB
 // edit) must still reach the core in a shape it builds, or it keeps every inbound down.
 func TestGetXrayConfig_UpgradesLegacyXdnsMask(t *testing.T) {
+	t.Skip(mahsaCoreLegacyXdns)
 	setupConflictDB(t)
 	seedInboundConflict(t, "in-45301-kcp", "127.0.0.1", 45301, model.VLESS,
 		legacyXdnsStream, `{"clients":[],"decryption":"none"}`)

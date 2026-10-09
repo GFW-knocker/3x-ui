@@ -76,7 +76,7 @@ XUI_INIT_WEB_BASE_PATH=/
 # XUI_PORT=8080
 ```
 
-Drop the xray binary (`xray-windows-amd64.exe` on Windows, `xray-linux-amd64` on Linux, etc.) plus the matching `geoip.dat` and `geosite.dat` files into `x-ui/`. The easiest source is a [released Xray-core build](https://github.com/XTLS/Xray-core/releases). On Windows, `wintun.dll` is also required for testing TUN inbounds.
+Drop the xray binary (`xray-windows-amd64.exe` on Windows, `xray-linux-amd64` on Linux, etc.) plus the matching `geoip.dat` and `geosite.dat` files into `x-ui/`. The easiest source is a [released Mahsa-Core build](https://github.com/GFW-knocker/Xray-core/releases). On Windows, `wintun.dll` is also required for testing TUN inbounds.
 
 ## Running
 

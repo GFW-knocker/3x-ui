@@ -62,7 +62,7 @@ Two key ideas that explain most of the complexity:
 - Web framework: **Gin** (`gin-gonic/gin`) + sessions (cookie store), gzip.
 - ORM: **GORM** with **SQLite** (default) or **PostgreSQL** (`XUI_DB_TYPE=postgres`).
 - Scheduler: **robfig/cron/v3** (seconds-precision) for all background jobs.
-- Xray: **xtls/xray-core** vendored as a library; the panel talks to the running core over
+- Xray: **GFW-knocker/Xray-core** (Mahsa-Core, a fork of xtls/xray-core) vendored as a library; the panel talks to the running core over
   its **gRPC API** and also shells out to manage the process.
 - Bots: Telegram bot (**mymmrac/telego**), Discord bot (Discord REST API v10 + **gorilla/websocket** Gateway v10). i18n: **nicksnyder/go-i18n**.
 - Misc: gorilla/websocket, gopsutil (system stats), go-qrcode, gotp (2FA TOTP).

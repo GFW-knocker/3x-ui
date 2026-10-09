@@ -18,7 +18,7 @@ question it already answers.
 
 - Backend: Go 1.27, module `github.com/mhsanaei/3x-ui/v3`, Gin and GORM.
 - It runs Xray-core as a managed child process (`internal/xray/process.go`) and
-  imports `github.com/xtls/xray-core` for config types and the gRPC
+  imports `github.com/GFW-knocker/Xray-core` (Mahsa-Core, a fork of XTLS Xray-core) for config types and the gRPC
   stats/handler/router API. The release the panel BUNDLES is pinned in
   `DockerInit.sh`; the version it COMPILES against is pinned in `go.mod`, and
   the two are not always the same.
@@ -126,7 +126,7 @@ configs for the same inbound.
 
 ## Downstream programs that must accept what the panel emits
 
-- **XTLS/Xray-core** — the Xray config the panel generates, and the VLESS/VMess
+- **GFW-knocker/Xray-core** (Mahsa-Core, forked from XTLS/Xray-core) — the Xray config the panel generates, and the VLESS/VMess
   transport and security fields.
 - **MetaCubeX/mihomo** — consumes the Clash YAML from `internal/sub/`.
 - **SagerNet/sing-box** — parses the share links the panel emits.

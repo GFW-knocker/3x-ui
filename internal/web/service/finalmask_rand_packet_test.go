@@ -149,10 +149,7 @@ func TestHealedConfigsBuildInXray(t *testing.T) {
 			"settings":       map[string]any{"clients": []any{}, "decryption": "none"},
 			"streamSettings": stream,
 		}
-		if err := buildGoldenInbound(t, inbound); err == nil {
-			t.Fatal("xray-core is expected to refuse a packet and a rand on one item")
-		}
-
+		// Mahsa-Core's exp noise lets "rand" follow a "packet", so only the healed shape is checked.
 		dropEmptyRandPackets(stream["finalmask"])
 		inbound["streamSettings"] = stream
 		assertXrayAccepts(t, "the healed noise mask", buildGoldenInbound(t, inbound))
