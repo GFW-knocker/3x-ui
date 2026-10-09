@@ -419,7 +419,7 @@ export function genVlessLink(input: GenVlessLinkInput): string {
     externalProxy = null,
   } = input;
 
-  if (inbound.protocol !== 'vless') return '';
+  if (inbound.protocol !== 'vless' && inbound.protocol !== 'mvless') return '';
   const stream = inbound.streamSettings;
   if (!stream) return '';
 
@@ -519,7 +519,7 @@ export function genVlessLink(input: GenVlessLinkInput): string {
   }
 
   const url = new URL(
-    `vless://${applyVlessRoute(clientId, externalProxy?.vlessRoute)}@${formatUrlHost(address)}:${port}`,
+    `${inbound.protocol}://${applyVlessRoute(clientId, externalProxy?.vlessRoute)}@${formatUrlHost(address)}:${port}`,
   );
   for (const [key, value] of params) url.searchParams.set(key, value);
   url.hash = encodeURIComponent(remark);
@@ -1421,6 +1421,7 @@ export function getInboundClients(inbound: Inbound): ClientShape[] | null {
     case 'vmess':
       return (inbound.settings.clients ?? []) as ClientShape[];
     case 'vless':
+    case 'mvless':
       return (inbound.settings.clients ?? []) as ClientShape[];
     case 'trojan':
       return (inbound.settings.clients ?? []) as ClientShape[];
@@ -1476,6 +1477,7 @@ export function genLink(input: GenLinkInput): string {
         externalProxy,
       });
     case 'vless':
+    case 'mvless':
       return genVlessLink({
         inbound,
         address,

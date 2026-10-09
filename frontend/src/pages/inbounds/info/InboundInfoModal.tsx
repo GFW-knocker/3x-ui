@@ -638,7 +638,11 @@ export default function InboundInfoModal({
           </dd>
         </div>
 
-        {(dbInbound.isVMess || dbInbound.isVLess || dbInbound.isTrojan || dbInbound.isSS) && (
+        {(dbInbound.isVMess ||
+          dbInbound.isVLess ||
+          dbInbound.isMVLess ||
+          dbInbound.isTrojan ||
+          dbInbound.isSS) && (
           <>
             <div className="info-row">
               <dt>{t('transmission')}</dt>

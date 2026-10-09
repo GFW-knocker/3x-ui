@@ -20,6 +20,7 @@ import {
 const MULTI_CLIENT_PROTOCOLS = new Set([
   'shadowsocks',
   'vless',
+  'mvless',
   'vmess',
   'trojan',
   'hysteria',

@@ -31,6 +31,7 @@ export * from './wireguard';
 export const OutboundSettingsSchema = z.discriminatedUnion('protocol', [
   z.object({ protocol: z.literal('vmess'), settings: VmessOutboundSettingsSchema }),
   z.object({ protocol: z.literal('vless'), settings: VlessOutboundSettingsSchema }),
+  z.object({ protocol: z.literal('mvless'), settings: VlessOutboundSettingsSchema }),
   z.object({ protocol: z.literal('trojan'), settings: TrojanOutboundSettingsSchema }),
   z.object({ protocol: z.literal('shadowsocks'), settings: ShadowsocksOutboundSettingsSchema }),
   z.object({ protocol: z.literal('wireguard'), settings: WireguardOutboundSettingsSchema }),

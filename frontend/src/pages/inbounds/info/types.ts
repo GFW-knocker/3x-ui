@@ -61,6 +61,7 @@ export interface DBInboundLike {
   enable?: boolean;
   isVMess?: boolean;
   isVLess?: boolean;
+  isMVLess?: boolean;
   isTrojan?: boolean;
   isSS?: boolean;
   isMixed?: boolean;

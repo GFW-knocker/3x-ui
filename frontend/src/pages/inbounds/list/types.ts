@@ -10,6 +10,7 @@ export interface StreamHints {
 export type ProtocolFlags = {
   isVMess?: boolean;
   isVLess?: boolean;
+  isMVLess?: boolean;
   isTrojan?: boolean;
   isSS?: boolean;
   isHysteria?: boolean;

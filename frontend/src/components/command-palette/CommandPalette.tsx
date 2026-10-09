@@ -356,6 +356,7 @@ export default function CommandPalette() {
           'inbounds',
           'ports',
           'vless',
+          'mvless',
           'vmess',
           'reality',
           'trojan',

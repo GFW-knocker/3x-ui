@@ -58,6 +58,7 @@ const VMESS_SECURITY_OPTIONS = ['auto', 'aes-128-gcm', 'chacha20-poly1305'] as c
 const MULTI_CLIENT_PROTOCOLS = new Set([
   'shadowsocks',
   'vless',
+  'mvless',
   'vmess',
   'trojan',
   'hysteria',
@@ -431,7 +432,7 @@ export default function ClientFormModal({
   const vlessLikeIds = useMemo(() => {
     const ids = new Set<number>();
     for (const row of inbounds || []) {
-      if (row && row.protocol === 'vless') ids.add(row.id);
+      if (row && (row.protocol === 'vless' || row.protocol === 'mvless')) ids.add(row.id);
     }
     return ids;
   }, [inbounds]);

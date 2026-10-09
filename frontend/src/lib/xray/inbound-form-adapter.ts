@@ -271,6 +271,7 @@ export function pruneEmpty(value: unknown): unknown {
 function clientSchemaForProtocol(protocol: string): z.ZodType | null {
   switch (protocol) {
     case 'vless':
+    case 'mvless':
       return VlessClientSchema;
     case 'vmess':
       return VmessClientSchema;

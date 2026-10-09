@@ -248,7 +248,7 @@ export function useInboundColumns({
                 {mixedNetworkLabel(record.settings)}
               </Tag>,
             );
-          } else if (record.isVMess || record.isVLess || record.isTrojan) {
+          } else if (record.isVMess || record.isVLess || record.isMVLess || record.isTrojan) {
             const stream = readStreamHints(record.streamSettings);
             tags.push(
               <Tag key="n" color="green">

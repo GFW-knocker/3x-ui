@@ -9,6 +9,7 @@ import { Protocols } from '@/schemas/primitives';
  */
 export const NODE_ELIGIBLE_PROTOCOLS: Readonly<Record<string, true>> = {
   [Protocols.VLESS]: true,
+  [Protocols.MVLESS]: true,
   [Protocols.VMESS]: true,
   [Protocols.TROJAN]: true,
   [Protocols.SHADOWSOCKS]: true,

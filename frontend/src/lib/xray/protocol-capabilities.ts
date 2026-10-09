@@ -5,13 +5,14 @@
 // called against a partial-row, a full form value, or a hand-built test
 // fixture without the caller projecting a whole object.
 
-const TLS_ELIGIBLE_PROTOCOLS = ['vmess', 'vless', 'trojan', 'shadowsocks'];
+const TLS_ELIGIBLE_PROTOCOLS = ['vmess', 'vless', 'mvless', 'trojan', 'shadowsocks'];
 const TLS_NETWORKS = ['tcp', 'ws', 'http', 'grpc', 'httpupgrade', 'xhttp'];
-const REALITY_ELIGIBLE_PROTOCOLS = ['vless', 'trojan'];
+const REALITY_ELIGIBLE_PROTOCOLS = ['vless', 'mvless', 'trojan'];
 const REALITY_NETWORKS = ['tcp', 'http', 'grpc', 'xhttp'];
 const STREAM_PROTOCOLS = [
   'vmess',
   'vless',
+  'mvless',
   'trojan',
   'shadowsocks',
   'hysteria',
@@ -58,7 +59,7 @@ function hasVlessEncryption(settings: CapabilityProtocolSlice['settings']): bool
 }
 
 export function canEnableTlsFlow(values: CapabilityProtocolSlice): boolean {
-  if (values.protocol !== 'vless') return false;
+  if (values.protocol !== 'vless' && values.protocol !== 'mvless') return false;
   const network = values.streamSettings?.network;
   const security = values.streamSettings?.security;
 

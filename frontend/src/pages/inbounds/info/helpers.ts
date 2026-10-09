@@ -13,6 +13,7 @@ import type { ClientSetting, ClientStats, DBInboundLike, InboundInfo } from './t
 const LINK_PROTOCOLS: ReadonlySet<string> = new Set([
   Protocols.VMESS,
   Protocols.VLESS,
+  Protocols.MVLESS,
   Protocols.TROJAN,
   Protocols.SHADOWSOCKS,
   Protocols.HYSTERIA,

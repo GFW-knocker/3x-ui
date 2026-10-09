@@ -6,7 +6,7 @@ import { MUX_PROTOCOLS } from './outbound-form-constants';
 
 export function isMuxAllowed(protocol: string, flow: string, network: string): boolean {
   if (!MUX_PROTOCOLS.has(protocol)) return false;
-  if (protocol === 'vless' && flow) return false;
+  if ((protocol === 'vless' || protocol === 'mvless') && flow) return false;
   if (network === 'xhttp') return false;
   return true;
 }

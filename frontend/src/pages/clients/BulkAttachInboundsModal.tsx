@@ -10,6 +10,7 @@ import type { BulkAttachResult } from '@/schemas/client';
 const MULTI_USER_PROTOCOLS = new Set([
   'vmess',
   'vless',
+  'mvless',
   'trojan',
   'hysteria',
   'shadowsocks',

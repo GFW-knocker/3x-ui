@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const ProtocolSchema = z.enum([
   'vmess',
   'vless',
+  'mvless',
   'trojan',
   'shadowsocks',
   'wireguard',
@@ -26,6 +27,7 @@ export type Protocol = z.infer<typeof ProtocolSchema>;
 export const Protocols = Object.freeze({
   VMESS: 'vmess',
   VLESS: 'vless',
+  MVLESS: 'mvless',
   TROJAN: 'trojan',
   SHADOWSOCKS: 'shadowsocks',
   WIREGUARD: 'wireguard',
@@ -38,3 +40,9 @@ export const Protocols = Object.freeze({
   AMNEZIAWG: 'amneziawg',
   TUIC: 'tuic',
 });
+
+// Mahsa-Core's MVLESS takes VLESS's settings and differs only on the wire, so every
+// VLESS-specific rule (flow, encryption, fallbacks, reverse) applies to it too.
+export function isVlessFamily(protocol: string | undefined | null): boolean {
+  return protocol === Protocols.VLESS || protocol === Protocols.MVLESS;
+}

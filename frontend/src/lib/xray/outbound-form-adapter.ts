@@ -597,6 +597,9 @@ export function rawOutboundToFormValues(raw: RawOutboundRow): OutboundFormValues
     case 'vless':
       typed = { protocol: 'vless', settings: vlessFromWire(settings) };
       break;
+    case 'mvless':
+      typed = { protocol: 'mvless', settings: vlessFromWire(settings) };
+      break;
     case 'trojan':
       typed = { protocol: 'trojan', settings: trojanFromWire(settings) };
       break;
@@ -856,8 +859,16 @@ function loopbackToWire(s: LoopbackOutboundFormSettings) {
 }
 
 // canEnableMux mirrors the legacy Outbound.canEnableMux().
-const MUX_PROTOCOLS = new Set(['vmess', 'vless', 'trojan', 'shadowsocks', 'http', 'socks']);
-const STREAM_PROTOCOLS = new Set(['vmess', 'vless', 'trojan', 'shadowsocks', 'hysteria']);
+const MUX_PROTOCOLS = new Set([
+  'vmess',
+  'vless',
+  'mvless',
+  'trojan',
+  'shadowsocks',
+  'http',
+  'socks',
+]);
+const STREAM_PROTOCOLS = new Set(['vmess', 'vless', 'mvless', 'trojan', 'shadowsocks', 'hysteria']);
 
 function dropEmptyStrings(obj: Raw): Raw {
   const out: Raw = {};
@@ -884,7 +895,9 @@ function stripUiOnlyStreamFields(stream: unknown): Raw {
 function muxAllowed(values: OutboundFormValues): boolean {
   if (!MUX_PROTOCOLS.has(values.protocol)) return false;
   const flow =
-    values.protocol === 'vless' ? (values.settings as VlessOutboundFormSettings).flow : '';
+    values.protocol === 'vless' || values.protocol === 'mvless'
+      ? (values.settings as VlessOutboundFormSettings).flow
+      : '';
   if (flow) return false;
   const network =
     values.streamSettings && 'network' in values.streamSettings
@@ -903,6 +916,7 @@ export function formValuesToWirePayload(values: OutboundFormValues): WireOutboun
       settings = vmessToWire(values.settings);
       break;
     case 'vless':
+    case 'mvless':
       settings = vlessToWire(values.settings);
       break;
     case 'trojan':

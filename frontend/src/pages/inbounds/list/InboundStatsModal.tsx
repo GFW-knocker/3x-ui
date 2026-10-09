@@ -78,7 +78,7 @@ export default function InboundStatsModal({
               })()}
             {record.isTunnel && <Tag color="green">{tunnelNetworkLabel(record.settings)}</Tag>}
             {record.isMixed && <Tag color="green">{mixedNetworkLabel(record.settings)}</Tag>}
-            {(record.isVMess || record.isVLess || record.isTrojan) &&
+            {(record.isVMess || record.isVLess || record.isMVLess || record.isTrojan) &&
               (() => {
                 const stream = readStreamHints(record.streamSettings);
                 const l4 = networkL4(stream.network);

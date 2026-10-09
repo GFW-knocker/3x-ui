@@ -300,7 +300,7 @@ export default function InboundsPage() {
       if (!dbInbound?.listen?.startsWith?.('@')) return dbInbound;
       for (const candidate of dbInbounds) {
         if (candidate.id === dbInbound.id) continue;
-        if (!['trojan', 'vless'].includes(candidate.protocol)) continue;
+        if (!['trojan', 'vless', 'mvless'].includes(candidate.protocol)) continue;
         const candStream = coerceInboundJsonField(candidate.streamSettings) as { network?: string };
         if (candStream.network !== 'tcp') continue;
         const candSettings = coerceInboundJsonField(candidate.settings) as {

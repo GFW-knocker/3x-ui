@@ -587,9 +587,11 @@ function parseUrlLink(link: string, expectedProto: string): URL | null {
   }
 }
 
+// Also takes Mahsa-Core's mvless:// links, which share the vless format.
 export function parseVlessLink(link: string): Raw | null {
-  const url = parseUrlLink(link, 'vless');
+  const url = parseUrlLink(link, 'vless') ?? parseUrlLink(link, 'mvless');
   if (!url) return null;
+  const protocol = url.protocol.replace(/:$/, '');
   const id = url.username;
   const address = url.hostname;
   const port = Number(url.port) || 443;
@@ -601,7 +603,7 @@ export function parseVlessLink(link: string): Raw | null {
   applySecurityParams(stream, params);
   applyFinalMaskParam(stream, params);
   return {
-    protocol: 'vless',
+    protocol,
     tag: decodeRemark(url),
     settings: {
       address,

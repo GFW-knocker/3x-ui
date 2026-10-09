@@ -193,6 +193,7 @@ export type LoopbackOutboundFormSettings = z.infer<typeof LoopbackOutboundFormSe
 export const OutboundFormSettingsSchema = z.discriminatedUnion('protocol', [
   z.object({ protocol: z.literal('vmess'), settings: VmessOutboundFormSettingsSchema }),
   z.object({ protocol: z.literal('vless'), settings: VlessOutboundFormSettingsSchema }),
+  z.object({ protocol: z.literal('mvless'), settings: VlessOutboundFormSettingsSchema }),
   z.object({ protocol: z.literal('trojan'), settings: TrojanOutboundFormSettingsSchema }),
   z.object({ protocol: z.literal('shadowsocks'), settings: ShadowsocksOutboundFormSettingsSchema }),
   z.object({ protocol: z.literal('socks'), settings: SocksOutboundFormSettingsSchema }),

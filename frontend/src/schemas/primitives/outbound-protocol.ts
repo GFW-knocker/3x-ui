@@ -14,6 +14,7 @@ export const OutboundProtocols = Object.freeze({
   DNS: 'dns',
   VMess: 'vmess',
   VLESS: 'vless',
+  MVLESS: 'mvless',
   Trojan: 'trojan',
   Shadowsocks: 'shadowsocks',
   Wireguard: 'wireguard',

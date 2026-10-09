@@ -41,6 +41,15 @@ import {
   trafficFor,
 } from './outbounds-tab-helpers';
 
+// Protocols whose rows also show their transport network and security tags.
+const STREAM_TAG_PROTOCOLS: readonly string[] = [
+  Protocols.VMess,
+  Protocols.VLESS,
+  Protocols.MVLESS,
+  Protocols.Trojan,
+  Protocols.Shadowsocks,
+];
+
 interface OutboundColumnsParams {
   testMode: OutboundTestMode;
   rows: OutboundRow[];
@@ -169,9 +178,7 @@ export function useOutboundColumns({
             </Tooltip>
             <div className="protocol-line">
               <Tag color="green">{record.protocol}</Tag>
-              {[Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].some(
-                (id) => isOutboundProtocol(record, id),
-              ) && (
+              {STREAM_TAG_PROTOCOLS.some((id) => isOutboundProtocol(record, id)) && (
                 <>
                   <Tag>{record.streamSettings?.network}</Tag>
                   {showSecurity(record.streamSettings?.security) && (

@@ -164,6 +164,7 @@ export function createDefaultOutboundSettings(protocol: string): AnyOutboundSett
     case 'vmess':
       return createDefaultVmessOutboundSettings();
     case 'vless':
+    case 'mvless':
       return createDefaultVlessOutboundSettings();
     case 'trojan':
       return createDefaultTrojanOutboundSettings();

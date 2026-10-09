@@ -86,6 +86,7 @@ export function isInboundMultiUser(record: { protocol: string; settings: unknown
   switch (record.protocol) {
     case 'vmess':
     case 'vless':
+    case 'mvless':
     case 'trojan':
     case 'hysteria':
     case 'mtproto':

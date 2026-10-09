@@ -25,6 +25,15 @@ import {
   trafficFor,
 } from './outbounds-tab-helpers';
 
+// Protocols whose rows also show their transport network and security tags.
+const STREAM_TAG_PROTOCOLS: readonly string[] = [
+  Protocols.VMess,
+  Protocols.VLESS,
+  Protocols.MVLESS,
+  Protocols.Trojan,
+  Protocols.Shadowsocks,
+];
+
 interface SubscriptionOutboundsProps {
   subscriptionOutbounds: unknown[];
   outboundsTraffic: OutboundTrafficRow[];
@@ -62,9 +71,7 @@ export default function SubscriptionOutbounds({
       </Tooltip>
       <div className="protocol-line">
         <Tag color="green">{record.protocol}</Tag>
-        {[Protocols.VMess, Protocols.VLESS, Protocols.Trojan, Protocols.Shadowsocks].includes(
-          record.protocol as never,
-        ) && (
+        {STREAM_TAG_PROTOCOLS.includes(record.protocol as never) && (
           <>
             <Tag>{record.streamSettings?.network}</Tag>
             {showSecurity(record.streamSettings?.security) && (

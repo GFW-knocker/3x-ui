@@ -61,6 +61,7 @@ interface ClientRollup {
 const TRACKED_PROTOCOLS: readonly string[] = [
   Protocols.VMESS,
   Protocols.VLESS,
+  Protocols.MVLESS,
   Protocols.TROJAN,
   Protocols.SHADOWSOCKS,
   Protocols.HYSTERIA,

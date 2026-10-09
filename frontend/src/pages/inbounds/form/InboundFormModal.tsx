@@ -41,7 +41,7 @@ import {
   type InboundFormValues,
 } from '@/schemas/forms/inbound-form';
 import { FormField, rhfZodValidate } from '@/components/form/rhf';
-import { Protocols, TRAFFIC_RESETS } from '@/schemas/primitives';
+import { isVlessFamily, Protocols, TRAFFIC_RESETS } from '@/schemas/primitives';
 import { SockoptStreamSettingsSchema } from '@/schemas/protocols/stream/sockopt';
 import { HysteriaStreamSettingsSchema } from '@/schemas/protocols/stream/hysteria';
 import { createHysteriaTlsSettingsWithDefaultCert } from '@/lib/xray/inbound-tls-defaults';
@@ -306,7 +306,7 @@ export default function InboundFormModal({
     settings: { network: wSsNetwork, allowedNetwork: wTunnelNetwork, udp: mixedUdpOn },
   });
   const isFallbackHost =
-    (protocol === Protocols.VLESS || protocol === Protocols.TROJAN) &&
+    (isVlessFamily(protocol) || protocol === Protocols.TROJAN) &&
     network === 'tcp' &&
     (security === 'tls' || security === 'reality');
 
@@ -461,7 +461,7 @@ export default function InboundFormModal({
     if (
       mode === 'edit' &&
       dbInbound &&
-      (dbInbound.protocol === Protocols.VLESS || dbInbound.protocol === Protocols.TROJAN)
+      (isVlessFamily(dbInbound.protocol) || dbInbound.protocol === Protocols.TROJAN)
     ) {
       loadFallbacks(dbInbound.id);
     } else {
@@ -529,7 +529,7 @@ export default function InboundFormModal({
       if (!NODE_ELIGIBLE_PROTOCOLS[next]) {
         setV('nodeId', null);
       }
-      if (next !== Protocols.VLESS) {
+      if (!isVlessFamily(next)) {
         setV('disableFlow', false);
       }
       if (next === Protocols.HYSTERIA) {
@@ -714,7 +714,7 @@ export default function InboundFormModal({
         <Switch />
       </FormField>
 
-      {protocol === Protocols.VLESS && (
+      {isVlessFamily(protocol) && (
         <FormField
           name="disableFlow"
           valueProp="checked"
@@ -826,7 +826,7 @@ export default function InboundFormModal({
 
       {protocol === Protocols.SHADOWSOCKS && <ShadowsocksFields isSSWith2022={isSSWith2022} />}
 
-      {protocol === Protocols.VLESS && (
+      {isVlessFamily(protocol) && (
         <VlessFields
           saving={saving}
           selectedVlessAuth={selectedVlessAuth}
@@ -839,7 +839,7 @@ export default function InboundFormModal({
       )}
 
       {isFallbackHost && fallbacksCard}
-      {(protocol === Protocols.VLESS || protocol === Protocols.TROJAN) &&
+      {(isVlessFamily(protocol) || protocol === Protocols.TROJAN) &&
         network === 'tcp' &&
         !isFallbackHost && (
           <Alert
@@ -1145,6 +1145,7 @@ export default function InboundFormModal({
                 ...((
                   [
                     Protocols.VLESS,
+                    Protocols.MVLESS,
                     Protocols.SHADOWSOCKS,
                     Protocols.HTTP,
                     Protocols.MIXED,

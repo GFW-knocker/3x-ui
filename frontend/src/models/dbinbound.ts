@@ -152,6 +152,10 @@ export class DBInbound {
     return this.protocol === Protocols.VLESS;
   }
 
+  get isMVLess() {
+    return this.protocol === Protocols.MVLESS;
+  }
+
   get isTrojan() {
     return this.protocol === Protocols.TROJAN;
   }

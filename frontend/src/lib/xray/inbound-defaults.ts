@@ -380,6 +380,7 @@ export type AnyInboundSettings =
 export function createDefaultInboundSettings(protocol: string): AnyInboundSettings | null {
   switch (protocol) {
     case 'vless':
+    case 'mvless':
       return createDefaultVlessInboundSettings();
     case 'vmess':
       return createDefaultVmessInboundSettings();

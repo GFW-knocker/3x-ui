@@ -31,6 +31,7 @@ export const TARGET_STRATEGY_OPTIONS = OutboundDomainStrategySchema.options.map(
 export const MUX_PROTOCOLS = new Set<string>([
   'vmess',
   'vless',
+  'mvless',
   'trojan',
   'shadowsocks',
   'http',
@@ -57,6 +58,7 @@ export const HYSTERIA_NETWORK_OPTION = { value: 'hysteria', label: 'Hysteria' };
 export const SERVER_PROTOCOLS = new Set<string>([
   'vmess',
   'vless',
+  'mvless',
   'trojan',
   'shadowsocks',
   'socks',

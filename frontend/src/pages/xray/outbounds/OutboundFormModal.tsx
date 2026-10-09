@@ -431,7 +431,7 @@ export default function OutboundFormModal({
 
                       {SERVER_PROTOCOLS.has(protocol) && <ServerTarget />}
                       {protocol === 'vmess' && <VmessFields />}
-                      {protocol === 'vless' && <VlessFields />}
+                      {(protocol === 'vless' || protocol === 'mvless') && <VlessFields />}
                       {protocol === 'trojan' && <TrojanFields />}
                       {protocol === 'shadowsocks' && <ShadowsocksFields />}
                       {protocol === 'http' && <HttpFields />}
@@ -443,7 +443,7 @@ export default function OutboundFormModal({
 
                       {protocol === 'freedom' && <FreedomFields />}
 
-                      {protocol === 'vless' && reverseTag && (
+                      {(protocol === 'vless' || protocol === 'mvless') && reverseTag && (
                         <Controller
                           control={methods.control}
                           name="settings.reverseSniffing"
