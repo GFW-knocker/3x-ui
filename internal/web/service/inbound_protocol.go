@@ -35,7 +35,7 @@ func inboundShadowsocksMethod(protocol, settings string) string {
 // the inbound's raw settings JSON, which carries the encryption value
 // (streamSettings does not).
 func inboundCanEnableTlsFlow(protocol, streamSettings, settings string) bool {
-	if protocol != string(model.VLESS) {
+	if !model.Protocol(protocol).IsVLESSFamily() {
 		return false
 	}
 	if streamSettings == "" {
@@ -62,6 +62,7 @@ func inboundCanEnableTlsFlow(protocol, streamSettings, settings string) bool {
 // protocol's row is local on the node it is pushed to, so that panel runs it.
 var nodeEligibleProtocols = map[model.Protocol]bool{
 	model.VLESS:       true,
+	model.MVLESS:      true,
 	model.VMESS:       true,
 	model.Trojan:      true,
 	model.Shadowsocks: true,
@@ -145,7 +146,7 @@ func inboundCanHostFallbacks(ib *model.Inbound) bool {
 	if ib == nil {
 		return false
 	}
-	if ib.Protocol != model.VLESS && ib.Protocol != model.Trojan {
+	if !ib.Protocol.IsVLESSFamily() && ib.Protocol != model.Trojan {
 		return false
 	}
 	return streamSupportsFallbacks(ib.StreamSettings)

@@ -199,7 +199,7 @@ func (s *InboundService) writeBackClientSubID(sourceInboundID int, client model.
 
 func (s *InboundService) generateRandomCredential(targetProtocol model.Protocol) string {
 	switch targetProtocol {
-	case model.VMESS, model.VLESS:
+	case model.VMESS, model.VLESS, model.MVLESS:
 		return uuid.NewString()
 	default:
 		return strings.ReplaceAll(uuid.NewString(), "-", "")
@@ -223,7 +223,7 @@ func (s *InboundService) buildTargetClientFromSource(source model.Client, target
 	switch targetProtocol {
 	case model.VMESS:
 		target.ID = s.generateRandomCredential(targetProtocol)
-	case model.VLESS:
+	case model.VLESS, model.MVLESS:
 		target.ID = s.generateRandomCredential(targetProtocol)
 		if (flow == "xtls-rprx-vision" || flow == "xtls-rprx-vision-udp443") &&
 			!targetInbound.DisableFlow &&

@@ -24,6 +24,7 @@ type Protocol string
 const (
 	VMESS       Protocol = "vmess"
 	VLESS       Protocol = "vless"
+	MVLESS      Protocol = "mvless"
 	Tunnel      Protocol = "tunnel"
 	HTTP        Protocol = "http"
 	Trojan      Protocol = "trojan"
@@ -35,6 +36,12 @@ const (
 	AmneziaWG   Protocol = "amneziawg"
 	TUIC        Protocol = "tuic"
 )
+
+// IsVLESSFamily reports whether p takes VLESS settings: Mahsa-Core's MVLESS shares VLESS's
+// clients, flow, encryption and fallbacks and differs only on the wire.
+func (p Protocol) IsVLESSFamily() bool {
+	return p == VLESS || p == MVLESS
+}
 
 // User represents a user account in the 3x-ui panel.
 type User struct {
@@ -64,7 +71,7 @@ type Inbound struct {
 	// Xray configuration fields
 	Listen            string   `json:"listen" form:"listen"`
 	Port              int      `json:"port" form:"port" validate:"gte=0,lte=65535" example:"443"`
-	Protocol          Protocol `json:"protocol" form:"protocol" validate:"required,oneof=vmess vless trojan shadowsocks wireguard hysteria http mixed tunnel tun mtproto amneziawg tuic" example:"vless"`
+	Protocol          Protocol `json:"protocol" form:"protocol" validate:"required,oneof=vmess vless mvless trojan shadowsocks wireguard hysteria http mixed tunnel tun mtproto amneziawg tuic" example:"vless"`
 	Settings          string   `json:"settings" form:"settings"`
 	StreamSettings    string   `json:"streamSettings" form:"streamSettings"`
 	Tag               string   `json:"tag" form:"tag" gorm:"unique" example:"in-443-tcp"`

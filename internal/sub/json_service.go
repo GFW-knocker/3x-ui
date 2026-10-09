@@ -648,7 +648,7 @@ func (s *SubJsonService) getConfig(subReq *SubService, inbound *model.Inbound, c
 		switch inbound.Protocol {
 		case "vmess":
 			newOutbounds = append(newOutbounds, s.genVnext(inbound, streamSettings, client, jsonMux(mux, hostMux)))
-		case "vless":
+		case "vless", "mvless":
 			vc := client
 			vc.ID = applyVlessRoute(client.ID, hostVlessRoute(extPrxy))
 			// Same gate the raw link and the Clash proxy apply: a flow left

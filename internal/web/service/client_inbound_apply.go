@@ -860,7 +860,7 @@ func (s *ClientService) UpdateInboundClient(inboundSvc *InboundService, data *mo
 	settingsClients[clientIndex] = interfaceClients[0]
 	oldSettings["clients"] = settingsClients
 
-	if oldInbound.Protocol == model.VLESS {
+	if oldInbound.Protocol.IsVLESSFamily() {
 		hasVisionFlow := false
 		for _, c := range settingsClients {
 			cm, ok := c.(map[string]any)

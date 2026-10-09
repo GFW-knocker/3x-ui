@@ -29,6 +29,7 @@ import (
 	"github.com/GFW-knocker/Xray-core/common/serial"
 	"github.com/GFW-knocker/Xray-core/infra/conf"
 	hysteriaAccount "github.com/GFW-knocker/Xray-core/proxy/hysteria/account"
+	"github.com/GFW-knocker/Xray-core/proxy/mvless"
 	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks"
 	"github.com/GFW-knocker/Xray-core/proxy/shadowsocks_2022"
 	"github.com/GFW-knocker/Xray-core/proxy/trojan"
@@ -586,7 +587,7 @@ func buildUserAccount(protocolName string, user map[string]any) (*serial.TypedMe
 		return serial.ToTypedMessage(&vmess.Account{
 			Id: userID,
 		}), nil
-	case "vless":
+	case "vless", "mvless":
 		userID, err := getRequiredUserString(user, "id")
 		if err != nil {
 			return nil, err
@@ -625,6 +626,9 @@ func buildUserAccount(protocolName string, user map[string]any) (*serial.TypedMe
 			} else if testpre, ok := testpreVal.(uint32); ok && testpre > 0 {
 				vlessAccount.Testpre = testpre
 			}
+		}
+		if protocolName == "mvless" {
+			return serial.ToTypedMessage(mvlessAccount(vlessAccount)), nil
 		}
 		return serial.ToTypedMessage(vlessAccount), nil
 	case "trojan":
@@ -708,6 +712,16 @@ func buildUserAccount(protocolName string, user map[string]any) (*serial.TypedMe
 	default:
 		return nil, nil
 	}
+}
+
+// mvlessAccount retypes a VLESS account for Mahsa-Core's MVLESS inbound, whose account
+// has the same fields but is a distinct proto type the inbound requires.
+func mvlessAccount(v *vless.Account) *mvless.Account {
+	account := &mvless.Account{Id: v.Id, Flow: v.Flow, Testpre: v.Testpre, Testseed: v.Testseed}
+	if v.Reverse != nil {
+		account.Reverse = &mvless.Reverse{Tag: v.Reverse.Tag}
+	}
+	return account
 }
 
 // AddUser adds a user to an inbound in the Xray core using the specified

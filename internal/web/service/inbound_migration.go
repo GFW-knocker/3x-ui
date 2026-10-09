@@ -101,7 +101,7 @@ func (s *InboundService) MigrationRequirements() (err error) {
 
 	// Fix inbounds based problems
 	var inbounds []*model.Inbound
-	err = tx.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "trojan", "shadowsocks", "hysteria"}).Find(&inbounds).Error
+	err = tx.Model(model.Inbound{}).Where("protocol IN (?)", []string{"vmess", "vless", "mvless", "trojan", "shadowsocks", "hysteria"}).Find(&inbounds).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return
 	}
@@ -157,7 +157,7 @@ func (s *InboundService) MigrationRequirements() (err error) {
 			// one client uses the exact xtls-rprx-vision flow. Older versions saved it
 			// for any non-empty flow (including the UDP variant) or kept it after the
 			// flow was cleared from the client modal — clean those up here.
-			if inbounds[inbound_index].Protocol == model.VLESS && !hasVisionFlow {
+			if inbounds[inbound_index].Protocol.IsVLESSFamily() && !hasVisionFlow {
 				delete(settings, "testseed")
 			}
 
@@ -305,7 +305,7 @@ func (s *InboundService) MigrationRestoreVisionFlow() {
 	db := database.GetDB()
 	var inbounds []*model.Inbound
 	if err := db.Model(&model.Inbound{}).
-		Where("protocol = ?", model.VLESS).
+		Where("protocol IN ?", []model.Protocol{model.VLESS, model.MVLESS}).
 		Find(&inbounds).Error; err != nil {
 		logger.Warning("MigrationRestoreVisionFlow: load inbounds failed:", err)
 		return

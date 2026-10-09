@@ -3105,6 +3105,7 @@
             "enum": [
               "vmess",
               "vless",
+              "mvless",
               "trojan",
               "shadowsocks",
               "wireguard",

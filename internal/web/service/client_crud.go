@@ -407,7 +407,7 @@ func markInboundNodesDirty(inboundIds []int) error {
 
 func (s *ClientService) fillProtocolDefaults(c *model.Client, ib *model.Inbound) error {
 	switch ib.Protocol {
-	case model.VMESS, model.VLESS:
+	case model.VMESS, model.VLESS, model.MVLESS:
 		if c.ID == "" {
 			c.ID = uuid.NewString()
 		}

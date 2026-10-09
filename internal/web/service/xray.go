@@ -250,7 +250,7 @@ func (s *XrayService) GetXrayConfig() (*xray.Config, error) {
 			}
 			entry := map[string]any{"email": c.Email}
 			switch inbound.Protocol {
-			case model.VLESS:
+			case model.VLESS, model.MVLESS:
 				if c.ID != "" {
 					entry["id"] = c.ID
 				}

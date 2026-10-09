@@ -685,7 +685,7 @@ func (s *SubService) getInboundsBySubId(subId string) ([]*model.Inbound, error) 
 		JOIN client_inbounds ON client_inbounds.inbound_id = inbounds.id
 		JOIN clients ON clients.id = client_inbounds.client_id
 		WHERE
-			inbounds.protocol in ('vmess','vless','trojan','shadowsocks','hysteria','wireguard','amneziawg','mtproto','tuic')
+			inbounds.protocol in ('vmess','vless','mvless','trojan','shadowsocks','hysteria','wireguard','amneziawg','mtproto','tuic')
 			AND clients.sub_id = ? AND inbounds.enable = ?
 	)`, subId, true).Order("sub_sort_index ASC").Order("id ASC").Find(&inbounds).Error
 	if err != nil {
@@ -824,7 +824,7 @@ func (s *SubService) GetLink(inbound *model.Inbound, email string) string {
 	switch inbound.Protocol {
 	case "vmess":
 		return s.genVmessLink(inbound, email)
-	case "vless":
+	case "vless", "mvless":
 		return s.genVlessLink(inbound, email)
 	case "trojan":
 		return s.genTrojanLink(inbound, email)
@@ -1209,9 +1209,10 @@ func vlessFlowAllowed(network, security string, settings map[string]any) bool {
 }
 
 func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
-	if inbound.Protocol != model.VLESS {
+	if !inbound.Protocol.IsVLESSFamily() {
 		return ""
 	}
+	scheme := string(inbound.Protocol)
 	address := s.resolveInboundAddress(inbound)
 	stream := unmarshalStreamSettings(inbound.StreamSettings)
 	client, ok := s.clientForLink(inbound, email)
@@ -1256,7 +1257,7 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 			params,
 			security,
 			func(ep map[string]any, dest string, port int) string {
-				return fmt.Sprintf("vless://%s@%s", applyVlessRoute(uuid, hostVlessRoute(ep)), joinHostPort(dest, port))
+				return fmt.Sprintf("%s://%s@%s", scheme, applyVlessRoute(uuid, hostVlessRoute(ep)), joinHostPort(dest, port))
 			},
 			func(ep map[string]any) string {
 				return s.endpointRemark(inbound, email, ep, streamNetwork)
@@ -1264,7 +1265,7 @@ func (s *SubService) genVlessLink(inbound *model.Inbound, email string) string {
 		)
 	}
 
-	link := fmt.Sprintf("vless://%s@%s", uuid, joinHostPort(address, port))
+	link := fmt.Sprintf("%s://%s@%s", scheme, uuid, joinHostPort(address, port))
 	return buildLinkWithParams(link, params, s.genRemark(inbound, email, "", streamNetwork))
 }
 

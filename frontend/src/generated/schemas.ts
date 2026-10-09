@@ -3079,6 +3079,7 @@ export const SCHEMAS: Record<string, unknown> = {
         "enum": [
           "vmess",
           "vless",
+          "mvless",
           "trojan",
           "shadowsocks",
           "wireguard",

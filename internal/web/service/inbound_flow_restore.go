@@ -27,7 +27,7 @@ const visionFlow = "xtls-rprx-vision"
 // never overwrites an explicit non-empty flow. Returns the rewritten settings
 // JSON and whether anything changed.
 func (s *InboundService) restoreVisionFlowForEligibleInbound(tx *gorm.DB, settings, streamSettings string, protocol model.Protocol) (string, bool) {
-	if protocol != model.VLESS {
+	if !protocol.IsVLESSFamily() {
 		return settings, false
 	}
 	if !inboundCanEnableTlsFlow(string(protocol), streamSettings, settings) {

@@ -112,7 +112,7 @@ func splitLines(s string) []string {
 // ParseLink parses a single share link and returns the outbound object plus
 // a stable identity for tag correlation. Supported schemes:
 //   - vmess://
-//   - vless://
+//   - vless:// (also mvless:// for Mahsa-Core)
 //   - trojan://
 //   - ss:// (modern and legacy)
 //   - hysteria2:// (also hy2://)
@@ -122,7 +122,7 @@ func ParseLink(link string) (*ParseResult, error) {
 	switch {
 	case strings.HasPrefix(link, "vmess://"):
 		return parseVmess(link)
-	case strings.HasPrefix(link, "vless://"):
+	case strings.HasPrefix(link, "vless://"), strings.HasPrefix(link, "mvless://"):
 		return parseVless(link)
 	case strings.HasPrefix(link, "trojan://"):
 		return parseTrojan(link)
@@ -268,7 +268,7 @@ func parseVless(link string) (*ParseResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	if u.Scheme != "vless" {
+	if u.Scheme != "vless" && u.Scheme != "mvless" {
 		return nil, fmt.Errorf("not vless")
 	}
 	id := u.User.Username()
@@ -291,7 +291,7 @@ func parseVless(link string) (*ParseResult, error) {
 	identity := "vless:" + u.Scheme + "://" + id + "@" + host + ":" + strconv.Itoa(port) + "?" + canonicalQuery(params)
 
 	ob := Outbound{
-		"protocol": "vless",
+		"protocol": u.Scheme,
 		"tag":      decodeHash(u.Fragment),
 		"settings": map[string]any{
 			"address":    host,

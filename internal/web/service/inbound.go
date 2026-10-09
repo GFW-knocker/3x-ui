@@ -651,6 +651,7 @@ func (s *InboundService) normalizeStreamSettings(inbound *model.Inbound) {
 	protocolsWithStream := map[model.Protocol]bool{
 		model.VMESS:       true,
 		model.VLESS:       true,
+		model.MVLESS:      true,
 		model.Trojan:      true,
 		model.Shadowsocks: true,
 		model.Hysteria:    true,
@@ -2302,7 +2303,7 @@ func (s *InboundService) GetInboundTags() (string, error) {
 func (s *InboundService) GetClientReverseTags() (string, error) {
 	db := database.GetDB()
 	var inbounds []model.Inbound
-	err := db.Model(model.Inbound{}).Select("settings").Where("protocol = ?", "vless").Find(&inbounds).Error
+	err := db.Model(model.Inbound{}).Select("settings").Where("protocol IN ?", []model.Protocol{model.VLESS, model.MVLESS}).Find(&inbounds).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return "[]", err
 	}
