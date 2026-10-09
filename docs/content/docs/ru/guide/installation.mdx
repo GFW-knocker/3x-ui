@@ -24,20 +24,20 @@ Virtuozzo, Arch, Manjaro, openSUSE (Tumbleweed/Leap), Alpine — а также �
 настраивает службу и устанавливает команду управления `x-ui`.
 
 ```bash title="latest stable"
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh)
 ```
 
 Чтобы установить **конкретную версию**, добавьте её тег:
 
 ```bash title="pinned version"
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) v3.4.0
+bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh) v3.4.0
 ```
 
 Чтобы установить скользящую **dev**-сборку (последний предварительный релиз по
 каждому коммиту из `main` — не стабильный релиз), передайте `dev-latest`:
 
 ```bash title="rolling dev build"
-bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh) dev-latest
+bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh) dev-latest
 ```
 
 По завершении запишите выведенные данные для входа и выполните `x-ui`, чтобы
@@ -77,7 +77,7 @@ docker run -d \
   --network=host \
   --restart=unless-stopped \
   --name 3x-ui \
-  ghcr.io/mhsanaei/3x-ui:latest
+  ghcr.io/gfw-knocker/3x-ui:latest
 ```
 
 Том `db/` хранит базу данных SQLite (`/etc/x-ui/x-ui.db`), а `cert/` — TLS-сертификаты,
@@ -88,7 +88,7 @@ docker run -d \
 <Tab value="Manual">
 
 Опытные пользователи могут скачать архив релиза для своей архитектуры со
-[страницы релизов](https://github.com/MHSanaei/3x-ui/releases), распаковать его и
+[страницы релизов](https://github.com/GFW-knocker/3x-ui/releases), распаковать его и
 запустить бинарный файл как службу systemd. Установочный скрипт автоматизирует
 ровно эти шаги, поэтому он предпочтительнее, если только у вас нет особой причины
 устанавливать вручную.
@@ -123,10 +123,10 @@ docker run -d \
 записав их в `/etc/x-ui/install-result.env`:
 
 ```bash
-XUI_NONINTERACTIVE=1 bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
+XUI_NONINTERACTIVE=1 bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh)
 ```
 
-В каталоге [`deploy/`](https://github.com/MHSanaei/3x-ui/tree/main/deploy)
+В каталоге [`deploy/`](https://github.com/GFW-knocker/3x-ui/tree/main/deploy)
 репозитория есть готовые **cloud-init** user-data для автоматической установки в
 любом облаке (Hetzner, AWS, DigitalOcean, Vultr, GCP, Azure, Oracle).
 

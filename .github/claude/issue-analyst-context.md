@@ -169,7 +169,7 @@ test that cannot fail is invisible to CI. `make verify` is the local gate.
 
 ## Support facts reporters get wrong
 
-- Linux install: `bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)`
+- Linux install: `bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh)`
 - Install generates a RANDOM username, password and web base path — never
   admin/admin. The `x-ui` menu on the server shows or resets them.
 - The installer service environment file is DISTRO-DEPENDENT:
@@ -182,7 +182,7 @@ test that cannot fail is invisible to CI. `make verify` is the local gate.
 - SQLite to PostgreSQL: `x-ui migrate-db --dsn "postgres://..."`, then set
   `XUI_DB_TYPE`/`XUI_DB_DSN` in that file and `systemctl restart x-ui`. The
   source SQLite file is left in place.
-- Docker image `ghcr.io/mhsanaei/3x-ui`; PostgreSQL profile
+- Docker image `ghcr.io/gfw-knocker/3x-ui`; PostgreSQL profile
   `docker compose --profile postgres up -d`. Fail2ban IP-limit enforcement needs
   `NET_ADMIN` + `NET_RAW` (compose grants them; a bare `docker run` must add
   `--cap-add=NET_ADMIN --cap-add=NET_RAW`).

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, BookOpen, Heart } from 'lucide-react';
+import { ArrowRight, BookOpen } from 'lucide-react';
 import { GitHubIcon, TelegramIcon } from '@/components/icons';
 import { Logo } from '@/components/logo';
 import { Features } from '@/components/home/features';
@@ -7,7 +7,7 @@ import { GitHubStatsRow } from '@/components/home/github-stats';
 import { InstallCommand } from '@/components/home/install-command';
 import { getGitHubStats } from '@/lib/github-stats';
 import { i18n } from '@/lib/i18n';
-import { appName, productRepoUrl, deepWikiUrl, telegramChannelUrl, donateUrl } from '@/lib/shared';
+import { appName, productRepoUrl, deepWikiUrl, telegramChannelUrl } from '@/lib/shared';
 import { getSiteMessages, type SiteMessages } from '@/lib/site-i18n';
 
 export function generateStaticParams() {
@@ -15,7 +15,7 @@ export function generateStaticParams() {
 }
 
 const INSTALL_COMMAND =
-  'bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)';
+  'bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh)';
 
 export default async function HomePage({ params }: PageProps<'/[lang]'>) {
   const { lang } = await params;
@@ -126,15 +126,6 @@ function Footer({ prefix, m }: { prefix: string; m: SiteMessages }) {
           >
             <TelegramIcon className="size-4" />
             Telegram
-          </a>
-          <a
-            href={donateUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="inline-flex items-center gap-1.5 hover:text-fd-foreground"
-          >
-            <Heart className="size-4" />
-            {m.donate}
           </a>
         </nav>
       </div>

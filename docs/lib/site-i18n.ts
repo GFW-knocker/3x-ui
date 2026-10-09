@@ -12,7 +12,6 @@ export interface SiteMessages {
   getStarted: string;
   viewOnGitHub: string;
   documentation: string;
-  donate: string;
   docs: string;
   stars: string;
   forks: string;
@@ -33,7 +32,6 @@ const en: SiteMessages = {
   getStarted: 'Get started',
   viewOnGitHub: 'View on GitHub',
   documentation: 'Documentation',
-  donate: 'Donate',
   docs: 'Docs',
   stars: 'stars',
   forks: 'forks',
@@ -84,7 +82,6 @@ const fa: SiteMessages = {
   getStarted: 'شروع کنید',
   viewOnGitHub: 'مشاهده در GitHub',
   documentation: 'مستندات',
-  donate: 'حمایت مالی',
   docs: 'مستندات',
   stars: 'ستاره',
   forks: 'فورک',
@@ -135,7 +132,6 @@ const ru: SiteMessages = {
   getStarted: 'Начать',
   viewOnGitHub: 'Открыть на GitHub',
   documentation: 'Документация',
-  donate: 'Поддержать',
   docs: 'Документация',
   stars: 'звёзд',
   forks: 'форков',
@@ -186,7 +182,6 @@ const zh: SiteMessages = {
   getStarted: '开始使用',
   viewOnGitHub: '在 GitHub 上查看',
   documentation: '文档',
-  donate: '捐赠',
   docs: '文档',
   stars: '星标',
   forks: '复刻',
