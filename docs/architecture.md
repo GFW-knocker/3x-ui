@@ -22,8 +22,8 @@ separate HTTP server serves **subscription links** to end users.
 The panel supervises **managed child processes**: Xray-core itself and — when MTProto
 inbounds exist — a dedicated child proxy binary:
 
-- **`mtg-multi` for MTProto inbounds** (`github.com/mhsanaei/mtg-multi`, a multi-secret fork
-  built from source; `internal/mtproto/`): One process per inbound serves every attached
+- **`mtg-multi` for MTProto inbounds** (`github.com/GFW-knocker/mtg-multi`, a multi-secret fork
+  built from the commit pinned in `tools/build-mtg-multi.sh`; `internal/mtproto/`): One process per inbound serves every attached
   client's FakeTLS secret through the fork's `[secrets]` section, plus optional per-client
   sponsored-channel ad-tags via `[secret-ad-tags]`. A client or ad-tag edit is hot-applied via
   the fork's management API (`PUT /secrets`, guarded by a per-process bearer token), with a

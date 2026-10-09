@@ -133,7 +133,7 @@ configs for the same inbound.
 - **amnezia-vpn/amneziawg-go** — the obfuscation parameters the panel generates
   (`Jc`/`Jmin`/`Jmax`, `S1`-`S4`, `H1`-`H4`, `I1`-`I5`). Its `device/uapi.go` is the
   symbol that decides which keys are accepted.
-- **mhsanaei/mtg-multi** — the MTProto sidecar whose TOML (`[secrets]`,
+- **GFW-knocker/mtg-multi** — the MTProto sidecar whose TOML (`[secrets]`,
   `[secret-ad-tags]`, `[secret-limits]`) and management API
   (`PUT /secrets`, `POST /secrets/{name}/reset-quota`) `internal/mtproto/`
   writes and calls.

@@ -153,24 +153,9 @@ jobs:
           fetch -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
           fetch -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
           mv xray xray-linux-${{ matrix.platform }}
-          # mtg-multi (MTProto sidecar) ships prebuilt release binaries whose
-          # platform labels match our matrix, so download and unpack the matching
-          # archive. Only the platforms the fork publishes are packaged — the tag
-          # lookup lives inside that branch so unpackaged platforms (s390x) never
-          # depend on it. The tag comes from the release-page redirect on
-          # github.com — the host the downloads need anyway — because api.github.com
-          # has 503'd whole release runs while asset downloads kept working.
-          case "${{ matrix.platform }}" in
-            amd64|arm64|armv7|armv6|386)
-              MTG_MULTI_VER=$(curl -sf $CURL_RETRY -o /dev/null -w '%{redirect_url}' "https://github.com/mhsanaei/mtg-multi/releases/latest" | sed -n 's#.*/releases/tag/##p')
-              if [ -z "$MTG_MULTI_VER" ]; then echo "could not resolve the latest mtg-multi release tag"; exit 1; fi
-              MTG_PKG="mtg-multi-${MTG_MULTI_VER#v}-linux-${{ matrix.platform }}"
-              curl -sfLRO $CURL_RETRY "https://github.com/mhsanaei/mtg-multi/releases/download/${MTG_MULTI_VER}/${MTG_PKG}.tar.gz"
-              tar -xzf "${MTG_PKG}.tar.gz"
-              mv "${MTG_PKG}/mtg-multi" "mtg-linux-${{ matrix.platform }}"
-              rm -rf "${MTG_PKG}" "${MTG_PKG}.tar.gz"
-              ;;
-          esac
+          # mtg-multi (MTProto sidecar) is pure Go, so it is built from source for every
+          # platform at the commit pinned in tools/build-mtg-multi.sh, using GOOS/GOARCH above.
+          sh ../../tools/build-mtg-multi.sh "mtg-linux-${{ matrix.platform }}"
           cd ../..
 
       - name: Package
@@ -267,6 +252,7 @@ jobs:
             LDFLAGS="$LDFLAGS -X github.com/mhsanaei/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA:0:8} -X github.com/mhsanaei/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release.exe -v .
+          sh tools/build-mtg-multi.sh mtg-windows-amd64.exe
 
       - name: Copy and download resources
         shell: pwsh
@@ -291,17 +277,8 @@ jobs:
           Invoke-WebRequest @retry -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile "geosite_RU.dat"
           Rename-Item xray.exe xray-windows-amd64.exe
 
-          # mtg-multi (MTProto sidecar) publishes a prebuilt Windows binary, so
-          # download and unpack it instead of compiling. The tag comes from the
-          # release-page redirect on github.com — not api.github.com, whose
-          # outages have failed release runs while asset downloads kept working.
-          $MTG_MULTI_VER = (curl.exe -sf --retry 5 --retry-all-errors --retry-delay 3 -o NUL -w '%{redirect_url}' "https://github.com/mhsanaei/mtg-multi/releases/latest") -replace '^.*/releases/tag/', ''
-          if (-not $MTG_MULTI_VER -or $MTG_MULTI_VER -notmatch '^v[\d.]+$') { throw "could not resolve the latest mtg-multi release tag" }
-          $MTG_PKG = "mtg-multi-$($MTG_MULTI_VER.TrimStart('v'))-windows-amd64"
-          curl.exe -sfLRO --retry 5 --retry-all-errors --retry-delay 3 "https://github.com/mhsanaei/mtg-multi/releases/download/$MTG_MULTI_VER/$MTG_PKG.zip"
-          Expand-Archive -Path "$MTG_PKG.zip" -DestinationPath "mtg-tmp" -Force
-          Move-Item "mtg-tmp/$MTG_PKG/mtg-multi.exe" "mtg-windows-amd64.exe"
-          Remove-Item -Recurse -Force "mtg-tmp", "$MTG_PKG.zip"
+          # mtg-multi was built from pinned source in the MSYS2 build step.
+          Move-Item ..\..\mtg-windows-amd64.exe mtg-windows-amd64.exe
 
           cd ..
           Copy-Item -Path ..\windows_files\* -Destination . -Recurse

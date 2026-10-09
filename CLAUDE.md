@@ -12,9 +12,9 @@ file locations when it can answer in one hop.
   Runs Xray-core as a managed child process (`internal/xray/process.go`) and
   imports `github.com/xtls/xray-core` for config types + gRPC stats/handler/router
   API. MTProto inbounds run a second managed child — the `mtg-multi` binary
-  (a multi-secret mtg fork — NOT a Go dependency; its prebuilt release binary is
-  fetched at image/release build time by `DockerInit.sh` + `release.yml`,
-  panel-side code in `internal/mtproto/`) — outside Xray, one process per inbound
+  (a multi-secret mtg fork — NOT a Go dependency; `tools/build-mtg-multi.sh`
+  builds it from a pinned GFW-knocker/mtg-multi commit at image/release build
+  time for `DockerInit.sh` + `release.yml`, panel-side code in `internal/mtproto/`) — outside Xray, one process per inbound
   serving each
   client's FakeTLS secret via the fork's `[secrets]` section (plus per-client
   ad-tags via `[secret-ad-tags]` and per-client data quota / expiry via

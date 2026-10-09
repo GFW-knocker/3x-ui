@@ -20,6 +20,7 @@ RUN apk --no-cache --update add \
   build-base \
   gcc \
   curl \
+  git \
   unzip
 
 COPY . .

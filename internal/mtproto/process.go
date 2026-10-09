@@ -1,4 +1,4 @@
-// Package mtproto manages mtg-multi (github.com/mhsanaei/mtg-multi) sidecar
+// Package mtproto manages mtg-multi (github.com/GFW-knocker/mtg-multi) sidecar
 // processes that serve MTProto FakeTLS proxies. Xray-core has no mtproto
 // protocol, so mtproto inbounds are run as standalone mtg processes — one
 // process per inbound, each serving every active client's secret through the
