@@ -8,8 +8,8 @@ import (
 	"github.com/amnezia-vpn/amneziawg-go/v3/device"
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	"github.com/GFW-knocker/3x-ui/v3/internal/amneziawg"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/wireguard"
 )
 
 // DeviceOptions carries AmneziaWG 3.0's device-wide fields (header

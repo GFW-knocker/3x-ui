@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // nodeForPlainServer builds an http (non-TLS) node so do()'s token handling can

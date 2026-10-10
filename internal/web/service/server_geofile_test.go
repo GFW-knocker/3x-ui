@@ -12,7 +12,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/dbtest"
 )
 
 // Loyalsoldier and runetfreedom write "<hash>  geoip.dat"; chocolate4u writes

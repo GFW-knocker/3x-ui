@@ -14,8 +14,8 @@ import (
 	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 	"gvisor.dev/gvisor/pkg/tcpip/link/channel"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	"github.com/GFW-knocker/3x-ui/v3/internal/amneziawg"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/wireguard"
 )
 
 // BenchmarkStackTunWrite measures the upload path's per-packet cost: one

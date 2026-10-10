@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/GFW-knocker/3x-ui/v3/internal/xray"
 )
 
 // nextCalendarRenewal returns the next renewal strictly after from, at midnight

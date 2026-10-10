@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // settings.key is read on nearly every request and job tick (getSetting

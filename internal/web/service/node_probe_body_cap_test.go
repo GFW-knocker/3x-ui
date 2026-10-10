@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // An oversized status body must be rejected, not buffered whole by encoding/json.

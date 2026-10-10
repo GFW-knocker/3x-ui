@@ -3,7 +3,7 @@ package service
 import (
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 func inboundKeepAlive(t *testing.T, inboundSvc *InboundService, ibId int, email string) int {

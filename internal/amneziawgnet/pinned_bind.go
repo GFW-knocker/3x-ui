@@ -11,7 +11,7 @@ import (
 
 	awgconn "github.com/amnezia-vpn/amneziawg-go/v3/conn"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 // pinnedBind opens its UDP socket on exactly one host address (#6367).

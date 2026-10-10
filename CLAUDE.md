@@ -8,7 +8,7 @@ index, layering rules), read `docs/architecture.md` on demand — do not guess
 file locations when it can answer in one hop.
 
 ## Stack
-- Backend: Go 1.27 (`module github.com/mhsanaei/3x-ui/v3`), Gin, GORM.
+- Backend: Go 1.27 (`module github.com/GFW-knocker/3x-ui/v3`), Gin, GORM.
   Runs Xray-core as a managed child process (`internal/xray/process.go`) and
   imports `github.com/GFW-knocker/Xray-core` (Mahsa-Core, a fork of `xtls/xray-core`)
   for config types + gRPC stats/handler/router

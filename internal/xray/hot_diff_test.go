@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	xuilogger "github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
+	xuilogger "github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/json_util"
 
 	"github.com/op/go-logging"
 )

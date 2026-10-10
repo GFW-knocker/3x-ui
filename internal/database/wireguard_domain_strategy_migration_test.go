@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/GFW-knocker/3x-ui/v3/internal/config"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/xray"
 )
 
 const wgTestKeys = `"secretKey":"yAnz5TF+lXXJte14tji3zlMNq+hd2rYUIgJBgB3fBmk=","peers":[{"publicKey":"xTIBA5rboUvnH4htodjb6e697QjLERt1NAB4mZqp8Dg=","endpoint":"engage.cloudflareclient.com:2408"}]`

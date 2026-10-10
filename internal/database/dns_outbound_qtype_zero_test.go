@@ -9,8 +9,8 @@ import (
 	"github.com/GFW-knocker/Xray-core/proxy/dns"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/config"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // The core drops a lone numeric qType 0 from its PortList, and a rule with no

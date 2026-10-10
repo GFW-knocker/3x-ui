@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // Mahsa-Core's MVLESS shares VLESS's settings and differs only on the wire, so every

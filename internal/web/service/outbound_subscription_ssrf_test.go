@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/netsafe"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/netsafe"
 )
 
 func TestSubscriptionFetchClientBlocksPrivateDial(t *testing.T) {

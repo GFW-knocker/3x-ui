@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 func streamWithNoiseItem(t *testing.T, item map[string]any) map[string]any {

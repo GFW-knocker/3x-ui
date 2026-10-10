@@ -7,9 +7,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/crypto/nodetoken"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/crypto/nodetoken"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // enableNodeTokenEncryption installs a test keyring and restores off mode so

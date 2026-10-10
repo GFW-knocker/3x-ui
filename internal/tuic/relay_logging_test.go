@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	clientquic "github.com/quic-go/quic-go"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 func audit3LogsStart(t *testing.T, level, marker, relayAddr string) (*Server, *clientquic.Conn, uuid.UUID, string, []byte) {

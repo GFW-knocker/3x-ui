@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/json_util"
 )
 
 func TestPersistConfigWritesCurrentSnapshot(t *testing.T) {

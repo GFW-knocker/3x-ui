@@ -22,7 +22,7 @@ import (
 	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 	"gvisor.dev/gvisor/pkg/tcpip/stack"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 // SocksRelay describes the loopback SOCKS5 inbound decapsulated AmneziaWG

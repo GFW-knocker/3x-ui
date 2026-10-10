@@ -11,9 +11,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/dbtest"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 func initHwidSubRouter(t *testing.T, limit int) (*gin.Engine, string) {

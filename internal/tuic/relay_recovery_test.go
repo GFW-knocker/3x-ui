@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 
 	clientquic "github.com/quic-go/quic-go"
 )

@@ -12,8 +12,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/eventbus"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 type xrayMetricsState struct {

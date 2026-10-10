@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/crypto"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/dbtest"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/crypto"
 )
 
 func setupAPITokenTestDB(t *testing.T) {

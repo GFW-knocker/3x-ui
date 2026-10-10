@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/maskcompat"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/maskcompat"
 )
 
 // Outbound is the minimal shape we emit for each parsed link.

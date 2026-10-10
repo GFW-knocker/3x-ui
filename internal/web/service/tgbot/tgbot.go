@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/global"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/locale"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/GFW-knocker/3x-ui/v3/internal/eventbus"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/common"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/global"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/locale"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/service"
 
 	"github.com/mymmrac/telego"
 	th "github.com/mymmrac/telego/telegohandler"

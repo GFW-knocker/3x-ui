@@ -3,7 +3,7 @@ package sub
 import (
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // Bad observatory settings (malformed JSON, non-URL destination, bad duration)

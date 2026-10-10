@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/web/locale"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/locale"
 
 	"github.com/mymmrac/telego"
 	"github.com/nicksnyder/go-i18n/v2/i18n"

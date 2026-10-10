@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/dbtest"
+	"github.com/GFW-knocker/3x-ui/v3/internal/eventbus"
 )
 
 // probe is one observatory sample: whether the outbound is alive and the

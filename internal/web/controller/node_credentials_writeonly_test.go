@@ -15,10 +15,10 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/locale"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/dbtest"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/locale"
 )
 
 func newNodeCredentialTestEngine(t *testing.T) *gin.Engine {

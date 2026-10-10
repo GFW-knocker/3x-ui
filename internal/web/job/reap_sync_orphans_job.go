@@ -1,8 +1,8 @@
 package job
 
 import (
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/service"
 )
 
 // ReapSyncOrphansJob hard-deletes the clients the node-snapshot sweep only

@@ -11,8 +11,8 @@ import (
 	"github.com/amnezia-vpn/amneziawg-go/v3/device"
 	"gvisor.dev/gvisor/pkg/tcpip/adapters/gonet"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/amneziawg"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 // verboseLoggerIfEnabled returns a real amneziawg-go verbose logger (real

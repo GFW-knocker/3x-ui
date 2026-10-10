@@ -4,8 +4,8 @@ import (
 	"encoding/base64"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	wgutil "github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
+	wgutil "github.com/GFW-knocker/3x-ui/v3/internal/util/wireguard"
 )
 
 func wgTestKeypair(t *testing.T, seed byte) (priv, pub string) {

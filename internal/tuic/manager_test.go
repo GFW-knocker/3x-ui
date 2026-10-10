@@ -14,7 +14,7 @@ import (
 
 	"github.com/apernet/quic-go"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 func TestEnsureStartsServerAndReconciles(t *testing.T) {

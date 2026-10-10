@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
 )
 
 const settleTimeout = 30 * time.Second

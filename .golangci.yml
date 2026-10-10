@@ -46,7 +46,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/mhsanaei/3x-ui
+        - github.com/GFW-knocker/3x-ui
   exclusions:
     paths:
       - frontend

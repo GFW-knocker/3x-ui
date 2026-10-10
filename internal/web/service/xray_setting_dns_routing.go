@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/netsafe"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/netsafe"
 )
 
 // dnsAllowRuleTag marks the routing rules this file manages. Both

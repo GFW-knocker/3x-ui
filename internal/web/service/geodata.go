@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray/geodata"
+	"github.com/GFW-knocker/3x-ui/v3/internal/config"
+	"github.com/GFW-knocker/3x-ui/v3/internal/xray/geodata"
 )
 
 // GeodataTokenIssue reports a routing token the running core would reject,

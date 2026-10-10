@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-playground/validator/v10"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/runtime"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/runtime"
 )
 
 func TestReloadMasterMtlsClientDoesNotMintMissingCredential(t *testing.T) {

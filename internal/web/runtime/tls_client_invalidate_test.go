@@ -3,7 +3,7 @@ package runtime
 import (
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // Only a later call for the same node pruned its pooled client, so a deleted

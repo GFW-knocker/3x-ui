@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 )
 
 // Mahsa-Core keeps xray's QUIC transport; links carry it as v2rayN and the pre-v3 MX-UI did:

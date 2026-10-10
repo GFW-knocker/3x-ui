@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/json_util"
 )
 
 // xray-core v26.6.22 (#6258) renamed the XHTTP session keys with no fallback.

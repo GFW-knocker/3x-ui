@@ -20,8 +20,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/config"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
 )
 
 // GetBinaryName returns the mtg binary filename for the current OS and arch,

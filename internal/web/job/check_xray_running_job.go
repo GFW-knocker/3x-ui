@@ -3,9 +3,9 @@
 package job
 
 import (
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/GFW-knocker/3x-ui/v3/internal/eventbus"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/service"
 )
 
 // EventBus is set from web layer to publish events.

@@ -11,14 +11,14 @@ import (
 	"strings"
 	"testing"
 
+	xraygeodata "github.com/GFW-knocker/Xray-core/common/geodata"
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
-	xraygeodata "github.com/GFW-knocker/Xray-core/common/geodata"
 	"google.golang.org/protobuf/proto"
 
-	xuilogger "github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray/geodata"
+	xuilogger "github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/service"
+	"github.com/GFW-knocker/3x-ui/v3/internal/xray/geodata"
 )
 
 func newGeodataEngine(t *testing.T) *gin.Engine {

@@ -7,9 +7,9 @@ package panel
 import (
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/common"
+	"github.com/GFW-knocker/3x-ui/v3/internal/web/websocket"
 
 	"github.com/google/uuid"
 	ws "github.com/gorilla/websocket"

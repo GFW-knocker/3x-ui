@@ -10,7 +10,7 @@
 // architecture this fork originally shipped was retired.
 package amneziawg
 
-import "github.com/mhsanaei/3x-ui/v3/internal/database/model"
+import "github.com/GFW-knocker/3x-ui/v3/internal/database/model"
 
 // Obfuscation31 is an AmneziaWG 3.1 obfuscation parameter set (junk packets,
 // padding, magic headers, the five CPS signature-packet slots, and the 3.x

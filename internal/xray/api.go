@@ -16,10 +16,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	wgutil "github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	"github.com/GFW-knocker/3x-ui/v3/internal/config"
+	"github.com/GFW-knocker/3x-ui/v3/internal/logger"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/common"
+	wgutil "github.com/GFW-knocker/3x-ui/v3/internal/util/wireguard"
 
 	"github.com/GFW-knocker/Xray-core/app/proxyman/command"
 	routerService "github.com/GFW-knocker/Xray-core/app/router/command"

@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/GFW-knocker/3x-ui/v3/internal/util/json_util"
+	"github.com/GFW-knocker/3x-ui/v3/internal/xray"
 )
 
 // The empty-diff branch of tryHotApply makes no gRPC call, so it can prove the
