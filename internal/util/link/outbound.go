@@ -178,6 +178,8 @@ func parseVmess(link string) (*ParseResult, error) {
 		stream["grpcSettings"].(map[string]any)["multiMode"] = getString(j, "type", "") == "multi"
 	case "httpupgrade":
 		setHTTPUpgrade(stream, getString(j, "host", ""), getString(j, "path", "/"))
+	case "quic":
+		setQuic(stream, getString(j, "host", ""), getString(j, "path", ""), getString(j, "type", ""))
 	case "xhttp":
 		xh := stream["xhttpSettings"].(map[string]any)
 		xh["host"] = getString(j, "host", "")
@@ -625,6 +627,16 @@ func parseWireguard(link string) (*ParseResult, error) {
 
 // --- helpers ---
 
+// setQuic writes Mahsa-Core's quicSettings; an unnamed cipher or header is "none",
+// the value the core assumes when either is absent.
+func setQuic(stream map[string]any, security, key, header string) {
+	stream["quicSettings"] = map[string]any{
+		"security": firstNonEmpty(security, "none"),
+		"key":      key,
+		"header":   map[string]any{"type": firstNonEmpty(header, "none")},
+	}
+}
+
 func buildStream(network, security string) map[string]any {
 	stream := map[string]any{"network": network, "security": security}
 	switch network {
@@ -635,6 +647,8 @@ func buildStream(network, security string) map[string]any {
 			"mtu": 1350, "tti": 20, "uplinkCapacity": 5, "downlinkCapacity": 20,
 			"cwndMultiplier": 1, "maxSendingWindow": 2097152,
 		}
+	case "quic":
+		setQuic(stream, "", "", "")
 	case "ws":
 		stream["wsSettings"] = map[string]any{"path": "/", "host": "", "headers": map[string]any{}, "heartbeatPeriod": 0}
 	case "grpc":
@@ -713,6 +727,8 @@ func applyTransport(stream map[string]any, p url.Values) {
 				xh[k] = v
 			}
 		}
+	case "quic":
+		setQuic(stream, p.Get("quicSecurity"), p.Get("key"), p.Get("headerType"))
 	case "kcp":
 		// mtu/tti live on kcpSettings; header/seed are finalmask mkcp-legacy (see applyMkcpLegacyFromShare).
 		kcp := stream["kcpSettings"].(map[string]any)

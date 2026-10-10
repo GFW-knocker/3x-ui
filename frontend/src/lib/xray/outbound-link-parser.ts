@@ -133,6 +133,16 @@ function applyXhttpStringFromJson(xhttp: Raw, json: Record<string, unknown>): vo
   }
 }
 
+// Mahsa-Core's quicSettings; an unnamed cipher or header is none, as the core assumes.
+function quicSettings(security: unknown, key: unknown, header: unknown): Raw {
+  const text = (v: unknown) => (typeof v === 'string' ? v : '');
+  return {
+    security: text(security) || 'none',
+    key: text(key),
+    header: { type: text(header) || 'none' },
+  };
+}
+
 function buildStream(network: string, security: string): Raw {
   const stream: Raw = { network, security };
   switch (network) {
@@ -148,6 +158,9 @@ function buildStream(network: string, security: string): Raw {
         cwndMultiplier: 1,
         maxSendingWindow: 2097152,
       };
+      break;
+    case 'quic':
+      stream.quicSettings = quicSettings('', '', '');
       break;
     case 'ws':
       stream.wsSettings = { path: '/', host: '', headers: {}, heartbeatPeriod: 0 };
@@ -221,6 +234,13 @@ function applyTransportParams(stream: Raw, params: URLSearchParams): void {
       applyXhttpStringFromParams(xhttp, params);
       break;
     }
+    case 'quic':
+      stream.quicSettings = quicSettings(
+        params.get('quicSecurity'),
+        params.get('key'),
+        params.get('headerType'),
+      );
+      break;
     case 'kcp': {
       // mtu/tti on kcpSettings; header/seed via applyMkcpLegacyFromShare.
       const kcp = stream.kcpSettings as Raw;
@@ -533,6 +553,8 @@ export function parseVmessLink(link: string): Raw | null {
       (stream.grpcSettings as Raw).serviceName = json.path ?? '';
       (stream.grpcSettings as Raw).authority = json.authority ?? '';
       (stream.grpcSettings as Raw).multiMode = json.type === 'multi';
+    } else if (network === 'quic') {
+      stream.quicSettings = quicSettings(json.host, json.path, json.type);
     } else if (network === 'httpupgrade') {
       (stream.httpupgradeSettings as Raw).host = json.host ?? '';
       (stream.httpupgradeSettings as Raw).path = json.path ?? '/';

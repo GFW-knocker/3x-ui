@@ -52,6 +52,7 @@ import {
   HysteriaForm,
   KcpForm,
   MuxForm,
+  QuicForm,
   RawForm,
   SockoptForm,
   WsForm,
@@ -477,6 +478,8 @@ export default function OutboundFormModal({
                           {network === 'tcp' && <RawForm />}
 
                           {network === 'kcp' && <KcpForm />}
+
+                          {network === 'quic' && <QuicForm />}
 
                           {network === 'ws' && <WsForm />}
 

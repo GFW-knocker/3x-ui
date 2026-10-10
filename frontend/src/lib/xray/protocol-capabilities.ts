@@ -6,7 +6,7 @@
 // fixture without the caller projecting a whole object.
 
 const TLS_ELIGIBLE_PROTOCOLS = ['vmess', 'vless', 'mvless', 'trojan', 'shadowsocks'];
-const TLS_NETWORKS = ['tcp', 'ws', 'http', 'grpc', 'httpupgrade', 'xhttp'];
+const TLS_NETWORKS = ['tcp', 'ws', 'http', 'grpc', 'httpupgrade', 'xhttp', 'quic'];
 const REALITY_ELIGIBLE_PROTOCOLS = ['vless', 'mvless', 'trojan'];
 const REALITY_NETWORKS = ['tcp', 'http', 'grpc', 'xhttp'];
 const STREAM_PROTOCOLS = [

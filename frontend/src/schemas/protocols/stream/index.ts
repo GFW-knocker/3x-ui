@@ -6,6 +6,7 @@ import { GrpcStreamSettingsSchema } from './grpc';
 import { HttpUpgradeStreamSettingsSchema } from './httpupgrade';
 import { HysteriaStreamSettingsSchema } from './hysteria';
 import { KcpStreamSettingsSchema } from './kcp';
+import { QuicStreamSettingsSchema } from './quic';
 import { SockoptStreamSettingsSchema } from './sockopt';
 import { TcpStreamSettingsSchema } from './tcp';
 import { WsStreamSettingsSchema } from './ws';
@@ -17,6 +18,7 @@ export * from './grpc';
 export * from './httpupgrade';
 export * from './hysteria';
 export * from './kcp';
+export * from './quic';
 export * from './sockopt';
 export * from './tcp';
 export * from './ws';
@@ -25,6 +27,7 @@ export * from './xhttp';
 export const NetworkSchema = z.enum([
   'tcp',
   'kcp',
+  'quic',
   'ws',
   'grpc',
   'httpupgrade',
@@ -45,6 +48,7 @@ export type Network = z.infer<typeof NetworkSchema>;
 const TransportNetworkSettingsSchema = z.discriminatedUnion('network', [
   z.object({ network: z.literal('tcp'), tcpSettings: TcpStreamSettingsSchema }),
   z.object({ network: z.literal('kcp'), kcpSettings: KcpStreamSettingsSchema }),
+  z.object({ network: z.literal('quic'), quicSettings: QuicStreamSettingsSchema }),
   z.object({ network: z.literal('ws'), wsSettings: WsStreamSettingsSchema }),
   z.object({ network: z.literal('grpc'), grpcSettings: GrpcStreamSettingsSchema }),
   z.object({

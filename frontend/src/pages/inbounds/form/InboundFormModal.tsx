@@ -50,6 +50,7 @@ import { VLESS_AUTH_LABEL_KEYS, vlessEncryptionAuthKind } from '@/lib/xray/vless
 import { SniffingSchema } from '@/schemas/primitives/sniffing';
 import { TcpStreamSettingsSchema } from '@/schemas/protocols/stream/tcp';
 import { KcpStreamSettingsSchema } from '@/schemas/protocols/stream/kcp';
+import { QuicStreamSettingsSchema } from '@/schemas/protocols/stream/quic';
 import { WsStreamSettingsSchema } from '@/schemas/protocols/stream/ws';
 import { GrpcStreamSettingsSchema } from '@/schemas/protocols/stream/grpc';
 import { HttpUpgradeStreamSettingsSchema } from '@/schemas/protocols/stream/httpupgrade';
@@ -77,6 +78,7 @@ import {
   GrpcForm,
   HttpUpgradeForm,
   KcpForm,
+  QuicForm,
   RawForm,
   SockoptForm,
   WsForm,
@@ -206,6 +208,8 @@ function newStreamSlice(n: string): Record<string, unknown> {
       return TcpStreamSettingsSchema.parse({ header: { type: 'none' } });
     case 'kcp':
       return KcpStreamSettingsSchema.parse({});
+    case 'quic':
+      return QuicStreamSettingsSchema.parse({});
     case 'ws':
       return WsStreamSettingsSchema.parse({});
     case 'grpc':
@@ -861,6 +865,7 @@ export default function InboundFormModal({
     const ALL = [
       'tcpSettings',
       'kcpSettings',
+      'quicSettings',
       'wsSettings',
       'grpcSettings',
       'httpupgradeSettings',
@@ -908,6 +913,7 @@ export default function InboundFormModal({
             options={[
               { value: 'tcp', label: 'RAW' },
               { value: 'kcp', label: 'mKCP' },
+              { value: 'quic', label: 'QUIC' },
               { value: 'ws', label: 'WebSocket' },
               { value: 'grpc', label: 'gRPC' },
               { value: 'httpupgrade', label: 'HTTPUpgrade' },
@@ -935,6 +941,8 @@ export default function InboundFormModal({
           {network === 'httpupgrade' && <HttpUpgradeForm />}
 
           {network === 'kcp' && <KcpForm />}
+
+          {network === 'quic' && <QuicForm />}
         </>
       )}
 

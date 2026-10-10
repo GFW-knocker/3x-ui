@@ -4,4 +4,5 @@ export { default as GrpcForm } from './grpc';
 export { default as XhttpForm } from './xhttp';
 export { default as HttpUpgradeForm } from './httpupgrade';
 export { default as KcpForm } from './kcp';
+export { default as QuicForm } from './quic';
 export { default as SockoptForm } from './sockopt';

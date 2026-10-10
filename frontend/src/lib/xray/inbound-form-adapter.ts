@@ -134,6 +134,7 @@ function coerceShareAddrStrategy(v: unknown): ShareAddrStrategy {
 const NETWORK_SETTINGS_KEY: Record<string, string> = {
   tcp: 'tcpSettings',
   kcp: 'kcpSettings',
+  quic: 'quicSettings',
   ws: 'wsSettings',
   grpc: 'grpcSettings',
   httpupgrade: 'httpupgradeSettings',

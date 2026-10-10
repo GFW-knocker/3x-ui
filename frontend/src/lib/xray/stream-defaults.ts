@@ -3,6 +3,7 @@ import {
   HttpUpgradeStreamSettingsSchema,
   HysteriaStreamSettingsSchema,
   KcpStreamSettingsSchema,
+  QuicStreamSettingsSchema,
   TcpStreamSettingsSchema,
   WsStreamSettingsSchema,
   XHttpStreamSettingsSchema,
@@ -12,6 +13,7 @@ import { RealityStreamSettingsSchema, TlsStreamSettingsSchema } from '@/schemas/
 const NETWORK_KEY_MAP = {
   tcp: 'tcpSettings',
   kcp: 'kcpSettings',
+  quic: 'quicSettings',
   ws: 'wsSettings',
   grpc: 'grpcSettings',
   httpupgrade: 'httpupgradeSettings',
@@ -34,6 +36,8 @@ function networkSchemaFor(network: string): SchemaWithParse | null {
       return TcpStreamSettingsSchema;
     case 'kcp':
       return KcpStreamSettingsSchema;
+    case 'quic':
+      return QuicStreamSettingsSchema;
     case 'ws':
       return WsStreamSettingsSchema;
     case 'grpc':

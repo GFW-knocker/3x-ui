@@ -1749,6 +1749,9 @@ func applyShareNetworkParams(stream map[string]any, streamNetwork string, params
 		}
 	case "kcp":
 		applyKcpShareParams(stream, params)
+	case "quic":
+		security, key, header := quicShareFields(stream)
+		params["quicSecurity"], params["key"], params["headerType"] = security, key, header
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]any)
 		applyPathAndHostParams(ws, params)
@@ -1766,6 +1769,22 @@ func applyShareNetworkParams(stream map[string]any, streamNetwork string, params
 		xhttp, _ := stream["xhttpSettings"].(map[string]any)
 		applyXhttpExtraParams(xhttp, params)
 	}
+}
+
+// quicShareFields reads Mahsa-Core's quicSettings; an absent header shares as "none",
+// which is what the core assumes for it.
+func quicShareFields(stream map[string]any) (security, key, header string) {
+	quic, _ := stream["quicSettings"].(map[string]any)
+	security, _ = quic["security"].(string)
+	key, _ = quic["key"].(string)
+	headerSettings, _ := quic["header"].(map[string]any)
+	if header, _ = headerSettings["type"].(string); header == "" {
+		header = "none"
+	}
+	if security == "" {
+		security = "none"
+	}
+	return security, key, header
 }
 
 // applyXhttpExtraObj copies the bidirectional xhttp settings into the
@@ -1806,6 +1825,8 @@ func applyVmessNetworkParams(stream map[string]any, network string, obj map[stri
 		}
 	case "kcp":
 		applyKcpShareObj(stream, obj)
+	case "quic":
+		obj["host"], obj["path"], obj["type"] = quicShareFields(stream)
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]any)
 		applyPathAndHostObj(ws, obj)

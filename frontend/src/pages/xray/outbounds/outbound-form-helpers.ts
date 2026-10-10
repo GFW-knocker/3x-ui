@@ -29,6 +29,11 @@ export function newStreamSlice(network: string): Record<string, unknown> {
           maxSendingWindow: 2097152,
         },
       };
+    case 'quic':
+      return {
+        network: 'quic',
+        quicSettings: { security: 'none', key: '', header: { type: 'none' } },
+      };
     case 'ws':
       return {
         network: 'ws',

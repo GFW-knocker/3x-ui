@@ -41,6 +41,7 @@ export const MUX_PROTOCOLS = new Set<string>([
 export const NETWORK_OPTIONS: { value: string; label: string }[] = [
   { value: 'tcp', label: 'RAW' },
   { value: 'kcp', label: 'mKCP' },
+  { value: 'quic', label: 'QUIC' },
   { value: 'ws', label: 'WebSocket' },
   { value: 'grpc', label: 'gRPC' },
   { value: 'httpupgrade', label: 'HTTPUpgrade' },

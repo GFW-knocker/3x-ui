@@ -283,6 +283,11 @@ export function genVmessLink(input: GenVmessLinkInput): string {
     const kcp = stream.kcpSettings;
     obj.mtu = kcp.mtu;
     obj.tti = kcp.tti;
+  } else if (stream.network === 'quic') {
+    const quic = stream.quicSettings;
+    obj.type = quic.header.type;
+    obj.host = quic.security;
+    obj.path = quic.key;
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     obj.path = ws.path;
@@ -445,6 +450,11 @@ export function genVlessLink(input: GenVlessLinkInput): string {
     const kcp = stream.kcpSettings;
     params.set('mtu', String(kcp.mtu));
     params.set('tti', String(kcp.tti));
+  } else if (stream.network === 'quic') {
+    const quic = stream.quicSettings;
+    params.set('quicSecurity', quic.security);
+    params.set('key', quic.key);
+    params.set('headerType', quic.header.type);
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     params.set('path', ws.path);
@@ -551,6 +561,11 @@ function writeNetworkParams(
     const kcp = stream.kcpSettings;
     params.set('mtu', String(kcp.mtu));
     params.set('tti', String(kcp.tti));
+  } else if (stream.network === 'quic') {
+    const quic = stream.quicSettings;
+    params.set('quicSecurity', quic.security);
+    params.set('key', quic.key);
+    params.set('headerType', quic.header.type);
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     params.set('path', ws.path);
