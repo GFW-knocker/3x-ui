@@ -31,6 +31,14 @@ describe('isPanelUpdateAvailable', () => {
     expect(isPanelUpdateAvailable('nightly-1', 'nightly-1')).toBe(false);
   });
 
+  // Fork tags are an upstream version plus a Mahsa revision, ordered like the Go side.
+  it('orders Mahsa revisions instead of falling back to string inequality', () => {
+    expect(isPanelUpdateAvailable('3.9.0-mahsa-r2', '3.9.0-mahsa-r1')).toBe(true);
+    expect(isPanelUpdateAvailable('v3.9.0-mahsa-r1', '3.9.0-mahsa-r2')).toBe(false);
+    expect(isPanelUpdateAvailable('3.9.0', '3.9.0-mahsa-r1')).toBe(false);
+    expect(isPanelUpdateAvailable('3.10.0', '3.9.0-mahsa-r5')).toBe(true);
+  });
+
   it('compares dev builds by commit and never across channels', () => {
     expect(isPanelUpdateAvailable('dev+1a2b3c4d', 'dev+0f0f0f0f')).toBe(true);
     expect(isPanelUpdateAvailable('dev+1a2b3c4d', 'dev+1a2b3c4d')).toBe(false);

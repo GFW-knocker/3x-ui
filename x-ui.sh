@@ -213,7 +213,7 @@ replace_xui_script() {
 installed_script_url() {
     local ver
     ver=$("${xui_folder}/x-ui" -v 2> /dev/null | tr -d '[:space:]')
-    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && curl -fsIL -o /dev/null "https://raw.githubusercontent.com/GFW-knocker/3x-ui/v${ver}/x-ui.sh"; then
+    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-mahsa-r[0-9]+)?$ ]] && curl -fsIL -o /dev/null "https://raw.githubusercontent.com/GFW-knocker/3x-ui/v${ver}/x-ui.sh"; then
         echo "https://raw.githubusercontent.com/GFW-knocker/3x-ui/v${ver}/x-ui.sh"
     else
         echo -e "${yellow}No x-ui.sh published for the installed version (${ver:-unknown}), using main${plain}" >&2
