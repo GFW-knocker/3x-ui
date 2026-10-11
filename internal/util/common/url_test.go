@@ -10,14 +10,14 @@ func TestEnsureURLScheme(t *testing.T) {
 	}{
 		{"empty", "", ""},
 		{"whitespace only", "   ", ""},
-		{"bare telegram handle", "t.me/xui_support", "https://t.me/xui_support"},
+		{"bare telegram handle", "t.me/example_support", "https://t.me/example_support"},
 		{"bare domain with path", "example.com/help", "https://example.com/help"},
-		{"already https", "https://t.me/xui_support", "https://t.me/xui_support"},
+		{"already https", "https://t.me/example_support", "https://t.me/example_support"},
 		{"already http", "http://example.com", "http://example.com"},
-		{"telegram deep link", "tg://resolve?domain=xui_support", "tg://resolve?domain=xui_support"},
+		{"telegram deep link", "tg://resolve?domain=example_support", "tg://resolve?domain=example_support"},
 		{"mailto", "mailto:support@example.com", "mailto:support@example.com"},
 		{"tel", "tel:+1234567890", "tel:+1234567890"},
-		{"trims whitespace", "  t.me/xui_support  ", "https://t.me/xui_support"},
+		{"trims whitespace", "  t.me/example_support  ", "https://t.me/example_support"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

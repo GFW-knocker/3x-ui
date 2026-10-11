@@ -23,9 +23,6 @@ export const gitConfig = {
 
 export const productRepoUrl = `https://github.com/${productRepo.user}/${productRepo.repo}`;
 
-// AI-generated interactive wiki of the 3x-ui codebase.
-export const deepWikiUrl = `https://deepwiki.com/${productRepo.user}/${productRepo.repo}`;
-
 // Community channel on Telegram (announcements & support).
 export const telegramChannel = 'mahsa_net';
 export const telegramChannelUrl = `https://t.me/${telegramChannel}`;

@@ -127,8 +127,8 @@ func incyHeaderText(v string) string {
 	return "base64:" + base64.StdEncoding.EncodeToString([]byte(text))
 }
 
-// ApplyIncyHeaders sets the Incy app-management headers from
-// https://docs.incy.cc/en/app-management/ (matched case-insensitively).
+// ApplyIncyHeaders sets the headers from Incy's app-management docs
+// (matched case-insensitively).
 func ApplyIncyHeaders(c *gin.Context, cfg IncyConfig, isIncy bool) {
 	if c == nil || c.Writer == nil || !cfg.AutoDetect || !isIncy {
 		return
