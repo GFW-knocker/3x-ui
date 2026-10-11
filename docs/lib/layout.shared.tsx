@@ -2,13 +2,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import { Logo } from '@/components/logo';
 import { TelegramIcon } from '@/components/icons';
 import { DocsThemeSwitch } from '@/components/theme-switch';
-import {
-  appName,
-  productRepoUrl,
-  telegramChannel,
-  telegramChannelUrl,
-  siteUrl,
-} from './shared';
+import { appName, productRepoUrl, telegramChannel, telegramChannelUrl, siteUrl } from './shared';
 import { getSiteMessages } from './site-i18n';
 
 // Build locale-aware shared layout options. With `hideLocale: 'default-locale'`,
