@@ -432,19 +432,12 @@ func getPublicIP(url string) string {
 
 var publicIPv4Services = []string{
 	"https://api4.ipify.org",
-	"https://ipv4.icanhazip.com",
 	"https://v4.api.ipinfo.io/ip",
-	"https://ipv4.myexternalip.com/raw",
-	"https://4.ident.me",
-	"https://check-host.net/ip",
 }
 
 var publicIPv6Services = []string{
 	"https://api6.ipify.org",
-	"https://ipv6.icanhazip.com",
 	"https://v6.api.ipinfo.io/ip",
-	"https://ipv6.myexternalip.com/raw",
-	"https://6.ident.me",
 }
 
 // resolvePublicIPs caches the public IPv4/IPv6 addresses on first use. The
