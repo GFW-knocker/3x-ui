@@ -813,6 +813,21 @@ func validateFinalMaskRealityCombo(streamSettings string) error {
 	return common.NewError("Finalmask is not supported with REALITY security — it crashes Xray-core on the first connection (see XTLS/Xray-core#6453). Remove the finalmask configuration or switch security to tls/none.")
 }
 
+// validateRealityTransport mirrors the core's StreamConfig.Build, which refuses the whole
+// config when REALITY rides any transport but RAW, XHTTP or gRPC.
+func validateRealityTransport(streamSettings string) error {
+	var stream map[string]any
+	if err := json.Unmarshal([]byte(streamSettings), &stream); err != nil || stream["security"] != "reality" {
+		return nil
+	}
+	network, _ := stream["network"].(string)
+	switch strings.ToLower(network) {
+	case "", "tcp", "raw", "xhttp", "splithttp", "grpc":
+		return nil
+	}
+	return common.NewErrorf("REALITY only works over RAW (TCP), XHTTP or gRPC, not %s. Switch security to tls/none or change the transport.", network)
+}
+
 var xmcProfileUsernamePattern = regexp.MustCompile(`^[A-Za-z0-9_]{3,16}$`)
 
 // xmcMaskProfilesComplete reports whether an xmc finalmask carries the signed
@@ -1151,6 +1166,9 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, boo
 		}
 	}
 	if err := validateFinalMaskRealityCombo(inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
+	if err := validateRealityTransport(inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {
@@ -1789,6 +1807,9 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, 
 	// Normalize streamSettings based on protocol
 	s.normalizeStreamSettings(inbound)
 	if err := validateFinalMaskRealityCombo(inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
+	if err := validateRealityTransport(inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {

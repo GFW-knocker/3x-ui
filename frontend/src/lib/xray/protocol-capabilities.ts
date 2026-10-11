@@ -48,6 +48,25 @@ export function canEnableReality(values: CapabilityProtocolSlice): boolean {
   return REALITY_NETWORKS.includes(values.streamSettings?.network ?? '');
 }
 
+// A protocol or transport switch can strand a security the new pair cannot carry; the
+// core refuses the whole config over e.g. REALITY on QUIC, so it falls back to none.
+export function dropUnsupportedSecurity<T extends Record<string, unknown>>(
+  protocol: string,
+  stream: T,
+): T {
+  const network = typeof stream.network === 'string' ? stream.network : undefined;
+  const security = typeof stream.security === 'string' ? stream.security : undefined;
+  const slice = { protocol, streamSettings: { network, security } };
+  const stranded =
+    (security === 'tls' && !canEnableTls(slice)) ||
+    (security === 'reality' && !canEnableReality(slice));
+  if (!stranded) return stream;
+  const cleaned: Record<string, unknown> = { ...stream, security: 'none' };
+  delete cleaned.tlsSettings;
+  delete cleaned.realitySettings;
+  return cleaned as T;
+}
+
 // VLESS encryption (vlessenc / ML-KEM) is on when encryption or decryption holds
 // a generated value (e.g. "mlkem768x25519plus.native.0rtt.<key>") rather than
 // the "none"/"" sentinel. The value is never the literal "vlessenc" (that is the

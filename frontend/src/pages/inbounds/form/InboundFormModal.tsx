@@ -32,6 +32,7 @@ import {
   canEnableSniffing,
   canEnableStream,
   canEnableTls,
+  dropUnsupportedSecurity,
   isSS2022,
 } from '@/lib/xray/protocol-capabilities';
 import {
@@ -558,6 +559,8 @@ export default function InboundFormModal({
         const current = getV('streamSettings') as { network?: string } | undefined;
         if (current?.network === 'hysteria' || !current?.network) {
           setV('streamSettings', { network: 'tcp', security: 'none', tcpSettings: {} });
+        } else if (canEnableStream({ protocol: next })) {
+          setV('streamSettings', dropUnsupportedSecurity(next, current));
         }
       }
     });
@@ -899,7 +902,7 @@ export default function InboundFormModal({
         cleaned.finalmask = { ...fm, udp };
       }
     }
-    setV('streamSettings', cleaned);
+    setV('streamSettings', dropUnsupportedSecurity(protocol, cleaned));
   };
 
   const streamTab = (
