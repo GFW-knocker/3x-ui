@@ -2,28 +2,31 @@ name: Release 3X-UI
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  # Only main (dev channel) and version tags ship binaries; build any other
+  # branch on demand via workflow_dispatch.
   push:
     branches:
       - main
     tags:
       - "v*.*.*"
     paths:
-      - '**.js'
-      - '**.css'
-      - '**.html'
-      - '**.sh'
-      - '**.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'x-ui.service'
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "**.sh"
+      - "frontend/**"
+      - "x-ui.service.debian"
+      - "x-ui.service.arch"
+      - "x-ui.service.rhel"
+      - ".github/workflows/release.yml"
 
 jobs:
   build:
     permissions:
       contents: write
     strategy:
+      # One platform hitting a transient outage must not cancel the other six.
+      fail-fast: false
       matrix:
         platform:
           - amd64
@@ -36,16 +39,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           check-latest: true
 
+      # Frontend dist must be built BEFORE go build — Go's //go:embed
+      # all:dist directive in internal/web/web.go requires internal/web/dist/ to exist
+      # at compile time. internal/web/dist/ is .gitignored, so on a fresh CI
+      # checkout it doesn't exist until vite emits it.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend bundle
+        run: |
+          npm ci
+          npm run build
+        working-directory: frontend
+
       - name: Build 3X-UI
         run: |
+          CURL_RETRY="--retry 5 --retry-all-errors --retry-delay 3"
+          fetch() { wget -q --tries=5 --waitretry=10 --retry-on-http-error=429,500,502,503 "$@"; }
           export CGO_ENABLED=1
           export GOOS=linux
           export GOARCH=${{ matrix.platform }}
@@ -61,89 +83,102 @@ jobs:
           esac
           echo "Resolving Bootlin musl toolchain for arch=$BOOTLIN_ARCH (platform=${{ matrix.platform }})"
           TARBALL_BASE="https://toolchains.bootlin.com/downloads/releases/toolchains/$BOOTLIN_ARCH/tarballs/"
-          TARBALL_URL=$(curl -fsSL "$TARBALL_BASE" | grep -oE "${BOOTLIN_ARCH}--musl--stable-[^\"]+\\.tar\\.xz" | sort -r | head -n1)
+          TARBALL_URL=$(curl -fsSL $CURL_RETRY "$TARBALL_BASE" | grep -oE "${BOOTLIN_ARCH}--musl--stable-[^\"]+\\.tar\\.xz" | sort -r | head -n1)
           [ -z "$TARBALL_URL" ] && { echo "Failed to locate Bootlin musl toolchain for arch=$BOOTLIN_ARCH" >&2; exit 1; }
           echo "Downloading: $TARBALL_URL"
           cd /tmp
-          curl -fL -sS -o "$(basename "$TARBALL_URL")" "$TARBALL_BASE/$TARBALL_URL"
+          curl -fL -sS $CURL_RETRY -o "$(basename "$TARBALL_URL")" "$TARBALL_BASE/$TARBALL_URL"
           tar -xf "$(basename "$TARBALL_URL")"
           TOOLCHAIN_DIR=$(find . -maxdepth 1 -type d -name "${BOOTLIN_ARCH}--musl--stable-*" | head -n1)
           export PATH="$(realpath "$TOOLCHAIN_DIR")/bin:$PATH"
           export CC=$(realpath "$(find "$TOOLCHAIN_DIR/bin" -name '*-gcc.br_real' -type f -executable | head -n1)")
           [ -z "$CC" ] && { echo "No gcc.br_real found in $TOOLCHAIN_DIR/bin" >&2; exit 1; }
           cd -
-          go build -ldflags "-w -s -linkmode external -extldflags '-static'" -o xui-release -v main.go
+          # Stamp the commit into per-commit (dev channel) builds only; tagged
+          # stable releases stay unstamped so config.IsDevBuild() returns false.
+          LDFLAGS="-w -s -linkmode external -extldflags '-static'"
+          if [[ "$GITHUB_REF" != refs/tags/* ]]; then
+            LDFLAGS="$LDFLAGS -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA::8} -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          fi
+          go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release -v .
           file xui-release
           ldd xui-release || echo "Static binary confirmed"
-          
+
           mkdir x-ui
           cp xui-release x-ui/
-          cp x-ui.service x-ui/
+          cp x-ui.service.debian x-ui/
+          cp x-ui.service.arch x-ui/
+          cp x-ui.service.rhel x-ui/
           cp x-ui.sh x-ui/
           mv x-ui/xui-release x-ui/x-ui
           mkdir x-ui/bin
           cd x-ui/bin
-          
+
           # Download dependencies
-          Xray_URL="https://github.com/GFW-knocker/Xray-core/releases/download/v1.25.8-mahsa-r1/"
+          Xray_URL="https://github.com/GFW-knocker/Xray-core/releases/download/v1.26.10-mahsa-r2/"
           if [ "${{ matrix.platform }}" == "amd64" ]; then
-            wget -q ${Xray_URL}Xray-linux-64.zip
+            fetch ${Xray_URL}Xray-linux-64.zip
             unzip Xray-linux-64.zip
             rm -f Xray-linux-64.zip
           elif [ "${{ matrix.platform }}" == "arm64" ]; then
-            wget -q ${Xray_URL}Xray-linux-arm64-v8a.zip
+            fetch ${Xray_URL}Xray-linux-arm64-v8a.zip
             unzip Xray-linux-arm64-v8a.zip
             rm -f Xray-linux-arm64-v8a.zip
           elif [ "${{ matrix.platform }}" == "armv7" ]; then
-            wget -q ${Xray_URL}Xray-linux-arm32-v7a.zip
+            fetch ${Xray_URL}Xray-linux-arm32-v7a.zip
             unzip Xray-linux-arm32-v7a.zip
             rm -f Xray-linux-arm32-v7a.zip
           elif [ "${{ matrix.platform }}" == "armv6" ]; then
-            wget -q ${Xray_URL}Xray-linux-arm32-v6.zip
+            fetch ${Xray_URL}Xray-linux-arm32-v6.zip
             unzip Xray-linux-arm32-v6.zip
             rm -f Xray-linux-arm32-v6.zip
           elif [ "${{ matrix.platform }}" == "386" ]; then
-            wget -q ${Xray_URL}Xray-linux-32.zip
+            fetch ${Xray_URL}Xray-linux-32.zip
             unzip Xray-linux-32.zip
             rm -f Xray-linux-32.zip
           elif [ "${{ matrix.platform }}" == "armv5" ]; then
-            wget -q ${Xray_URL}Xray-linux-arm32-v5.zip
+            fetch ${Xray_URL}Xray-linux-arm32-v5.zip
             unzip Xray-linux-arm32-v5.zip
             rm -f Xray-linux-arm32-v5.zip
           elif [ "${{ matrix.platform }}" == "s390x" ]; then
-            wget -q ${Xray_URL}Xray-linux-s390x.zip
+            fetch ${Xray_URL}Xray-linux-s390x.zip
             unzip Xray-linux-s390x.zip
             rm -f Xray-linux-s390x.zip
           fi
           rm -f geoip.dat geosite.dat
-          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
-          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
-          wget -q -O geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat
-          wget -q -O geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat
-          wget -q -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
-          wget -q -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
+          fetch https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+          fetch https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+          fetch -O geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat
+          fetch -O geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat
+          fetch -O geoip_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
+          fetch -O geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
           mv xray xray-linux-${{ matrix.platform }}
+          # mtg-multi (MTProto sidecar) is pure Go, so it is built from source for every
+          # platform at the commit pinned in tools/build-mtg-multi.sh, using GOOS/GOARCH above.
+          sh ../../tools/build-mtg-multi.sh "mtg-linux-${{ matrix.platform }}"
           cd ../..
-          
+
       - name: Package
-        run: tar -zcvf x-ui-linux-${{ matrix.platform }}.tar.gz x-ui
+        run: |
+          tar -zcvf x-ui-linux-${{ matrix.platform }}.tar.gz x-ui
+          sha256sum x-ui-linux-${{ matrix.platform }}.tar.gz > x-ui-linux-${{ matrix.platform }}.tar.gz.sha256
 
       - name: Upload files to Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: x-ui-linux-${{ matrix.platform }}
-          path: ./x-ui-linux-${{ matrix.platform }}.tar.gz
+          path: |
+            ./x-ui-linux-${{ matrix.platform }}.tar.gz
+            ./x-ui-linux-${{ matrix.platform }}.tar.gz.sha256
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
-        if: |
-          (github.event_name == 'release' && github.event.action == 'published') ||
-          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          file: x-ui-linux-${{ matrix.platform }}.tar.gz
-          asset_name: x-ui-linux-${{ matrix.platform }}.tar.gz
+          tag: ${{ github.ref_name }}
+          file: x-ui-linux-${{ matrix.platform }}.tar.gz*
+          file_glob: true
           overwrite: true
           prerelease: true
 
@@ -161,40 +196,90 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           check-latest: true
 
-      - name: Build 3X-UI for Windows
+      # Frontend dist must be built BEFORE go build — see comment on the
+      # Linux job above. This step is identical except npm runs on the
+      # Windows runner here.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend bundle
         shell: pwsh
         run: |
-          $env:CGO_ENABLED="1"
-          $env:GOOS="windows"
-          $env:GOARCH="amd64"
-          go build -ldflags "-w -s" -o xui-release.exe -v main.go
-          
+          npm ci
+          npm run build
+        working-directory: frontend
+
+      - name: Install MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-sqlite3
+            mingw-w64-x86_64-pkg-config
+
+      - name: Build 3X-UI for Windows (CGO)
+        shell: msys2 {0}
+        run: |
+          export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
+
+          export CGO_ENABLED=1
+          export GOOS=windows
+          export GOARCH=amd64
+          export CC=x86_64-w64-mingw32-gcc
+
+          which go
+          go version
+          gcc --version
+
+          # Stamp the commit into per-commit (dev channel) builds only.
+          LDFLAGS="-w -s"
+          if [[ "$GITHUB_REF" != refs/tags/* ]]; then
+            LDFLAGS="$LDFLAGS -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA:0:8} -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          fi
+          go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release.exe -v .
+          sh tools/build-mtg-multi.sh mtg-windows-amd64.exe
+
+      - name: Copy and download resources
+        shell: pwsh
+        run: |
+          $retry = @{ MaximumRetryCount = 5; RetryIntervalSec = 10 }
           mkdir x-ui
-          Copy-Item xui-release.exe x-ui\
+          Copy-Item xui-release.exe x-ui\x-ui.exe
           mkdir x-ui\bin
           cd x-ui\bin
-          
+
           # Download Xray for Windows
-          $Xray_URL = "https://github.com/GFW-knocker/Xray-core/releases/download/v1.25.8-mahsa-r1/"
-          Invoke-WebRequest -Uri "${Xray_URL}Xray-windows-64.zip" -OutFile "Xray-windows-64.zip"
+          $Xray_URL = "https://github.com/GFW-knocker/Xray-core/releases/download/v1.26.10-mahsa-r2/"
+          Invoke-WebRequest @retry -Uri "${Xray_URL}Xray-windows-64.zip" -OutFile "Xray-windows-64.zip"
           Expand-Archive -Path "Xray-windows-64.zip" -DestinationPath .
           Remove-Item "Xray-windows-64.zip"
           Remove-Item geoip.dat, geosite.dat -ErrorAction SilentlyContinue
-          Invoke-WebRequest -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile "geoip.dat"
-          Invoke-WebRequest -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile "geosite.dat"
-          Invoke-WebRequest -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat" -OutFile "geoip_IR.dat"
-          Invoke-WebRequest -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat" -OutFile "geosite_IR.dat"
-          Invoke-WebRequest -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile "geoip_RU.dat"
-          Invoke-WebRequest -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile "geosite_RU.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile "geoip.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile "geosite.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat" -OutFile "geoip_IR.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat" -OutFile "geosite_IR.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat" -OutFile "geoip_RU.dat"
+          Invoke-WebRequest @retry -Uri "https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat" -OutFile "geosite_RU.dat"
           Rename-Item xray.exe xray-windows-amd64.exe
+
+          # mtg-multi was built from pinned source in the MSYS2 build step.
+          Move-Item ..\..\mtg-windows-amd64.exe mtg-windows-amd64.exe
+
           cd ..
           Copy-Item -Path ..\windows_files\* -Destination . -Recurse
           cd ..
@@ -203,22 +288,90 @@ jobs:
         shell: pwsh
         run: |
           Compress-Archive -Path .\x-ui -DestinationPath "x-ui-windows-amd64.zip"
+          $hash = (Get-FileHash x-ui-windows-amd64.zip -Algorithm SHA256).Hash.ToLower()
+          [IO.File]::WriteAllText("$PWD\x-ui-windows-amd64.zip.sha256", "$hash  x-ui-windows-amd64.zip`n")
 
       - name: Upload files to Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: x-ui-windows-amd64
-          path: ./x-ui-windows-amd64.zip
+          path: |
+            ./x-ui-windows-amd64.zip
+            ./x-ui-windows-amd64.zip.sha256
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
-        if: |
-          (github.event_name == 'release' && github.event.action == 'published') ||
-          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/'))
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          file: x-ui-windows-amd64.zip
-          asset_name: x-ui-windows-amd64.zip
+          tag: ${{ github.ref_name }}
+          file: x-ui-windows-amd64.zip*
+          file_glob: true
           overwrite: true
           prerelease: true
+
+  # =================================
+  #  Rolling dev channel (per-commit)
+  # =================================
+  # Publishes/overwrites the build artifacts to a single fixed-tag pre-release
+  # `dev-latest`, force-moved to the new commit on every push to main. The panel's
+  # "Dev" update channel installs from this tag. `--latest=false` is load-bearing:
+  # it keeps releases/latest pointing at the real stable tag, so the stable
+  # channel is unaffected.
+  publish-dev:
+    name: Publish rolling dev release
+    needs: [build, build-windows]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Serialize racing pushes; never cancel an in-flight upload, or the dev
+    # release could be left with a partial asset set.
+    concurrency:
+      group: dev-release
+      cancel-in-progress: false
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: dev-artifacts
+          merge-multiple: true
+
+      - name: Publish dev-latest pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -e
+          retry() {
+            for i in 1 2 3 4 5; do
+              "$@" && return 0
+              echo "attempt $i failed: ${*:1:3}" >&2
+              sleep $((i * 5))
+            done
+            return 1
+          }
+          short="${COMMIT::8}"
+          notes="Rolling development build — installs via the panel's Dev update channel.
+
+          commit=${COMMIT}
+          built=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+          Automated per-commit build from main. Not a stable release."
+
+          # Force-move the dev-latest tag to this commit so the release tracks it.
+          git tag -f dev-latest "${COMMIT}"
+          retry git push -f origin refs/tags/dev-latest
+
+          # The release exists on every run but the first; edit-first avoids an
+          # existence probe that can 503 and mis-route into create (422).
+          if ! retry gh release edit dev-latest --prerelease --latest=false \
+              --title "Dev build ${short}" --notes "${notes}"; then
+            retry gh release create dev-latest --prerelease --latest=false \
+              --target "${COMMIT}" --title "Dev build ${short}" --notes "${notes}"
+          fi
+
+          retry gh release upload dev-latest dev-artifacts/*.tar.gz dev-artifacts/*.zip dev-artifacts/*.sha256 --clobber

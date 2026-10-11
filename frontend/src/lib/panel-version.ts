@@ -1,0 +1,53 @@
+// Mirror of web/service/panel.go isNewerVersion: parse a vMAJOR.MINOR.PATCH[-mahsa-rN]
+// tag and report whether `latest` is ahead of `current`. When either side isn't a
+// clean three-part numeric tag, fall back to a normalized string inequality —
+// the same heuristic the Go side uses so the node "update available" badge
+// agrees with what the server would decide.
+const MAHSA_REVISION = /^(.*)-mahsa-r(\d+)$/;
+
+function parseVersionParts(version: string): [number, number, number, number] | null {
+  let base = version.trim().replace(/^v/, '');
+  let revision = 0;
+  const forked = MAHSA_REVISION.exec(base);
+  if (forked) {
+    base = forked[1];
+    revision = Number(forked[2]);
+  }
+  const parts = base.split('.');
+  if (parts.length !== 3) return null;
+  const out: number[] = [];
+  for (const part of parts) {
+    if (!/^\d+$/.test(part)) return null;
+    out.push(Number(part));
+  }
+  return [out[0], out[1], out[2], revision];
+}
+
+// Format a panel version for display. Dev builds report a "dev+<commit>"
+// identity (see config.GetPanelVersion); show those — and any other
+// non-numeric label — verbatim. Semantic versions get a single normalized "v"
+// prefix, so a raw "v3.4.0" tag and a bare "3.4.0" both render as "v3.4.0"
+// instead of doubling up to "vv3.4.0".
+export function formatPanelVersion(version: string | undefined | null): string {
+  const v = (version || '').trim();
+  if (!v) return '';
+  const normalized = v.replace(/^v/i, '');
+  return /^\d/.test(normalized) ? `v${normalized}` : v;
+}
+
+export function isPanelUpdateAvailable(latest: string, current: string): boolean {
+  if (!latest || !current) return false;
+  // A dev+<sha> label and a release tag sit on different channels and carry no
+  // order, so a node moved to the other channel is not "behind" the master's latest.
+  if (latest.trim().startsWith('dev+') !== current.trim().startsWith('dev+')) return false;
+  const a = parseVersionParts(latest);
+  const b = parseVersionParts(current);
+  if (!a || !b) {
+    return latest.trim().replace(/^v/, '') !== current.trim().replace(/^v/, '');
+  }
+  for (let i = 0; i < 4; i++) {
+    if (a[i] > b[i]) return true;
+    if (a[i] < b[i]) return false;
+  }
+  return false;
+}
