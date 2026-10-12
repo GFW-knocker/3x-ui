@@ -314,8 +314,8 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 		// A bare /assets would 301 to the catch-all; a hard 404 keeps the mount
 		// invisible to scanners that never learned the subscription path.
 		mountAssets := func(prefix string) {
-			engine.GET(prefix, func(c *gin.Context) { c.AbortWithStatus(http.StatusNotFound) })
-			engine.HEAD(prefix, func(c *gin.Context) { c.AbortWithStatus(http.StatusNotFound) })
+			engine.GET(prefix, middleware.NotFound)
+			engine.HEAD(prefix, middleware.NotFound)
 			engine.StaticFS(prefix, assetsFS)
 		}
 		mountAssets("/assets")
@@ -344,6 +344,9 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 			})
 		}
 	}
+
+	// A miss on this port must not name the Go runtime ("404 page not found").
+	engine.NoRoute(middleware.NotFound)
 
 	g := engine.Group("/")
 

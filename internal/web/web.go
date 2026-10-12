@@ -271,12 +271,12 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	g.GET("/ws", s.ws.HandleWebSocket)
 
 	// Let unknown panel document routes fall back to the SPA shell, while every
-	// non-SPA miss still returns a hard 404.
+	// non-SPA miss reads like a stock nginx 404 (middleware.NotFound).
 	engine.NoRoute(func(c *gin.Context) {
 		if s.panel.HandleNoRoutePanelSPA(c) {
 			return
 		}
-		c.AbortWithStatus(http.StatusNotFound)
+		middleware.NotFound(c)
 	})
 
 	return engine, nil

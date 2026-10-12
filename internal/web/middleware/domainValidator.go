@@ -4,7 +4,6 @@ package middleware
 
 import (
 	"net"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +11,8 @@ import (
 
 // DomainValidatorMiddleware returns a Gin middleware that validates the request domain.
 // It extracts the host from the request, strips any port number, and compares it
-// against the configured domain. Requests from unauthorized domains are rejected
-// with HTTP 403 Forbidden status.
+// against the configured domain. Requests for any other host get the generic
+// nginx-style 404, so a scan by IP learns nothing about the panel.
 func DomainValidatorMiddleware(domain string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		host := c.Request.Host
@@ -22,7 +21,7 @@ func DomainValidatorMiddleware(domain string) gin.HandlerFunc {
 		}
 
 		if host != domain {
-			c.AbortWithStatus(http.StatusForbidden)
+			NotFound(c)
 			return
 		}
 
