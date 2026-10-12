@@ -270,11 +270,6 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	// Register WebSocket route with basePath (g already has basePath prefix)
 	g.GET("/ws", s.ws.HandleWebSocket)
 
-	// Chrome DevTools endpoint for debugging web apps
-	engine.GET("/.well-known/appspecific/com.chrome.devtools.json", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{})
-	})
-
 	// Let unknown panel document routes fall back to the SPA shell, while every
 	// non-SPA miss still returns a hard 404.
 	engine.NoRoute(func(c *gin.Context) {

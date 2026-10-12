@@ -310,9 +310,17 @@ func (s *Server) initRouter() (*gin.Engine, error) {
 	}
 
 	if assetsFS != nil {
-		engine.StaticFS("/assets", assetsFS)
+		assetsFS = filesOnlyFS{FileSystem: assetsFS}
+		// A bare /assets would 301 to the catch-all; a hard 404 keeps the mount
+		// invisible to scanners that never learned the subscription path.
+		mountAssets := func(prefix string) {
+			engine.GET(prefix, func(c *gin.Context) { c.AbortWithStatus(http.StatusNotFound) })
+			engine.HEAD(prefix, func(c *gin.Context) { c.AbortWithStatus(http.StatusNotFound) })
+			engine.StaticFS(prefix, assetsFS)
+		}
+		mountAssets("/assets")
 		if linksPathForAssets != "/assets" {
-			engine.StaticFS(linksPathForAssets, assetsFS)
+			mountAssets(linksPathForAssets)
 		}
 
 		// Browser may resolve subpage assets relative to the request URL —
