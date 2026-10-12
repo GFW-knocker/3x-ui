@@ -1,7 +1,5 @@
 name: Cleanup Caches
 on:
-  schedule:
-    - cron: "0 3 * * *" # every day
   workflow_dispatch:
 
 jobs:

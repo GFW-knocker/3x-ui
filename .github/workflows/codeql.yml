@@ -1,18 +1,7 @@
 name: "CodeQL Advanced"
 
 on:
-  push:
-    branches:
-      - main
-    tags-ignore:
-      - "v*"
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - "frontend/**"
-  schedule:
-    - cron: "18 2 * * 2"
+  workflow_dispatch:
 
 jobs:
   analyze:

@@ -1,29 +1,73 @@
 name: Release 3X-UI
 
+# Runs only when started by hand. The version typed at start picks what it does:
+# empty builds the selected branch for download, dev-latest refreshes the Dev
+# update channel, and a version tag publishes a release (both from main only).
 on:
   workflow_dispatch:
-  # Only main (dev channel) and version tags ship binaries; build any other
-  # branch on demand via workflow_dispatch.
-  push:
-    branches:
-      - main
-    tags:
-      - "v*.*.*"
-    paths:
-      - "**.go"
-      - "go.mod"
-      - "go.sum"
-      - "**.sh"
-      - "frontend/**"
-      - "x-ui.service.debian"
-      - "x-ui.service.arch"
-      - "x-ui.service.rhel"
-      - ".github/workflows/release.yml"
+    inputs:
+      version:
+        description: "Empty = build only; dev-latest = Dev channel; or a tag like v3.9.0-mahsa-r2 (must match internal/config/version)"
+        required: false
+        type: string
+        default: ""
+      latest:
+        description: "Mark the release as latest stable (untick for a pre-release); tags only"
+        required: false
+        type: boolean
+        default: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
+  prepare:
+    name: Check version
+    runs-on: ubuntu-latest
+    outputs:
+      kind: ${{ steps.check.outputs.kind }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Check version and branch
+        id: check
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -e
+          if [ -z "$VERSION" ]; then
+            echo "kind=build" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Publishing '$VERSION' must run from main, not $GITHUB_REF_NAME. Leave the version empty to only build a branch."
+            exit 1
+          fi
+          if [ "$VERSION" = "dev-latest" ]; then
+            echo "kind=dev" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! printf '%s' "$VERSION" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-mahsa-r[0-9]+)?$'; then
+            echo "::error::'$VERSION' is not a version tag like v3.9.0-mahsa-r2."
+            exit 1
+          fi
+          file_version="v$(tr -d '[:space:]' < internal/config/version)"
+          if [ "$file_version" != "$VERSION" ]; then
+            echo "::error::internal/config/version says $file_version. Commit the bump to $VERSION first."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$VERSION" > /dev/null; then
+            echo "::error::Tag $VERSION already exists. Bump the version for a new release."
+            exit 1
+          fi
+          echo "kind=stable" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: prepare
     permissions:
-      contents: write
+      contents: read
     strategy:
       # One platform hitting a transient outage must not cancel the other six.
       fail-fast: false
@@ -65,6 +109,8 @@ jobs:
         working-directory: frontend
 
       - name: Build 3X-UI
+        env:
+          RELEASE_KIND: ${{ needs.prepare.outputs.kind }}
         run: |
           CURL_RETRY="--retry 5 --retry-all-errors --retry-delay 3"
           fetch() { wget -q --tries=5 --waitretry=10 --retry-on-http-error=429,500,502,503 "$@"; }
@@ -94,10 +140,10 @@ jobs:
           export CC=$(realpath "$(find "$TOOLCHAIN_DIR/bin" -name '*-gcc.br_real' -type f -executable | head -n1)")
           [ -z "$CC" ] && { echo "No gcc.br_real found in $TOOLCHAIN_DIR/bin" >&2; exit 1; }
           cd -
-          # Stamp the commit into per-commit (dev channel) builds only; tagged
-          # stable releases stay unstamped so config.IsDevBuild() returns false.
+          # Stamp the commit into dev and build-only runs; versioned releases
+          # stay unstamped so config.IsDevBuild() returns false.
           LDFLAGS="-w -s -linkmode external -extldflags '-static'"
-          if [[ "$GITHUB_REF" != refs/tags/* ]]; then
+          if [[ "$RELEASE_KIND" != stable ]]; then
             LDFLAGS="$LDFLAGS -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA::8} -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release -v .
@@ -171,24 +217,14 @@ jobs:
             ./x-ui-linux-${{ matrix.platform }}.tar.gz
             ./x-ui-linux-${{ matrix.platform }}.tar.gz.sha256
 
-      - name: Upload files to GH release
-        uses: svenstaro/upload-release-action@v2
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          file: x-ui-linux-${{ matrix.platform }}.tar.gz*
-          file_glob: true
-          overwrite: true
-          prerelease: true
-
   # =================================
   #  Windows Build
   # =================================
   build-windows:
     name: Build for Windows
+    needs: prepare
     permissions:
-      contents: write
+      contents: read
     strategy:
       matrix:
         platform:
@@ -234,6 +270,8 @@ jobs:
 
       - name: Build 3X-UI for Windows (CGO)
         shell: msys2 {0}
+        env:
+          RELEASE_KIND: ${{ needs.prepare.outputs.kind }}
         run: |
           export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
 
@@ -246,9 +284,9 @@ jobs:
           go version
           gcc --version
 
-          # Stamp the commit into per-commit (dev channel) builds only.
+          # Stamp the commit into dev and build-only runs only.
           LDFLAGS="-w -s"
-          if [[ "$GITHUB_REF" != refs/tags/* ]]; then
+          if [[ "$RELEASE_KIND" != stable ]]; then
             LDFLAGS="$LDFLAGS -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA:0:8} -X github.com/GFW-knocker/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release.exe -v .
@@ -299,37 +337,21 @@ jobs:
             ./x-ui-windows-amd64.zip
             ./x-ui-windows-amd64.zip.sha256
 
-      - name: Upload files to GH release
-        uses: svenstaro/upload-release-action@v2
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-          file: x-ui-windows-amd64.zip*
-          file_glob: true
-          overwrite: true
-          prerelease: true
-
   # =================================
-  #  Rolling dev channel (per-commit)
+  #  Rolling dev channel
   # =================================
   # Publishes/overwrites the build artifacts to a single fixed-tag pre-release
-  # `dev-latest`, force-moved to the new commit on every push to main. The panel's
-  # "Dev" update channel installs from this tag. `--latest=false` is load-bearing:
-  # it keeps releases/latest pointing at the real stable tag, so the stable
-  # channel is unaffected.
+  # `dev-latest`, force-moved to the built commit each time it is run with that
+  # version. The panel's "Dev" update channel installs from this tag.
+  # `--latest=false` is load-bearing: it keeps releases/latest pointing at the
+  # real stable tag, so the stable channel is unaffected.
   publish-dev:
     name: Publish rolling dev release
-    needs: [build, build-windows]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [prepare, build, build-windows]
+    if: needs.prepare.outputs.kind == 'dev'
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # Serialize racing pushes; never cancel an in-flight upload, or the dev
-    # release could be left with a partial asset set.
-    concurrency:
-      group: dev-release
-      cancel-in-progress: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -360,7 +382,7 @@ jobs:
           commit=${COMMIT}
           built=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-          Automated per-commit build from main. Not a stable release."
+          Manually triggered build from main. Not a stable release."
 
           # Force-move the dev-latest tag to this commit so the release tracks it.
           git tag -f dev-latest "${COMMIT}"
@@ -375,3 +397,53 @@ jobs:
           fi
 
           retry gh release upload dev-latest dev-artifacts/*.tar.gz dev-artifacts/*.zip dev-artifacts/*.sha256 --clobber
+
+  # =================================
+  #  Versioned release
+  # =================================
+  # Creates the tag on the built commit and the release with every asset in one
+  # step, so a half-uploaded release is never visible.
+  publish-release:
+    name: Publish ${{ inputs.version }}
+    needs: [prepare, build, build-windows]
+    if: needs.prepare.outputs.kind == 'stable'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          LATEST: ${{ inputs.latest }}
+          COMMIT: ${{ github.sha }}
+        run: |
+          set -e
+          if [ "$LATEST" = "true" ]; then
+            channel="--latest"
+          else
+            channel="--prerelease --latest=false"
+          fi
+          assets=(release-artifacts/*.tar.gz release-artifacts/*.zip release-artifacts/*.sha256)
+          gh release create "$VERSION" "${assets[@]}" --target "$COMMIT" --title "$VERSION" --generate-notes $channel
+
+  docker:
+    name: Docker image
+    needs: [prepare, publish-release]
+    if: needs.prepare.outputs.kind == 'stable'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/docker.yml
+    with:
+      version: ${{ inputs.version }}
+      latest: ${{ inputs.latest }}

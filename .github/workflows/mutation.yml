@@ -2,11 +2,9 @@ name: Mutation testing
 
 # Mutation testing (gremlins) is the objective check for "fake" tests: it mutates the
 # source and a surviving (LIVED) mutant means no test caught the change. It is SLOW, so it
-# runs nightly / on demand and scoped per package — never per-commit. It is informational:
+# runs on demand only and scoped per package — never per-commit. It is informational:
 # no thresholds are set, so it reports survivors as artifacts without failing the build.
 on:
-  schedule:
-    - cron: "0 3 * * *" # 03:00 UTC daily
   workflow_dispatch:
 
 permissions:
