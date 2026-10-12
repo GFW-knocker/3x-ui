@@ -8,11 +8,11 @@ import (
 	"github.com/GFW-knocker/3x-ui/v3/internal/web/service"
 )
 
-const nginxNotFoundPage = "<html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx</center>\r\n</body>\r\n</html>\r\n"
+const stockNotFoundBody = "404 page not found\n"
 
-// A wrong-path probe must read like a stock nginx: the panel's hardening
+// A wrong-path probe must read like a stock net/http miss: the panel's hardening
 // headers on a 404 are a fingerprint that survives the secret base path.
-func TestWrongPathProbesLookLikeNginx(t *testing.T) {
+func TestWrongPathProbesLookLikeStockGo(t *testing.T) {
 	engine := newTestEngine(t)
 	for _, method := range []string{http.MethodGet, http.MethodHead, http.MethodPost} {
 		for _, path := range []string{
@@ -24,7 +24,7 @@ func TestWrongPathProbesLookLikeNginx(t *testing.T) {
 			req.Header.Set("Accept-Encoding", "gzip")
 			resp := httptest.NewRecorder()
 			engine.ServeHTTP(resp, req)
-			assertNginxNotFound(t, method, path, resp)
+			assertStockNotFound(t, method, path, resp)
 		}
 	}
 }
@@ -51,7 +51,7 @@ func TestPanelRoutesKeepSecurityHeaders(t *testing.T) {
 	}
 }
 
-func assertNginxNotFound(t *testing.T, method, path string, resp *httptest.ResponseRecorder) {
+func assertStockNotFound(t *testing.T, method, path string, resp *httptest.ResponseRecorder) {
 	t.Helper()
 	label := method + " " + path
 	if resp.Code != http.StatusNotFound {
@@ -59,28 +59,26 @@ func assertNginxNotFound(t *testing.T, method, path string, resp *httptest.Respo
 		return
 	}
 	for _, h := range []string{
-		"Content-Security-Policy", "X-Frame-Options", "X-Content-Type-Options",
-		"Referrer-Policy", "Strict-Transport-Security", "Cache-Control", "Vary",
-		"Content-Encoding", "Set-Cookie",
+		"Content-Security-Policy", "X-Frame-Options", "Referrer-Policy",
+		"Strict-Transport-Security", "Cache-Control", "Vary", "Content-Encoding",
+		"Set-Cookie", "Server",
 	} {
 		if v := resp.Result().Header.Get(h); v != "" {
 			t.Errorf("%s: header %s=%q leaked on a 404", label, h, v)
 		}
 	}
-	if got := resp.Result().Header.Get("Server"); got != "nginx" {
-		t.Errorf("%s: Server=%q, want nginx", label, got)
+	if got := resp.Result().Header.Get("Content-Type"); got != "text/plain; charset=utf-8" {
+		t.Errorf("%s: Content-Type=%q, want stock text/plain; charset=utf-8", label, got)
 	}
-	if got := resp.Result().Header.Get("Content-Type"); got != "text/html" {
-		t.Errorf("%s: Content-Type=%q, want text/html", label, got)
+	if got := resp.Result().Header.Get("X-Content-Type-Options"); got != "nosniff" {
+		t.Errorf("%s: X-Content-Type-Options=%q, want nosniff (http.Error sets it)", label, got)
 	}
-	if got := resp.Result().Header.Get("Content-Length"); got != "146" {
-		t.Errorf("%s: Content-Length=%q, want 146 (nginx's page)", label, got)
+	if got := resp.Result().Header.Get("Content-Length"); got != "" {
+		t.Errorf("%s: handler set Content-Length=%q; stock Go leaves it to the server", label, got)
 	}
-	wantBody := nginxNotFoundPage
-	if method == http.MethodHead {
-		wantBody = ""
-	}
-	if body := resp.Body.String(); body != wantBody {
-		t.Errorf("%s: body = %q, want %q", label, body, wantBody)
+	// http.NotFound writes the body for HEAD too; the real server discards it,
+	// the recorder keeps it, exactly as a stock ServeMux behaves under test.
+	if body := resp.Body.String(); body != stockNotFoundBody {
+		t.Errorf("%s: body = %q, want %q", label, body, stockNotFoundBody)
 	}
 }
