@@ -139,6 +139,9 @@ export const SCHEMAS: Record<string, unknown> = {
       "panelOutbound": {
         "type": "string"
       },
+      "publicIpLookupEnable": {
+        "type": "boolean"
+      },
       "realityScanCandidates": {
         "type": "string"
       },
@@ -613,6 +616,7 @@ export const SCHEMAS: Record<string, unknown> = {
       "outboundDownThreshold",
       "pageSize",
       "panelOutbound",
+      "publicIpLookupEnable",
       "realityScanCandidates",
       "remarkTemplate",
       "restartXrayOnClientDisable",
@@ -914,6 +918,9 @@ export const SCHEMAS: Record<string, unknown> = {
       },
       "panelOutbound": {
         "type": "string"
+      },
+      "publicIpLookupEnable": {
+        "type": "boolean"
       },
       "realityScanCandidates": {
         "type": "string"
@@ -1397,6 +1404,7 @@ export const SCHEMAS: Record<string, unknown> = {
       "outboundDownThreshold",
       "pageSize",
       "panelOutbound",
+      "publicIpLookupEnable",
       "realityScanCandidates",
       "remarkTemplate",
       "restartXrayOnClientDisable",

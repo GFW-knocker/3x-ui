@@ -336,6 +336,17 @@ export default function GeneralTab({ allSetting, updateSetting }: GeneralTabProp
                 />
               </SettingListItem>
 
+              <SettingListItem
+                paddings="small"
+                title={t('pages.settings.publicIpLookupEnable')}
+                description={t('pages.settings.publicIpLookupEnableDesc')}
+              >
+                <Switch
+                  checked={allSetting.publicIpLookupEnable}
+                  onChange={(v) => updateSetting({ publicIpLookupEnable: v })}
+                />
+              </SettingListItem>
+
               <SettingListItem paddings="small" title={t('pages.settings.language')}>
                 <Select
                   value={lang}

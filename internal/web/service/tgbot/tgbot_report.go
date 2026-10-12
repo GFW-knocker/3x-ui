@@ -108,7 +108,7 @@ func (t *Tgbot) prepareServerUsageInfo() string {
 	if cachedStatus, found := t.getCachedStatus(); found {
 		t.lastStatus = cachedStatus
 	} else {
-		t.lastStatus = t.serverService.GetStatus(t.lastStatus)
+		t.lastStatus = t.serverService.GetStatusWithPublicIP(t.lastStatus)
 		t.setCachedStatus(t.lastStatus)
 	}
 	var onlines []string

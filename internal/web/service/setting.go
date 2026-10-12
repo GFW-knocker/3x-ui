@@ -201,6 +201,7 @@ var defaultValueMap = map[string]string{
 	"externalTrafficInformEnable": "false",
 	"externalTrafficInformURI":    "",
 	"restartXrayOnClientDisable":  "true",
+	"publicIpLookupEnable":        "true",
 	"xrayOutboundTestUrl":         "https://www.google.com/generate_204",
 	"panelOutbound":               "",
 	"devChannelEnable":            "false",
@@ -1319,6 +1320,14 @@ func (s *SettingService) GetRestartXrayOnClientDisable() (bool, error) {
 
 func (s *SettingService) SetRestartXrayOnClientDisable(value bool) error {
 	return s.setBool("restartXrayOnClientDisable", value)
+}
+
+func (s *SettingService) GetPublicIpLookupEnable() (bool, error) {
+	return s.getBool("publicIpLookupEnable")
+}
+
+func (s *SettingService) SetPublicIpLookupEnable(value bool) error {
+	return s.setBool("publicIpLookupEnable", value)
 }
 
 // GetDevChannelEnable reports whether the panel self-update tracks the rolling

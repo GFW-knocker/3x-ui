@@ -19,7 +19,7 @@ import (
 
 // ServerProvider abstracts server status and database backup operations.
 type ServerProvider interface {
-	GetStatus(lastStatus *service.Status) *service.Status
+	GetStatusWithPublicIP(lastStatus *service.Status) *service.Status
 	GetDb() ([]byte, error)
 	BackupFilename(requestHost string) string
 }
@@ -38,7 +38,7 @@ func (s *DiscordService) BuildReport(ctx context.Context, server ServerProvider,
 
 	var status *service.Status
 	if server != nil {
-		status = server.GetStatus(nil)
+		status = server.GetStatusWithPublicIP(nil)
 	}
 	if status == nil {
 		status = &service.Status{

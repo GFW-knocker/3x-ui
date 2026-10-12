@@ -1289,6 +1289,8 @@
       "externalTrafficInformURIDesc": "トラフィックの更新ごとに外部 API に通知します。",
       "restartXrayOnClientDisable": "クライアント無効化後に Xray を再起動",
       "restartXrayOnClientDisableDesc": "クライアントがサービス対象でなくなったとき（有効期限や通信量上限による自動無効化、または手動での無効化・削除）、接続を終わらせるため Xray を再起動します。",
+      "publicIpLookupEnable": "パブリック IP の取得",
+      "publicIpLookupEnableDesc": "このサーバーのパブリック IPv4/IPv6 をダッシュボード、ボットのレポート、バックアップのファイル名に表示します。アドレスはいずれかが必要になったときにのみ api.ipify.org と ipinfo.io から取得します。オフにするとパネルはこれらに接続しません。",
       "fragment": "フラグメント",
       "fragmentDesc": "TLS helloパケットのフラグメントを有効にする",
       "fragmentSett": "設定",

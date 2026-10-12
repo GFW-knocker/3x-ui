@@ -20,7 +20,7 @@ type mockServerProvider struct {
 	filename string
 }
 
-func (m *mockServerProvider) GetStatus(lastStatus *service.Status) *service.Status {
+func (m *mockServerProvider) GetStatusWithPublicIP(lastStatus *service.Status) *service.Status {
 	return m.status
 }
 

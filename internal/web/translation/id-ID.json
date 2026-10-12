@@ -1289,6 +1289,8 @@
       "externalTrafficInformURIDesc": "Pembaruan lalu lintas dikirim ke URI ini.",
       "restartXrayOnClientDisable": "Nyalakan Ulang Xray Setelah Klien Dinonaktifkan",
       "restartXrayOnClientDisableDesc": "Saat klien berhenti dilayani — dinonaktifkan otomatis karena kedaluwarsa atau batas trafik, atau dinonaktifkan maupun dihapus secara manual — mulai ulang Xray agar koneksi aktifnya berakhir.",
+      "publicIpLookupEnable": "Pencarian IP Publik",
+      "publicIpLookupEnableDesc": "Tampilkan IPv4/IPv6 publik server ini di dasbor, laporan bot, dan nama file cadangan. Alamat diambil dari api.ipify.org dan ipinfo.io hanya saat salah satunya diminta; matikan agar panel tidak menghubungi keduanya.",
       "fragment": "Fragmentasi",
       "fragmentDesc": "Aktifkan fragmentasi untuk paket hello TLS",
       "fragmentSett": "Pengaturan Fragmentasi",

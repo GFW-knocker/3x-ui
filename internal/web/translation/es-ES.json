@@ -1289,6 +1289,8 @@
       "externalTrafficInformURIDesc": "Las actualizaciones de tráfico se envían a este URI.",
       "restartXrayOnClientDisable": "Reiniciar Xray al desactivar un cliente",
       "restartXrayOnClientDisableDesc": "Cuando un cliente deja de atenderse — desactivado automáticamente por vencimiento o límite de tráfico, o desactivado o eliminado a mano — reiniciar Xray para que terminen sus conexiones activas.",
+      "publicIpLookupEnable": "Consulta de IP pública",
+      "publicIpLookupEnableDesc": "Mostrar la IPv4/IPv6 pública de este servidor en el panel, en los informes de los bots y en los nombres de las copias de seguridad. La dirección se obtiene de api.ipify.org e ipinfo.io solo cuando se solicita; desactívelo para que el panel no contacte con ellos.",
       "fragment": "Fragmentación",
       "fragmentDesc": "Habilitar la fragmentación para el paquete de saludo de TLS",
       "fragmentSett": "Configuración de Fragmentación",

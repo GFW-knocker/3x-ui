@@ -108,7 +108,14 @@ func (a *ServerController) startTask() {
 }
 
 // status returns the current server status information.
-func (a *ServerController) status(c *gin.Context) { jsonObj(c, a.serverService.CurrentStatus(), nil) }
+func (a *ServerController) status(c *gin.Context) {
+	// Only a browser session displays the address; node probes and API tokens
+	// never need it, so the third-party lookup waits for a human on the dashboard.
+	if !c.GetBool("api_authed") {
+		a.serverService.EnsurePublicIPsInBackground()
+	}
+	jsonObj(c, a.serverService.CurrentStatus(), nil)
+}
 
 func (a *ServerController) getFail2banStatus(c *gin.Context) {
 	jsonObj(c, a.serverService.GetFail2banStatus(), nil)

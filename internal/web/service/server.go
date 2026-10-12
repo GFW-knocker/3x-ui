@@ -440,9 +440,26 @@ var publicIPv6Services = []string{
 	"https://v6.api.ipinfo.io/ip",
 }
 
-// resolvePublicIPs caches the public IPv4/IPv6 addresses on first use. The
-// lookups run outside s.mu so a stalling service cannot block a status sample.
+// publicIPLookupEnabled fails closed: a panel that cannot read the setting
+// must not contact third-party IP services on the operator's behalf.
+func (s *ServerService) publicIPLookupEnabled() bool {
+	enabled, err := s.settingService.GetPublicIpLookupEnable()
+	if err != nil {
+		logger.Warning("read publicIpLookupEnable failed, skipping public IP lookup:", err)
+		return false
+	}
+	return enabled
+}
+
+// resolvePublicIPs caches the public IPv4/IPv6 addresses on first use, or empties
+// the cache once the lookup is switched off so no stale address is displayed.
 func (s *ServerService) resolvePublicIPs() {
+	if !s.publicIPLookupEnabled() {
+		s.mu.Lock()
+		s.cachedIPv4, s.cachedIPv6, s.noIPv6 = "", "", false
+		s.mu.Unlock()
+		return
+	}
 	s.mu.Lock()
 	wantIPv4 := s.cachedIPv4 == ""
 	wantIPv6 := s.cachedIPv6 == "" && !s.noIPv6
@@ -485,12 +502,25 @@ func firstPublicIP(services []string) string {
 	return ip
 }
 
-// resolvePublicIPsInBackground keeps a status sample off the lookup path: a box
-// with no IPv6 route spends 3s per service, and the sample is what nodes report.
-func (s *ServerService) resolvePublicIPsInBackground() {
+// EnsurePublicIPs resolves the public addresses before a report that shows them
+// (Telegram, Discord) and the backup filename; status sampling never calls it.
+func (s *ServerService) EnsurePublicIPs() {
+	s.resolvePublicIPs()
+}
+
+// GetStatusWithPublicIP is GetStatus for consumers that display the address and
+// may wait for it: bot reports run off the request path.
+func (s *ServerService) GetStatusWithPublicIP(lastStatus *Status) *Status {
+	s.EnsurePublicIPs()
+	return s.GetStatus(lastStatus)
+}
+
+// EnsurePublicIPsInBackground serves the dashboard: the lookup runs off the
+// request path (a box with no IPv6 route spends 3s per service) and only when
+// an operator is actually looking at the page.
+func (s *ServerService) EnsurePublicIPsInBackground() {
 	s.mu.Lock()
-	settled := s.cachedIPv4 != "" && (s.cachedIPv6 != "" || s.noIPv6)
-	if s.resolvingIPs || settled {
+	if s.resolvingIPs {
 		s.mu.Unlock()
 		return
 	}
@@ -674,7 +704,6 @@ func (s *ServerService) GetStatus(lastStatus *Status) *Status {
 		logger.Warning("get udp connections failed:", err)
 	}
 
-	s.resolvePublicIPsInBackground()
 	status.PublicIP.IPv4, status.PublicIP.IPv6 = s.publicIPs()
 
 	// Xray status
@@ -1623,7 +1652,7 @@ func (s *ServerService) backupHost(requestHost string) string {
 		}
 	}
 	if host == "" {
-		s.resolvePublicIPs()
+		s.EnsurePublicIPs()
 		ipv4, ipv6 := s.publicIPs()
 		if ipv4 != "" && ipv4 != "N/A" {
 			host = ipv4

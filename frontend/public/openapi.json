@@ -165,6 +165,9 @@
           "panelOutbound": {
             "type": "string"
           },
+          "publicIpLookupEnable": {
+            "type": "boolean"
+          },
           "realityScanCandidates": {
             "type": "string"
           },
@@ -639,6 +642,7 @@
           "outboundDownThreshold",
           "pageSize",
           "panelOutbound",
+          "publicIpLookupEnable",
           "realityScanCandidates",
           "remarkTemplate",
           "restartXrayOnClientDisable",
@@ -940,6 +944,9 @@
           },
           "panelOutbound": {
             "type": "string"
+          },
+          "publicIpLookupEnable": {
+            "type": "boolean"
           },
           "realityScanCandidates": {
             "type": "string"
@@ -1423,6 +1430,7 @@
           "outboundDownThreshold",
           "pageSize",
           "panelOutbound",
+          "publicIpLookupEnable",
           "realityScanCandidates",
           "remarkTemplate",
           "restartXrayOnClientDisable",

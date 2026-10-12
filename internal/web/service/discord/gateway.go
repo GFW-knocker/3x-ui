@@ -476,7 +476,7 @@ func (g *GatewayClient) sendHelp(ctx context.Context) {
 func (g *GatewayClient) sendStatus(ctx context.Context) {
 	var status *service.Status
 	if g.serverService != nil {
-		status = g.serverService.GetStatus(nil)
+		status = g.serverService.GetStatusWithPublicIP(nil)
 	}
 	if status == nil {
 		status = &service.Status{}

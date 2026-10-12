@@ -1289,6 +1289,8 @@
       "externalTrafficInformURIDesc": "流量更新将发送到此 URI",
       "restartXrayOnClientDisable": "客户端被禁用后重启 Xray",
       "restartXrayOnClientDisableDesc": "当客户端不再被服务时——因到期或流量超限被自动禁用，或被手动禁用、删除——重启 Xray 以断开其活动连接。",
+      "publicIpLookupEnable": "公网 IP 查询",
+      "publicIpLookupEnableDesc": "在仪表盘、机器人报告和备份文件名中显示本服务器的公网 IPv4/IPv6。仅在需要时才向 api.ipify.org 和 ipinfo.io 查询地址；关闭后面板不会联系这些服务。",
       "fragment": "分片",
       "fragmentDesc": "启用 TLS hello 数据包分片",
       "fragmentSett": "设置",

@@ -1289,6 +1289,8 @@
       "externalTrafficInformURIDesc": "Trafik güncellemeleri bu URI'ye gönderilir.",
       "restartXrayOnClientDisable": "İstemci Devre Dışı Bırakıldığında Xray'i Yeniden Başlat",
       "restartXrayOnClientDisableDesc": "Bir istemci artık sunulmadığında — süre dolumu veya trafik limiti nedeniyle otomatik, ya da elle devre dışı bırakıldığında veya silindiğinde — açık bağlantıları bitsin diye Xray'i yeniden başlatır.",
+      "publicIpLookupEnable": "Genel IP Sorgusu",
+      "publicIpLookupEnableDesc": "Bu sunucunun genel IPv4/IPv6 adresini panoda, bot raporlarında ve yedek dosya adlarında göster. Adres yalnızca bunlardan biri istendiğinde api.ipify.org ve ipinfo.io'dan alınır; panelin bunlarla iletişim kurmaması için kapatın.",
       "fragment": "Parçalama",
       "fragmentDesc": "TLS merhaba paketinin parçalanmasını etkinleştirir.",
       "fragmentSett": "Parçalama Ayarları",
