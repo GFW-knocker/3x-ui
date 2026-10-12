@@ -7,10 +7,16 @@
 
 
 
-## Install on Linux VPS
+## Install latest version on Linux VPS
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/main/install.sh)
+```
+
+## Install v2.8.4-mahsa-r2 on Linux VPS
+
+```bash
+bash <(curl -Ls https://raw.githubusercontent.com/GFW-knocker/3x-ui/v2.8.4-mahsa-r2/install.sh) v2.8.4-mahsa-r2
 ```
 
 ## Install Specific Version
