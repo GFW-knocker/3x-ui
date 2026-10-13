@@ -167,6 +167,12 @@ export class HttpUtil {
   }
 }
 
+// Keeps both ends of an identifier visible, e.g. a UUID as "1234…cdef".
+export function truncateMiddle(value: string, head = 4, tail = 4): string {
+  if (value.length <= head + tail + 1) return value;
+  return `${value.slice(0, head)}…${value.slice(-tail)}`;
+}
+
 export function applyDocumentTitle(): void {
   const host = window.location.hostname;
   if (!host) return;

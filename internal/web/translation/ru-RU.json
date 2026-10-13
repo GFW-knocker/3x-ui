@@ -814,6 +814,7 @@
       "remaining": "Остаток",
       "duration": "Длительность",
       "attachedInbounds": "Привязанные входящие",
+      "uuid": "UUID",
       "selectInbound": "Выберите один или несколько входящих",
       "selectAllInbounds": "Выбрать всё",
       "clearAllInbounds": "Очистить всё",

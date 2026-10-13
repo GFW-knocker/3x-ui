@@ -72,7 +72,7 @@ import ClientTrafficCell from '@/components/clients/ClientTrafficCell';
 import ClientSpeedTag, { isActiveSpeed } from '@/components/clients/ClientSpeedTag';
 import ClientCardComment from '@/components/clients/ClientCardComment';
 import AppSidebar from '@/layouts/AppSidebar';
-import { IntlUtil, SizeFormatter } from '@/utils';
+import { IntlUtil, SizeFormatter, truncateMiddle } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
 import { LazyMount } from '@/components/utility';
 import {
@@ -1117,6 +1117,21 @@ export default function ClientsPage() {
         },
       },
       {
+        title: t('pages.clients.attachedInbounds'),
+        key: 'inboundIds',
+        width: 170,
+        render: (_v, record) => {
+          return (
+            <ClientInboundChips
+              ids={record.inboundIds || EMPTY_INBOUND_IDS}
+              inboundsById={inboundsById}
+              protocolColors={INBOUND_PROTOCOL_COLORS}
+              chipLimit={INBOUND_CHIP_LIMIT}
+            />
+          );
+        },
+      },
+      {
         title: t('pages.clients.client'),
         key: 'email',
         width: 220,
@@ -1131,6 +1146,26 @@ export default function ClientsPage() {
             <ClientCardComment comment={record.comment} className="sub" />
           </div>
         ),
+      },
+      {
+        title: t('pages.clients.uuid'),
+        key: 'uuid',
+        width: 120,
+        render: (_v, record) => {
+          const credential =
+            record.uuid || record.password || record.auth || record.secret || record.publicKey;
+          if (!credential) return <Typography.Text type="secondary">—</Typography.Text>;
+          return (
+            <Typography.Text
+              className="client-uuid"
+              title={credential}
+              copyable={{ text: credential }}
+              style={{ fontFamily: 'monospace', fontSize: 12 }}
+            >
+              {truncateMiddle(credential, 4, 4)}
+            </Typography.Text>
+          );
+        },
       },
       {
         title: t('pages.clients.group'),
@@ -1153,21 +1188,6 @@ export default function ClientsPage() {
             >
               {record.group}
             </Tag>
-          );
-        },
-      },
-      {
-        title: t('pages.clients.attachedInbounds'),
-        key: 'inboundIds',
-        width: 170,
-        render: (_v, record) => {
-          return (
-            <ClientInboundChips
-              ids={record.inboundIds || EMPTY_INBOUND_IDS}
-              inboundsById={inboundsById}
-              protocolColors={INBOUND_PROTOCOL_COLORS}
-              chipLimit={INBOUND_CHIP_LIMIT}
-            />
           );
         },
       },

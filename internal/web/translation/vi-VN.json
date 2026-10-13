@@ -814,6 +814,7 @@
       "remaining": "Còn lại",
       "duration": "Thời hạn",
       "attachedInbounds": "Inbound đã gắn",
+      "uuid": "UUID",
       "selectInbound": "Chọn một hoặc nhiều inbound",
       "selectAllInbounds": "Chọn tất cả",
       "clearAllInbounds": "Xóa tất cả",

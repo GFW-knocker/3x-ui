@@ -814,6 +814,7 @@
       "remaining": "剩余",
       "duration": "时长",
       "attachedInbounds": "关联入站",
+      "uuid": "UUID",
       "selectInbound": "选择一个或多个入站",
       "selectAllInbounds": "全选",
       "clearAllInbounds": "全部清除",

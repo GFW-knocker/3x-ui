@@ -814,6 +814,7 @@
       "remaining": "باقی‌مانده",
       "duration": "مدت",
       "attachedInbounds": "اینباندهای متصل",
+      "uuid": "UUID",
       "selectInbound": "یک یا چند اینباند انتخاب کنید",
       "selectAllInbounds": "انتخاب همه",
       "clearAllInbounds": "پاک کردن همه",

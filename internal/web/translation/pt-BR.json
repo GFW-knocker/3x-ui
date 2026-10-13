@@ -814,6 +814,7 @@
       "remaining": "Restante",
       "duration": "Duração",
       "attachedInbounds": "Inbounds associados",
+      "uuid": "UUID",
       "selectInbound": "Selecione um ou mais inbounds",
       "selectAllInbounds": "Selecionar tudo",
       "clearAllInbounds": "Limpar tudo",

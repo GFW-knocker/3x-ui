@@ -814,6 +814,7 @@
       "remaining": "Залишок",
       "duration": "Тривалість",
       "attachedInbounds": "Прив'язані вхідні",
+      "uuid": "UUID",
       "selectInbound": "Виберіть один або кілька вхідних",
       "selectAllInbounds": "Вибрати все",
       "clearAllInbounds": "Очистити все",

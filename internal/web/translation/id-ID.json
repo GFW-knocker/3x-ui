@@ -814,6 +814,7 @@
       "remaining": "Sisa",
       "duration": "Durasi",
       "attachedInbounds": "Inbound terlampir",
+      "uuid": "UUID",
       "selectInbound": "Pilih satu atau lebih inbound",
       "selectAllInbounds": "Pilih semua",
       "clearAllInbounds": "Hapus semua",

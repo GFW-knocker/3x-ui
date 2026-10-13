@@ -421,9 +421,12 @@ function ClientQrModalContent({
   const [activeKey, setActiveKey] = useState<string[]>([]);
 
   const items = useMemo(() => {
-    const out: { key: string; label: React.ReactNode; children: React.ReactNode }[] = [];
+    type Item = { key: string; label: React.ReactNode; children: React.ReactNode };
+    // Configs lead and the first one opens; the subscription panels trail, collapsed.
+    const subs: Item[] = [];
+    const out: Item[] = [];
     if (subLink) {
-      out.push({
+      subs.push({
         key: 'sub',
         label: t('subscription.title'),
         children: (
@@ -443,7 +446,7 @@ function ClientQrModalContent({
       });
     }
     if (subJsonLink) {
-      out.push({
+      subs.push({
         key: 'subJson',
         label: `${t('subscription.title')} (JSON)`,
         children: <QrPanel value={subJsonLink} remark={`${client?.email || ''} — JSON`} />,
@@ -526,7 +529,7 @@ function ClientQrModalContent({
         ),
       });
     });
-    return out;
+    return [...out, ...subs];
   }, [
     subLink,
     subJsonLink,

@@ -814,6 +814,7 @@
       "remaining": "المتبقي",
       "duration": "المدة",
       "attachedInbounds": "الاتصالات الواردة المرتبطة",
+      "uuid": "UUID",
       "selectInbound": "حدد اتصالاً واردًا واحدًا أو أكثر",
       "selectAllInbounds": "تحديد الكل",
       "clearAllInbounds": "مسح الكل",

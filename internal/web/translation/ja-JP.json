@@ -814,6 +814,7 @@
       "remaining": "残量",
       "duration": "期間",
       "attachedInbounds": "関連付けされたインバウンド",
+      "uuid": "UUID",
       "selectInbound": "1 つ以上のインバウンドを選択",
       "selectAllInbounds": "すべて選択",
       "clearAllInbounds": "すべてクリア",

@@ -814,6 +814,7 @@
       "remaining": "Kalan",
       "duration": "Süre",
       "attachedInbounds": "Bağlı Gelen Bağlantılar",
+      "uuid": "UUID",
       "selectInbound": "Bir veya Daha Fazla Gelen Bağlantı Seçin",
       "selectAllInbounds": "Tümünü Seç",
       "clearAllInbounds": "Tümünü Temizle",
