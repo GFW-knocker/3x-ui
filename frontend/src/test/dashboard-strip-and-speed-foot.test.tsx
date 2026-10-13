@@ -18,18 +18,19 @@ import SystemStrip from '@/pages/index/SystemStrip';
 import ThroughputCard from '@/pages/index/ThroughputCard';
 
 // The 1/5/15-minute load averages were sampled and pushed for months but never
-// rendered; the strip must show all three in order after uptime.
+// rendered; the strip leads with them, then uptime, then the panel cells.
 describe('SystemStrip', () => {
-  it('shows the three load averages', () => {
+  it('shows the three load averages first', () => {
     const status = new Status({ loads: [1.5, 0.75, 0.25], uptime: 60 });
     const { container } = render(<SystemStrip status={status} showIp={false} onToggleIp={() => {}} />);
     const text = container.textContent ?? '';
     const load = text.indexOf('System Load');
-    expect(load).toBeGreaterThan(text.indexOf('Uptime'));
+    expect(load).toBeGreaterThanOrEqual(0);
     for (const value of ['1.5', '0.75', '0.25']) {
       expect(text.indexOf(value), value).toBeGreaterThan(load);
     }
-    expect(text.indexOf('Panel')).toBeGreaterThan(text.indexOf('0.25'));
+    expect(text.indexOf('Uptime')).toBeGreaterThan(text.indexOf('0.25'));
+    expect(text.indexOf('Panel')).toBeGreaterThan(text.indexOf('Uptime'));
   });
 });
 

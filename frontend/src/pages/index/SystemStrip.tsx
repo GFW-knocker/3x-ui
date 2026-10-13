@@ -28,6 +28,26 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
       <div className="ov-strip-grid">
         <div className="ov-strip-cell">
           <div className="ov-kicker ov-kicker-icon">
+            <DashboardOutlined />
+            {t('pages.index.systemLoad')}
+          </div>
+          <div className="ov-strip-split">
+            {(['1m', '5m', '15m'] as const).map((window, i) => (
+              <Fragment key={window}>
+                {i > 0 && <span className="ov-strip-split-sep" />}
+                <div>
+                  <div className="ov-strip-sub">{window}</div>
+                  <div className="ov-strip-value">{status.loads[i] ?? 0}</div>
+                </div>
+              </Fragment>
+            ))}
+          </div>
+        </div>
+
+        <div className="ov-strip-spacer" aria-hidden="true" />
+
+        <div className="ov-strip-cell">
+          <div className="ov-kicker ov-kicker-icon">
             <ClockCircleOutlined />
             {t('pages.index.uptime')}
           </div>
@@ -43,24 +63,6 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
               <div className="ov-strip-sub">OS</div>
               <div className="ov-strip-value">{TimeFormatter.formatSecond(status.uptime)}</div>
             </div>
-          </div>
-        </div>
-
-        <div className="ov-strip-cell">
-          <div className="ov-kicker ov-kicker-icon">
-            <DashboardOutlined />
-            {t('pages.index.systemLoad')}
-          </div>
-          <div className="ov-strip-split">
-            {(['1m', '5m', '15m'] as const).map((window, i) => (
-              <Fragment key={window}>
-                {i > 0 && <span className="ov-strip-split-sep" />}
-                <div>
-                  <div className="ov-strip-sub">{window}</div>
-                  <div className="ov-strip-value">{status.loads[i] ?? 0}</div>
-                </div>
-              </Fragment>
-            ))}
           </div>
         </div>
 

@@ -322,11 +322,11 @@
   white-space: nowrap;
 }
 
+/* Sits under the plot as a foot row, mirroring the speed card's totals. */
 .ov-conn-total {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-top: 12px;
 }
 
 .ov-conn-legend {
@@ -402,17 +402,17 @@
 /* — system strip — */
 
 /* tracks follow SystemStrip's order:
-   uptime · system load · [flexible gap] · panel · ip addresses */
+   system load · [gap] · uptime · [gap] · panel · ip addresses */
 .ov-strip-grid {
   display: grid;
-  grid-template-columns: max-content max-content minmax(32px, 1fr) max-content max-content;
+  grid-template-columns: max-content minmax(32px, 1fr) max-content minmax(32px, 1fr) max-content max-content;
   gap: 16px 32px;
   padding: var(--ov-pad);
 }
 
 @media (max-width: 1439px) {
   .ov-strip-grid {
-    grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content;
+    grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr) max-content max-content;
     column-gap: 20px;
   }
 }

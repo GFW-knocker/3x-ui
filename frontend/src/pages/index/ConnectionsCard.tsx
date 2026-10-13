@@ -37,10 +37,6 @@ export default function ConnectionsCard({
     <Card hoverable styles={{ body: { padding: 0 } }}>
       <div className="ov-wide-head ov-wide-head-stack">
         <div className="ov-kicker">{t('pages.index.connectionCount')}</div>
-        <div className="ov-conn-total">
-          <span className="ov-tile-number">{status.tcpCount + status.udpCount}</span>
-          <span className="ov-tile-unit">{t('pages.index.openSockets')}</span>
-        </div>
       </div>
 
       <div className="ov-conn-legend">
@@ -61,7 +57,7 @@ export default function ConnectionsCard({
           data={tcp}
           data2={udp}
           labels={labels}
-          height={isMobile ? 88 : 102}
+          height={isMobile ? 88 : 84}
           strokeWidth={1.5}
           fillOpacity={0.24}
           showTooltip
@@ -74,6 +70,11 @@ export default function ConnectionsCard({
           yFormatter={(v) => Math.round(v).toLocaleString()}
           referenceLines={referenceLines}
         />
+      </div>
+
+      <div className="ov-wide-foot ov-conn-total">
+        <span className="ov-tile-number">{status.tcpCount + status.udpCount}</span>
+        <span className="ov-tile-unit">{t('pages.index.openSockets')}</span>
       </div>
     </Card>
   );
