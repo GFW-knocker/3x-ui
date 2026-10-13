@@ -1,7 +1,9 @@
+import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Tooltip } from 'antd';
 import {
   ClockCircleOutlined,
+  DashboardOutlined,
   DatabaseOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
@@ -46,6 +48,24 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
 
         <div className="ov-strip-cell">
           <div className="ov-kicker ov-kicker-icon">
+            <DashboardOutlined />
+            {t('pages.index.systemLoad')}
+          </div>
+          <div className="ov-strip-split">
+            {(['1m', '5m', '15m'] as const).map((window, i) => (
+              <Fragment key={window}>
+                {i > 0 && <span className="ov-strip-split-sep" />}
+                <div>
+                  <div className="ov-strip-sub">{window}</div>
+                  <div className="ov-strip-value">{status.loads[i] ?? 0}</div>
+                </div>
+              </Fragment>
+            ))}
+          </div>
+        </div>
+
+        <div className="ov-strip-cell">
+          <div className="ov-kicker ov-kicker-icon">
             <DatabaseOutlined />
             {t('pages.index.panel')}
           </div>
@@ -62,7 +82,7 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
           </div>
         </div>
 
-        <div className="ov-strip-cell">
+        <div className="ov-strip-cell ov-strip-cell-ip">
           <div className="ov-kicker ov-kicker-icon">
             <GlobalOutlined />
             {t('pages.index.ipAddresses')}

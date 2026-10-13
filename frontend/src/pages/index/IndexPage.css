@@ -362,7 +362,12 @@
 }
 
 .ov-wide-foot > div {
-  flex: 1 1 0;
+  flex: 0 1 auto;
+}
+
+/* Pushes the running totals to the right edge, away from the window averages. */
+.ov-foot-spacer {
+  flex: 1 1 auto;
 }
 
 .ov-foot-sep {
@@ -400,14 +405,14 @@
    uptime (xray | os) · panel (memory | threads) · ip addresses */
 .ov-strip-grid {
   display: grid;
-  grid-template-columns: minmax(max-content, 1.2fr) minmax(max-content, 1.2fr) minmax(0, 1.6fr);
+  grid-template-columns: repeat(3, max-content) minmax(0, 1fr);
   gap: 16px;
   padding: var(--ov-pad);
 }
 
 @media (max-width: 1439px) {
   .ov-strip-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -427,6 +432,16 @@
   .ov-strip-cell + .ov-strip-cell {
     border-inline-start: 1px solid var(--ov-line);
     padding-inline-start: 16px;
+  }
+
+  /* The IP cell hugs the right edge instead of stretching across the free column. */
+  .ov-strip-cell-ip {
+    justify-self: end;
+    text-align: end;
+  }
+
+  .ov-strip-cell-ip .ov-kicker-icon {
+    justify-content: flex-end;
   }
 }
 

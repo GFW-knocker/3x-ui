@@ -61,7 +61,7 @@ export default function ConnectionsCard({
           data={tcp}
           data2={udp}
           labels={labels}
-          height={isMobile ? 120 : 170}
+          height={isMobile ? 104 : 134}
           strokeWidth={1.5}
           fillOpacity={0.24}
           showTooltip

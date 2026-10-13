@@ -111,7 +111,7 @@ export default function VersionModal({ open, status, onClose, onBusy }: VersionM
           items={[
             {
               key: '1',
-              label: 'Xray',
+              label: 'Mahsa-Core',
               children: (
                 <>
                   <Alert

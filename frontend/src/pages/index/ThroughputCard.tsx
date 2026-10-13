@@ -64,7 +64,7 @@ export default function ThroughputCard({
           data={up}
           data2={down}
           labels={labels}
-          height={isMobile ? 140 : 186}
+          height={isMobile ? 120 : 150}
           strokeWidth={1.75}
           fillOpacity={0.24}
           showTooltip
@@ -81,21 +81,23 @@ export default function ThroughputCard({
 
       <div className="ov-wide-foot">
         <div>
-          <div className="ov-kicker">{t('pages.index.sent')}</div>
+          <div className="ov-kicker">{t('pages.index.avgUp')}</div>
+          <div className="ov-foot-value">{`↑ ${SizeFormatter.speedFormat(mean(up))}`}</div>
+        </div>
+        <span className="ov-foot-sep" />
+        <div>
+          <div className="ov-kicker">{t('pages.index.avgDl')}</div>
+          <div className="ov-foot-value">{`↓ ${SizeFormatter.speedFormat(mean(down))}`}</div>
+        </div>
+        <span className="ov-foot-spacer" />
+        <div>
+          <div className="ov-kicker">{t('pages.index.totalSent')}</div>
           <div className="ov-foot-value">{SizeFormatter.sizeFormat(status.netTraffic.sent)}</div>
         </div>
         <span className="ov-foot-sep" />
         <div>
-          <div className="ov-kicker">{t('pages.index.received')}</div>
+          <div className="ov-kicker">{t('pages.index.totalReceived')}</div>
           <div className="ov-foot-value">{SizeFormatter.sizeFormat(status.netTraffic.recv)}</div>
-        </div>
-        <span className="ov-foot-sep" />
-        <div>
-          <div className="ov-kicker">{t('pages.index.avgWindow')}</div>
-          <div className="ov-foot-value">
-            <span className="ov-foot-part">{`↑ ${SizeFormatter.speedFormat(mean(up))}`}</span>{' '}
-            <span className="ov-foot-part">{`↓ ${SizeFormatter.speedFormat(mean(down))}`}</span>
-          </div>
         </div>
       </div>
     </Card>
