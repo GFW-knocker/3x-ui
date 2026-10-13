@@ -99,7 +99,7 @@ import './ClientsPage.css';
 
 const FILTER_STATE_KEY = 'clientsFilterState';
 const DISABLED_PAGE_SIZE = 200;
-const DEFAULT_TABLE_PAGE_SIZE = 25;
+const DEFAULT_TABLE_PAGE_SIZE = 50;
 
 function UngroupIcon() {
   return (
