@@ -64,6 +64,8 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
           </div>
         </div>
 
+        <div className="ov-strip-spacer" aria-hidden="true" />
+
         <div className="ov-strip-cell">
           <div className="ov-kicker ov-kicker-icon">
             <DatabaseOutlined />
@@ -82,7 +84,7 @@ export default function SystemStrip({ status, showIp, onToggleIp }: SystemStripP
           </div>
         </div>
 
-        <div className="ov-strip-cell ov-strip-cell-ip">
+        <div className="ov-strip-cell">
           <div className="ov-kicker ov-kicker-icon">
             <GlobalOutlined />
             {t('pages.index.ipAddresses')}

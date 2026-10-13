@@ -456,6 +456,7 @@ export const EXAMPLES: Record<string, unknown> = {
     ],
     "items": [
       {
+        "auth": "",
         "comment": "Primary device",
         "createdAt": 1735000000000,
         "email": "alice@example.com",
@@ -468,14 +469,18 @@ export const EXAMPLES: Record<string, unknown> = {
         ],
         "limitHwid": 0,
         "limitIp": 0,
+        "password": "",
+        "publicKey": "",
         "reset": 0,
         "resetDay": 0,
         "resetMax": 0,
         "resetWeekday": 0,
+        "secret": "",
         "subId": "abcd1234",
         "totalGB": 53687091200,
         "traffic": null,
-        "updatedAt": 1735100000000
+        "updatedAt": 1735100000000,
+        "uuid": "11111111-2222-4333-8444-555555555555"
       }
     ],
     "page": 1,
@@ -556,6 +561,7 @@ export const EXAMPLES: Record<string, unknown> = {
     "tag": ""
   },
   "ClientSlim": {
+    "auth": "",
     "comment": "Primary device",
     "createdAt": 1735000000000,
     "email": "alice@example.com",
@@ -568,14 +574,18 @@ export const EXAMPLES: Record<string, unknown> = {
     ],
     "limitHwid": 0,
     "limitIp": 0,
+    "password": "",
+    "publicKey": "",
     "reset": 0,
     "resetDay": 0,
     "resetMax": 0,
     "resetWeekday": 0,
+    "secret": "",
     "subId": "abcd1234",
     "totalGB": 53687091200,
     "traffic": null,
-    "updatedAt": 1735100000000
+    "updatedAt": 1735100000000,
+    "uuid": "11111111-2222-4333-8444-555555555555"
   },
   "ClientTraffic": {
     "down": 2097152,

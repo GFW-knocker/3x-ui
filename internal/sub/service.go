@@ -2369,6 +2369,41 @@ func buildLinkWithParamsAndSecurity(link string, params map[string]string, fragm
 	return appendQueryAndFragment(link, params, fragment, security, omitTLSFields)
 }
 
+// encodeQueryReadable is url.Values.Encode (sorted keys) except that allowInsecure
+// follows the security it relaxes instead of leading the query alphabetically.
+func encodeQueryReadable(q url.Values) string {
+	keys := make([]string, 0, len(q))
+	for k := range q {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	if _, ok := q["allowInsecure"]; ok {
+		if _, hasSecurity := q["security"]; hasSecurity {
+			ordered := make([]string, 0, len(keys))
+			for _, k := range keys {
+				if k == "allowInsecure" {
+					continue
+				}
+				ordered = append(ordered, k)
+				if k == "security" {
+					ordered = append(ordered, "allowInsecure")
+				}
+			}
+			keys = ordered
+		}
+	}
+	var sb strings.Builder
+	for i, k := range keys {
+		if i > 0 {
+			sb.WriteByte('&')
+		}
+		sb.WriteString(url.QueryEscape(k))
+		sb.WriteByte('=')
+		sb.WriteString(url.QueryEscape(q.Get(k)))
+	}
+	return sb.String()
+}
+
 func appendQueryAndFragment(link string, params map[string]string, fragment, securityOverride string, omitTLSFields bool) string {
 	var sb strings.Builder
 	sb.WriteString(link)
@@ -2384,7 +2419,7 @@ func appendQueryAndFragment(link string, params map[string]string, fragment, sec
 			}
 			q.Set(k, v)
 		}
-		encoded := q.Encode()
+		encoded := encodeQueryReadable(q)
 		if encoded != "" {
 			if strings.Contains(link, "?") {
 				sb.WriteByte('&')

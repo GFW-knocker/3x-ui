@@ -401,24 +401,29 @@
 
 /* — system strip — */
 
-/* tracks follow SystemStrip's cell order:
-   uptime (xray | os) · panel (memory | threads) · ip addresses */
+/* tracks follow SystemStrip's order:
+   uptime · system load · [flexible gap] · panel · ip addresses */
 .ov-strip-grid {
   display: grid;
-  grid-template-columns: repeat(3, max-content) minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: max-content max-content minmax(32px, 1fr) max-content max-content;
+  gap: 16px 32px;
   padding: var(--ov-pad);
 }
 
 @media (max-width: 1439px) {
   .ov-strip-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: max-content max-content minmax(0, 1fr) max-content max-content;
+    column-gap: 20px;
   }
 }
 
 @media (max-width: 1100px) {
   .ov-strip-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ov-strip-spacer {
+    display: none;
   }
 }
 
@@ -429,19 +434,9 @@
 }
 
 @media (min-width: 1440px) {
-  .ov-strip-cell + .ov-strip-cell {
+  .ov-strip-cell ~ .ov-strip-cell {
     border-inline-start: 1px solid var(--ov-line);
     padding-inline-start: 16px;
-  }
-
-  /* The IP cell hugs the right edge instead of stretching across the free column. */
-  .ov-strip-cell-ip {
-    justify-self: end;
-    text-align: end;
-  }
-
-  .ov-strip-cell-ip .ov-kicker-icon {
-    justify-content: flex-end;
   }
 }
 

@@ -64,7 +64,7 @@ export default function ThroughputCard({
           data={up}
           data2={down}
           labels={labels}
-          height={isMobile ? 120 : 150}
+          height={isMobile ? 100 : 118}
           strokeWidth={1.75}
           fillOpacity={0.24}
           showTooltip

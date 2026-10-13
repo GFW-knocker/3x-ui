@@ -479,6 +479,7 @@ export function genVlessLink(input: GenVlessLinkInput): string {
     params.set('security', 'tls');
     if (stream.security === 'tls') {
       const tls = stream.tlsSettings;
+      if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
       if (tls.settings.fingerprint.length > 0) params.set('fp', tls.settings.fingerprint);
       params.set('alpn', tls.alpn.join(','));
       if (tls.serverName.length > 0) params.set('sni', tls.serverName);
@@ -486,7 +487,6 @@ export function genVlessLink(input: GenVlessLinkInput): string {
       if (tls.settings.verifyPeerCertByName.length > 0) {
         params.set('vcn', tls.settings.verifyPeerCertByName);
       }
-      if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
       if (tls.settings.pinnedPeerCertSha256.length > 0) {
         params.set('pcs', tls.settings.pinnedPeerCertSha256.join(','));
       }
@@ -592,6 +592,7 @@ function writeTlsParams(
 ): void {
   if (stream.security !== 'tls') return;
   const tls = stream.tlsSettings;
+  if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
   if (tls.settings.fingerprint.length > 0) params.set('fp', tls.settings.fingerprint);
   params.set('alpn', tls.alpn.join(','));
   if (tls.settings.echConfigList.length > 0) params.set('ech', tls.settings.echConfigList);
@@ -599,7 +600,6 @@ function writeTlsParams(
   if (tls.settings.verifyPeerCertByName.length > 0) {
     params.set('vcn', tls.settings.verifyPeerCertByName);
   }
-  if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
   if (tls.settings.pinnedPeerCertSha256.length > 0) {
     params.set('pcs', tls.settings.pinnedPeerCertSha256.join(','));
   }

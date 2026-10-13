@@ -185,7 +185,7 @@ export default function OverviewActionBar({
       ) : (
         <Tooltip title={t('pages.index.updatePanel')}>
           <button type="button" className="ov-panel-version ov-mono" onClick={onOpenPanelUpdate}>
-            {formatPanelVersion(panelVersion)}
+            {`${t('pages.index.panel')}: ${formatPanelVersion(panelVersion)}`}
           </button>
         </Tooltip>
       )}

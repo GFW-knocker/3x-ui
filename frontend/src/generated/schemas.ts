@@ -2149,6 +2149,9 @@ export const SCHEMAS: Record<string, unknown> = {
   "ClientSlim": {
     "description": "ClientSlim is the row-shape used by the clients page. It drops fields the\ntable never reads (UUID, password, auth, flow, security, reverse, tgId)\nso the list payload stays compact even when the panel manages thousands\nof clients. Modals that need the full record still call /get/:email.",
     "properties": {
+      "auth": {
+        "type": "string"
+      },
       "comment": {
         "example": "Primary device",
         "type": "string"
@@ -2193,6 +2196,12 @@ export const SCHEMAS: Record<string, unknown> = {
         "example": 0,
         "type": "integer"
       },
+      "password": {
+        "type": "string"
+      },
+      "publicKey": {
+        "type": "string"
+      },
       "reset": {
         "example": 0,
         "type": "integer"
@@ -2208,6 +2217,9 @@ export const SCHEMAS: Record<string, unknown> = {
       "resetWeekday": {
         "example": 0,
         "type": "integer"
+      },
+      "secret": {
+        "type": "string"
       },
       "subId": {
         "example": "abcd1234",
@@ -2230,6 +2242,11 @@ export const SCHEMAS: Record<string, unknown> = {
         "example": 1735100000000,
         "format": "int64",
         "type": "integer"
+      },
+      "uuid": {
+        "description": "Credentials the table shows truncated; omitted when the protocol has none.",
+        "example": "11111111-2222-4333-8444-555555555555",
+        "type": "string"
       }
     },
     "required": [

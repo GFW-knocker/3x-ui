@@ -1,7 +1,19 @@
 import { render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Status } from '@/models/status';
+
+// jsdom has no canvas; the sparkline under test is not what these cases check.
+vi.mock('uplot', () => ({
+  default: class {
+    static paths = { spline: () => undefined };
+    static pxRatio = 1;
+    setData() {}
+    setSize() {}
+    redraw() {}
+    destroy() {}
+  },
+}));
 import SystemStrip from '@/pages/index/SystemStrip';
 import ThroughputCard from '@/pages/index/ThroughputCard';
 
@@ -29,7 +41,9 @@ describe('ThroughputCard foot', () => {
       <ThroughputCard status={status} up={[10, 10]} down={[20, 20]} labels={['a', 'b']} isMobile={false} />,
     );
     const text = container.textContent ?? '';
-    const order = ['Avg UP', 'Avg DL', 'Total Sent', 'Total Received'].map((label) => text.indexOf(label));
+    const order = ['Avg Upload', 'Avg Download', 'Total Sent', 'Total Received'].map((label) =>
+      text.indexOf(label),
+    );
     expect(order.every((i) => i >= 0), text).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(text).not.toContain('Avg over window');

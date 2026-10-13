@@ -546,6 +546,7 @@ export const ClientReverseSchema = z.object({
 export type ClientReverse = z.infer<typeof ClientReverseSchema>;
 
 export const ClientSlimSchema = z.object({
+  auth: z.string().optional(),
   comment: z.string().optional(),
   createdAt: z.number().int(),
   email: z.string(),
@@ -555,14 +556,18 @@ export const ClientSlimSchema = z.object({
   inboundIds: z.array(z.number().int()),
   limitHwid: z.number().int(),
   limitIp: z.number().int(),
+  password: z.string().optional(),
+  publicKey: z.string().optional(),
   reset: z.number().int(),
   resetDay: z.number().int(),
   resetMax: z.number().int(),
   resetWeekday: z.number().int(),
+  secret: z.string().optional(),
   subId: z.string(),
   totalGB: z.number().int(),
   traffic: z.lazy(() => ClientTrafficSchema).nullable().optional(),
   updatedAt: z.number().int(),
+  uuid: z.string().optional(),
 });
 export type ClientSlim = z.infer<typeof ClientSlimSchema>;
 

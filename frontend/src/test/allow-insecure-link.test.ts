@@ -36,6 +36,8 @@ describe('allowInsecure in share links', () => {
       expect(new URL(vless).searchParams.get('allowInsecure'), `vless allow=${allow}`).toBe(
         allow ? '1' : null,
       );
+      // Readability: the flag sits right after the security it relaxes.
+      expect(vless.includes('security=tls&allowInsecure=1'), vless).toBe(allow);
       const trojan = genTrojanLink({
         inbound: withAllowInsecure(trojanRaw as Record<string, unknown>, allow),
         address: 'srv.example.com',
@@ -45,6 +47,7 @@ describe('allowInsecure in share links', () => {
       expect(new URL(trojan).searchParams.get('allowInsecure'), `trojan allow=${allow}`).toBe(
         allow ? '1' : null,
       );
+      expect(trojan.includes('security=tls&allowInsecure=1'), trojan).toBe(allow);
     }
   });
 

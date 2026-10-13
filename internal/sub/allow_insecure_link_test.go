@@ -43,6 +43,10 @@ func TestAllowInsecureReachesVlessAndTrojanLinks(t *testing.T) {
 			if has := strings.Contains(got, "allowInsecure=1"); has != allow {
 				t.Errorf("%s allowInsecure=%v: link %q, allowInsecure=1 present=%v", protocol, allow, got, has)
 			}
+			// Readability: the flag follows the security it relaxes, never leads the query.
+			if allow && !strings.Contains(got, "security=tls&allowInsecure=1") {
+				t.Errorf("%s: allowInsecure is not placed right after security=tls: %q", protocol, got)
+			}
 		}
 	}
 }

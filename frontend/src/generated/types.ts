@@ -518,6 +518,7 @@ export interface ClientReverse {
 }
 
 export interface ClientSlim {
+  auth?: string;
   comment?: string;
   createdAt: number;
   email: string;
@@ -527,14 +528,18 @@ export interface ClientSlim {
   inboundIds: number[];
   limitHwid: number;
   limitIp: number;
+  password?: string;
+  publicKey?: string;
   reset: number;
   resetDay: number;
   resetMax: number;
   resetWeekday: number;
+  secret?: string;
   subId: string;
   totalGB: number;
   traffic?: ClientTraffic | null;
   updatedAt: number;
+  uuid?: string;
 }
 
 export interface ClientTraffic {
