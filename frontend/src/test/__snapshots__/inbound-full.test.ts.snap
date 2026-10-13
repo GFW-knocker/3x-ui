@@ -71,6 +71,7 @@ exports[`InboundSchema (full) fixtures > parses hysteria-tls byte-stably 1`] = `
       "rejectUnknownSni": false,
       "serverName": "hysteria.example.test",
       "settings": {
+        "allowInsecure": false,
         "echConfigList": "",
         "fingerprint": "chrome",
         "pinnedPeerCertSha256": [],
@@ -215,6 +216,7 @@ exports[`InboundSchema (full) fixtures > parses trojan-ws-tls byte-stably 1`] = 
       "rejectUnknownSni": false,
       "serverName": "trojan.example.test",
       "settings": {
+        "allowInsecure": false,
         "echConfigList": "",
         "fingerprint": "chrome",
         "pinnedPeerCertSha256": [],
@@ -393,6 +395,7 @@ exports[`InboundSchema (full) fixtures > parses vless-ws-tls byte-stably 1`] = `
       "rejectUnknownSni": false,
       "serverName": "cdn.example.test",
       "settings": {
+        "allowInsecure": false,
         "echConfigList": "",
         "fingerprint": "chrome",
         "pinnedPeerCertSha256": [],
@@ -485,6 +488,7 @@ exports[`InboundSchema (full) fixtures > parses vless-ws-tls-pinned byte-stably 
       "rejectUnknownSni": false,
       "serverName": "cdn.example.test",
       "settings": {
+        "allowInsecure": false,
         "echConfigList": "",
         "fingerprint": "chrome",
         "pinnedPeerCertSha256": [
@@ -584,6 +588,7 @@ exports[`InboundSchema (full) fixtures > parses vmess-tcp-tls byte-stably 1`] = 
       "rejectUnknownSni": false,
       "serverName": "vmess.example.test",
       "settings": {
+        "allowInsecure": false,
         "echConfigList": "",
         "fingerprint": "chrome",
         "pinnedPeerCertSha256": [],

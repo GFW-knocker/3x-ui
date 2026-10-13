@@ -798,6 +798,9 @@ func putClientTLSVerification(tlsData map[string]any, tlsClientSettings map[stri
 	if vcn, ok := verifyPeerCertByNameValue(tlsClientSettings); ok {
 		tlsData["verifyPeerCertByName"] = vcn
 	}
+	if allowInsecureValue(tlsClientSettings) {
+		tlsData["allowInsecure"] = true
+	}
 	// xray-core now parses pinnedPeerCertSha256 as a comma-separated string, not
 	// an array; emit the joined form so v2ray clients can import the config (#5401).
 	if pins, ok := pinnedSha256List(tlsClientSettings); ok {

@@ -679,6 +679,8 @@
         "masterKeyLogTip": "المسار اللي هتتكتب فيه مفاتيح TLS الرئيسية (بصيغة SSLKEYLOGFILE) عشان التصحيح باستخدام Wireshark. سيبه فاضي في الإنتاج — لإنه بيخلي أي حد عنده الملف يقدر يفك تشفير المرور.",
         "verifyPeerCertByName": "التحقق من شهادة النظير بالاسم",
         "verifyPeerCertByNameTip": "بيقول للعملاء يتحققوا من شهادة السيرفر مقابل الاسم ده بدل الـ SNI. الأسماء بتتفصل بفاصلة. للوحة بس — بيتضاف في روابط المشاركة (vcn). ده البديل الحديث لـ allowInsecure اللي شالته Xray بعد 2026-06-01.",
+        "allowInsecure": "السماح بغير الآمن",
+        "allowInsecureTip": "يطلب من العملاء تخطي التحقق من شهادة TLS: ‏allowInsecure=1 في روابط المشاركة، و allowInsecure في اشتراك JSON، و skip-cert-verify في Clash. للشهادات الموقّعة ذاتيًا فقط. تلتزم به عملاء Mahsa-Core؛ بينما يتجاهله Xray-core الأصلي.",
         "pinFromCert": "املأ من شهادة الوارد ده",
         "pinFromRemote": "اجلب الهاش عبر ping على الـ SNI (xray tls ping)",
         "pinFromRemoteNoSni": "حدّد الـ SNI (serverName) الأول عشان تعمل ping للشهادة البعيدة.",

@@ -616,6 +616,8 @@
         "masterKeyLogTip": "Path to write TLS master keys (SSLKEYLOGFILE format) for debugging with Wireshark. Leave empty in production — it lets anyone with the file decrypt traffic.",
         "verifyPeerCertByName": "Verify Peer Cert By Name",
         "verifyPeerCertByNameTip": "Tell clients to verify the server certificate against this name instead of the SNI. Comma-separated names. Panel-only — included in share links (vcn). The modern replacement for allowInsecure, which Xray removed after 2026-06-01.",
+        "allowInsecure": "Allow Insecure",
+        "allowInsecureTip": "Tell clients to skip TLS certificate verification: allowInsecure=1 in share links, allowInsecure in JSON subscriptions, skip-cert-verify in Clash. Only for self-signed certificates. Honoured by Mahsa-Core clients; upstream Xray-core ignores it.",
         "pinnedPeerCertSha256": "Pinned Peer Cert SHA-256",
         "pinnedPeerCertSha256Tip": "SHA-256 hash(es) of the peer certificate as a hex string (e.g. e8e2d3…), comma-separated. Panel-only — not written to the server's xray config, but included in share links so clients can pin the certificate.",
         "pinnedPeerCertSha256Placeholder": "hex hash(es), comma-separated",

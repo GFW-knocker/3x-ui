@@ -4,6 +4,7 @@
 - <b>MVLESS</b> (diseñado para [MahsaNG](https://github.com/GFW-knocker/MahsaNG))<br>
 - <b>QUIC</b> (protocolo basado en UDP, eliminado de xray-core en el cuarto trimestre de 2024 pero conservado en [Mahsa-Core](https://github.com/GFW-knocker/Xray-core))<br>
 (nota: con mucho tráfico QUIC consume demasiada RAM)
+- compatible con <b>allowInsecure</b> (eliminado de xray-core pero conservado en [Mahsa-Core](https://github.com/GFW-knocker/Xray-core)): interruptor en los ajustes TLS, exportado en los enlaces y las suscripciones<br>
 - <b>Privacidad</b>: por motivos de privacidad se eliminaron el banner de patrocinadores y las llamadas redundantes a ip-api, y la consulta de IP pública es opcional; el panel no contacta con ningún dominio de terceros salvo GitHub para actualizaciones y las integraciones que tú actives<br>
 
 

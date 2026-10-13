@@ -679,6 +679,8 @@
         "masterKeyLogTip": "Path untuk menulis master key TLS (format SSLKEYLOGFILE) untuk debug dengan Wireshark. Biarkan kosong di produksi — ini memungkinkan siapa pun yang memiliki file tersebut mendekripsi lalu lintas.",
         "verifyPeerCertByName": "Verifikasi sertifikat peer berdasarkan nama",
         "verifyPeerCertByNameTip": "Minta klien memverifikasi sertifikat server terhadap nama ini, bukan SNI. Nama dipisahkan koma. Hanya panel — disertakan dalam tautan berbagi (vcn). Pengganti modern untuk allowInsecure, yang dihapus Xray setelah 2026-06-01.",
+        "allowInsecure": "Izinkan tidak aman",
+        "allowInsecureTip": "Minta klien melewati verifikasi sertifikat TLS: allowInsecure=1 di tautan berbagi, allowInsecure di langganan JSON, skip-cert-verify di Clash. Hanya untuk sertifikat self-signed. Dipatuhi klien Mahsa-Core; Xray-core asli mengabaikannya.",
         "pinFromCert": "Isi dari sertifikat inbound ini",
         "pinFromRemote": "Ambil hash dengan melakukan ping ke SNI (xray tls ping)",
         "pinFromRemoteNoSni": "Atur SNI (serverName) terlebih dahulu untuk melakukan ping ke sertifikat jarak jauh.",

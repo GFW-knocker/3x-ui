@@ -621,6 +621,7 @@ func TestSub_HostCipherSuitesJSON(t *testing.T) {
 
 // Xray reads a client's TLS verification fields at the top of tlsSettings; a
 // nested "settings" map is panel-only shape and xray silently ignores it.
+// allowInsecure sits there too: Mahsa-Core honours it, upstream cores ignore it.
 func TestSub_HostTLSVerificationJSONAtXrayLevel(t *testing.T) {
 	seedSubDB(t)
 	ib := seedSubInbound(t, "s1", "ech", 4461, 1,
@@ -652,15 +653,14 @@ func TestSub_HostTLSVerificationJSONAtXrayLevel(t *testing.T) {
 		"echConfigList":        "cloudflare-ech.com+udp://1.1.1.1",
 		"verifyPeerCertByName": "cert.example.com",
 		"pinnedPeerCertSha256": "aa11,bb22",
+		"allowInsecure":        true,
 	}
 	for key, value := range want {
 		if tls[key] != value {
 			t.Errorf("tlsSettings.%s = %#v, want %#v", key, tls[key], value)
 		}
 	}
-	for _, key := range []string{"settings", "allowInsecure"} {
-		if _, ok := tls[key]; ok {
-			t.Errorf("tlsSettings.%s must not reach xray: %#v", key, tls)
-		}
+	if _, ok := tls["settings"]; ok {
+		t.Errorf("tlsSettings.settings must not reach xray: %#v", tls)
 	}
 }

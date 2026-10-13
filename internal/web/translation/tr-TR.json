@@ -679,6 +679,8 @@
         "masterKeyLogTip": "Wireshark ile hata ayıklama için TLS ana anahtarlarının yazılacağı yol (SSLKEYLOGFILE biçimi). Üretimde boş bırakın — dosyaya erişimi olan herkesin trafiği çözmesine olanak tanır.",
         "verifyPeerCertByName": "Peer sertifikasını ada göre doğrula",
         "verifyPeerCertByNameTip": "İstemcilere sunucu sertifikasını SNI yerine bu ada göre doğrulamalarını söyler. Adları virgülle ayırın. Yalnızca panele özgü — paylaşım bağlantılarına eklenir (vcn). Xray'in 2026-06-01 sonrası kaldırdığı allowInsecure'un modern karşılığıdır.",
+        "allowInsecure": "Güvensize izin ver",
+        "allowInsecureTip": "İstemcilere TLS sertifika doğrulamasını atlamalarını söyler: paylaşım bağlantılarında allowInsecure=1, JSON aboneliğinde allowInsecure, Clash'te skip-cert-verify. Yalnızca kendinden imzalı sertifikalar için. Mahsa-Core istemcileri uyar; orijinal Xray-core yok sayar.",
         "pinFromCert": "Bu gelen bağlantının sertifikasından doldur",
         "pinFromRemote": "SNI'ye ping atarak hash'i al (xray tls ping)",
         "pinFromRemoteNoSni": "Uzak sertifikaya ping atmak için önce SNI'yi (serverName) ayarlayın.",

@@ -89,6 +89,9 @@ export const TlsClientSettingsSchema = z.object({
   // share links / subscriptions; the modern replacement for `allowInsecure`,
   // which xray-core removed after 2026-06-01.
   verifyPeerCertByName: z.string().default(''),
+  // Client directive restored by Mahsa-Core: skip certificate verification.
+  // Shipped as allowInsecure=1 / insecure=1 in share links and subscriptions.
+  allowInsecure: z.boolean().default(false),
 });
 export type TlsClientSettings = z.infer<typeof TlsClientSettingsSchema>;
 
@@ -116,6 +119,7 @@ export const TlsStreamSettingsSchema = z.object({
     echConfigList: '',
     pinnedPeerCertSha256: [],
     verifyPeerCertByName: '',
+    allowInsecure: false,
   }),
 });
 export type TlsStreamSettings = z.infer<typeof TlsStreamSettingsSchema>;

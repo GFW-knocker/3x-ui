@@ -320,6 +320,7 @@ export function genVmessLink(input: GenVmessLinkInput): string {
     if (tlsSettings.settings.verifyPeerCertByName.length > 0) {
       obj.vcn = tlsSettings.settings.verifyPeerCertByName;
     }
+    if (tlsSettings.settings.allowInsecure) obj.allowInsecure = true;
     if (tlsSettings.settings.pinnedPeerCertSha256.length > 0) {
       obj.pcs = tlsSettings.settings.pinnedPeerCertSha256.join(',');
     }
@@ -485,6 +486,7 @@ export function genVlessLink(input: GenVlessLinkInput): string {
       if (tls.settings.verifyPeerCertByName.length > 0) {
         params.set('vcn', tls.settings.verifyPeerCertByName);
       }
+      if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
       if (tls.settings.pinnedPeerCertSha256.length > 0) {
         params.set('pcs', tls.settings.pinnedPeerCertSha256.join(','));
       }
@@ -597,6 +599,7 @@ function writeTlsParams(
   if (tls.settings.verifyPeerCertByName.length > 0) {
     params.set('vcn', tls.settings.verifyPeerCertByName);
   }
+  if (tls.settings.allowInsecure) params.set('allowInsecure', '1');
   if (tls.settings.pinnedPeerCertSha256.length > 0) {
     params.set('pcs', tls.settings.pinnedPeerCertSha256.join(','));
   }
@@ -844,6 +847,7 @@ export function genHysteriaLink(input: GenHysteriaLinkInput): string {
   if (tls.settings.verifyPeerCertByName.length > 0) {
     params.set('vcn', tls.settings.verifyPeerCertByName);
   }
+  if (tls.settings.allowInsecure) params.set('insecure', '1');
   if (tls.settings.pinnedPeerCertSha256.length > 0) {
     params.set('pinSHA256', tls.settings.pinnedPeerCertSha256.map(hysteriaPinHex).join(','));
   }

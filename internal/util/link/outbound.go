@@ -221,6 +221,7 @@ func parseVmess(link string) (*ParseResult, error) {
 		tls["echConfigList"] = getString(j, "ech", "")
 		tls["verifyPeerCertByName"] = getString(j, "vcn", "")
 		tls["pinnedPeerCertSha256"] = getString(j, "pcs", "")
+		tls["allowInsecure"] = truthy(j["allowInsecure"])
 	}
 
 	port := num(j["port"])
@@ -531,6 +532,7 @@ func parseHysteria2(link string) (*ParseResult, error) {
 			"echConfigList":        params.Get("ech"),
 			"verifyPeerCertByName": params.Get("vcn"),
 			"pinnedPeerCertSha256": params.Get("pinSHA256"),
+			"allowInsecure":        params.Get("insecure") == "1",
 		},
 	}
 	applyFinalMask(stream, params)
@@ -670,6 +672,7 @@ func buildStream(network, security string) map[string]any {
 		stream["tlsSettings"] = map[string]any{
 			"serverName": "", "alpn": []any{}, "fingerprint": "",
 			"echConfigList": "", "verifyPeerCertByName": "", "pinnedPeerCertSha256": "",
+			"allowInsecure": false,
 		}
 	case "reality":
 		stream["realitySettings"] = map[string]any{
@@ -768,6 +771,7 @@ func applySecurity(stream map[string]any, p url.Values) {
 		tls["echConfigList"] = p.Get("ech")
 		tls["verifyPeerCertByName"] = p.Get("vcn")
 		tls["pinnedPeerCertSha256"] = p.Get("pcs")
+		tls["allowInsecure"] = p.Get("allowInsecure") == "1"
 	case "reality":
 		re := stream["realitySettings"].(map[string]any)
 		re["serverName"] = p.Get("sni")
@@ -1138,6 +1142,19 @@ func num(v any) int {
 		return n
 	}
 	return 0
+}
+
+// truthy accepts the bool, "1"/"true" and 1 spellings clients use for allowInsecure.
+func truthy(v any) bool {
+	switch x := v.(type) {
+	case bool:
+		return x
+	case string:
+		return x == "1" || strings.EqualFold(x, "true")
+	case float64:
+		return x == 1
+	}
+	return false
 }
 
 func getString(m map[string]any, key, def string) string {

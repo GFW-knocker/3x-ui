@@ -4,6 +4,7 @@
 - <b>MVLESS</b>（为 [MahsaNG](https://github.com/GFW-knocker/MahsaNG) 设计）<br>
 - <b>QUIC</b>（基于 UDP 的协议，2024 年第四季度已从 xray-core 移除，但在 [Mahsa-Core](https://github.com/GFW-knocker/Xray-core) 中保留）<br>
 （注意：高流量下 QUIC 会占用大量内存）
+- 支持 <b>allowInsecure</b>（已从 xray-core 移除，但在 [Mahsa-Core](https://github.com/GFW-knocker/Xray-core) 中保留）：TLS 设置中的开关，并输出到分享链接和订阅中<br>
 - <b>隐私</b>：出于隐私考虑移除了赞助商横幅和多余的 ip-api 调用，公网 IP 查询改为可选；除了用于更新的 GitHub 和你自行启用的集成之外，面板不会联系任何第三方域名<br>
 
 

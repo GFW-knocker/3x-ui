@@ -477,6 +477,8 @@
         "masterKeyLogTip": "Caminho para gravar as chaves mestras TLS (formato SSLKEYLOGFILE) para depuração com o Wireshark. Deixe vazio em produção — isso permite que qualquer pessoa com o arquivo descriptografe o tráfego.",
         "verifyPeerCertByName": "Verificar certificado do par pelo nome",
         "verifyPeerCertByNameTip": "Instrui os clientes a verificar o certificado do servidor em relação a este nome em vez do SNI. Nomes separados por vírgula. Apenas do painel — incluído nos links de compartilhamento (vcn). A substituição moderna para allowInsecure, que o Xray removeu após 2026-06-01.",
+        "allowInsecure": "Permitir inseguro",
+        "allowInsecureTip": "Instrui os clientes a pular a verificação do certificado TLS: allowInsecure=1 nos links, allowInsecure na assinatura JSON, skip-cert-verify no Clash. Apenas para certificados autoassinados. Respeitado por clientes Mahsa-Core; o Xray-core original ignora.",
         "pinFromCert": "Preencher a partir do certificado desta entrada",
         "pinFromRemote": "Obter o hash via ping ao SNI (xray tls ping)",
         "pinFromRemoteNoSni": "Defina primeiro o SNI (serverName) para fazer o ping no certificado remoto.",

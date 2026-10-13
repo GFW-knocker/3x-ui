@@ -476,6 +476,8 @@
         "masterKeyLog": "主密钥日志",
         "masterKeyLogTip": "写入 TLS 主密钥的路径（SSLKEYLOGFILE 格式），用于配合 Wireshark 调试。生产环境请留空——任何拥有该文件的人都能解密流量。",
         "verifyPeerCertByNameTip": "让客户端以此名称（而非 SNI）验证服务器证书。多个名称用逗号分隔。仅面板使用——会包含在分享链接中（vcn）。这是 allowInsecure 的现代替代方案，Xray 已在 2026-06-01 之后将其移除。",
+        "allowInsecure": "允许不安全",
+        "allowInsecureTip": "让客户端跳过 TLS 证书验证：分享链接中为 allowInsecure=1，JSON 订阅中为 allowInsecure，Clash 中为 skip-cert-verify。仅用于自签名证书。Mahsa-Core 客户端会遵守；上游 Xray-core 会忽略。",
         "pinFromCert": "从此入站的证书填充",
         "pinFromRemote": "通过 ping SNI 获取哈希（xray tls ping）",
         "pinFromRemoteNoSni": "请先设置 SNI（serverName）才能 ping 远端证书。",

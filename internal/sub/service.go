@@ -1458,6 +1458,9 @@ func (s *SubService) genHysteriaLink(inbound *model.Inbound, email string) strin
 		if vcn, ok := verifyPeerCertByNameValue(tlsSettings); ok {
 			params["vcn"] = vcn
 		}
+		if allowInsecureValue(tlsSettings) {
+			params["insecure"] = "1"
+		}
 		if pins, ok := pinnedSha256List(tlsSettings); ok {
 			for i, p := range pins {
 				pins[i] = hysteriaPinHex(p)
@@ -1880,6 +1883,9 @@ func applyShareTLSParams(stream map[string]any, params map[string]string) {
 		if vcn, ok := verifyPeerCertByNameValue(tlsSettings); ok {
 			params["vcn"] = vcn
 		}
+		if allowInsecureValue(tlsSettings) {
+			params["allowInsecure"] = "1"
+		}
 		if pins, ok := pinnedSha256List(tlsSettings); ok {
 			params["pcs"] = strings.Join(pins, ",")
 		}
@@ -1915,10 +1921,24 @@ func applyVmessTLSParams(stream map[string]any, obj map[string]any) {
 		if vcn, ok := verifyPeerCertByNameValue(tlsSettings); ok {
 			obj["vcn"] = vcn
 		}
+		if allowInsecureValue(tlsSettings) {
+			obj["allowInsecure"] = true
+		}
 		if pins, ok := pinnedSha256List(tlsSettings); ok {
 			obj["pcs"] = strings.Join(pins, ",")
 		}
 	}
+}
+
+// allowInsecureValue reads tlsSettings.settings.allowInsecure, the client-side
+// skip-verify switch Mahsa-Core kept after upstream Xray dropped it.
+func allowInsecureValue(tlsClientSettings any) bool {
+	raw, ok := searchKey(tlsClientSettings, "allowInsecure")
+	if !ok {
+		return false
+	}
+	allow, _ := raw.(bool)
+	return allow
 }
 
 // verifyPeerCertByNameValue extracts tlsSettings.settings.verifyPeerCertByName

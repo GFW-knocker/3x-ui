@@ -663,6 +663,8 @@
         "masterKeyLogTip": "寫入 TLS 主金鑰的路徑（SSLKEYLOGFILE 格式），用於以 Wireshark 除錯。正式環境請留空——擁有該檔案的任何人都能解密流量。",
         "verifyPeerCertByName": "依名稱驗證對端憑證",
         "verifyPeerCertByNameTip": "要求客戶端以此名稱（而非 SNI）驗證伺服器憑證。以逗號分隔多個名稱。僅面板使用——會包含在分享連結中（vcn）。這是 allowInsecure 的新式替代方案，Xray 已於 2026-06-01 之後移除 allowInsecure。",
+        "allowInsecure": "允許不安全",
+        "allowInsecureTip": "讓用戶端略過 TLS 憑證驗證：分享連結中為 allowInsecure=1，JSON 訂閱中為 allowInsecure，Clash 中為 skip-cert-verify。僅用於自簽憑證。Mahsa-Core 用戶端會遵守；上游 Xray-core 會忽略。",
         "pinFromCert": "從此入站的憑證填入",
         "pinFromRemote": "透過 ping SNI 取得雜湊值（xray tls ping）",
         "pinFromRemoteNoSni": "請先設定 SNI（serverName）才能 ping 遠端憑證。",
