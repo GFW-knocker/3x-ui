@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Card, theme } from 'antd';
 
 import { Sparkline } from '@/components/viz';
+import UsageRing from './UsageRing';
 import { mean, peak } from './useOverviewHistory';
 
 interface VitalTileProps {
@@ -15,6 +16,7 @@ interface VitalTileProps {
   footRight: string;
   data: number[];
   isMobile: boolean;
+  showRing?: boolean;
 }
 
 export default function VitalTile({
@@ -27,6 +29,7 @@ export default function VitalTile({
   footRight,
   data,
   isMobile,
+  showRing = false,
 }: VitalTileProps) {
   const { token } = theme.useToken();
   const meanColor = token.colorTextTertiary;
@@ -41,6 +44,7 @@ export default function VitalTile({
       <div className="ov-tile-head">
         <span className="ov-tile-icon">{icon}</span>
         <span className="ov-kicker">{label}</span>
+        {showRing && <UsageRing percent={percent} />}
       </div>
 
       <div className="ov-tile-value">

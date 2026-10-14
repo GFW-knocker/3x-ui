@@ -233,6 +233,7 @@ export default function IndexPage() {
                       footRight={`${t('pages.index.peak')} ${peak(history.series.cpu).toFixed(0)}%`}
                       data={history.series.cpu}
                       isMobile={isMobile}
+                      showRing
                     />
                     <VitalTile
                       icon={<DatabaseOutlined />}
@@ -244,6 +245,7 @@ export default function IndexPage() {
                       footRight={`${t('pages.index.peak')} ${peak(history.series.mem).toFixed(0)}%`}
                       data={history.series.mem}
                       isMobile={isMobile}
+                      showRing
                     />
                     <VitalTile
                       icon={<SwapOutlined />}
@@ -255,6 +257,7 @@ export default function IndexPage() {
                       footRight={`${t('pages.index.peak')} ${peak(history.series.swap).toFixed(0)}%`}
                       data={history.series.swap}
                       isMobile={isMobile}
+                      showRing
                     />
                     <VitalTile
                       icon={<HddOutlined />}
@@ -266,6 +269,7 @@ export default function IndexPage() {
                       footRight={`${t('pages.index.avg')} ${mean(history.series.diskUsage).toFixed(1)}%`}
                       data={history.series.diskUsage}
                       isMobile={isMobile}
+                      showRing
                     />
                   </div>
 

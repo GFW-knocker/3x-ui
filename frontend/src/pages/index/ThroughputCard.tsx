@@ -8,6 +8,18 @@ import { Sparkline } from '@/components/viz';
 import type { Status } from '@/models/status';
 import { mean, peak } from './useOverviewHistory';
 
+// "27.50 KB/s" renders as number and unit with a gap between them.
+function ValueUnit({ text }: { text: string }) {
+  const at = text.lastIndexOf(' ');
+  if (at < 0) return <>{text}</>;
+  return (
+    <>
+      <span>{text.slice(0, at)}</span>
+      <span className="ov-foot-unit">{text.slice(at + 1)}</span>
+    </>
+  );
+}
+
 interface ThroughputCardProps {
   status: Status;
   up: number[];
@@ -81,23 +93,31 @@ export default function ThroughputCard({
 
       <div className="ov-wide-foot">
         <div>
-          <div className="ov-kicker">{t('pages.index.avgUp')}</div>
-          <div className="ov-foot-value">{`↑ ${SizeFormatter.speedFormat(mean(up))}`}</div>
+          <div className="ov-kicker">{`${t('pages.index.avgUp')} ↑`}</div>
+          <div className="ov-foot-value">
+            <ValueUnit text={SizeFormatter.speedFormat(mean(up))} />
+          </div>
         </div>
         <span className="ov-foot-sep" />
         <div>
-          <div className="ov-kicker">{t('pages.index.avgDl')}</div>
-          <div className="ov-foot-value">{`↓ ${SizeFormatter.speedFormat(mean(down))}`}</div>
+          <div className="ov-kicker">{`${t('pages.index.avgDl')} ↓`}</div>
+          <div className="ov-foot-value">
+            <ValueUnit text={SizeFormatter.speedFormat(mean(down))} />
+          </div>
         </div>
         <span className="ov-foot-spacer" />
         <div>
           <div className="ov-kicker">{t('pages.index.totalSent')}</div>
-          <div className="ov-foot-value">{SizeFormatter.sizeFormat(status.netTraffic.sent)}</div>
+          <div className="ov-foot-value">
+            <ValueUnit text={SizeFormatter.sizeFormat(status.netTraffic.sent)} />
+          </div>
         </div>
         <span className="ov-foot-sep" />
         <div>
           <div className="ov-kicker">{t('pages.index.totalReceived')}</div>
-          <div className="ov-foot-value">{SizeFormatter.sizeFormat(status.netTraffic.recv)}</div>
+          <div className="ov-foot-value">
+            <ValueUnit text={SizeFormatter.sizeFormat(status.netTraffic.recv)} />
+          </div>
         </div>
       </div>
     </Card>

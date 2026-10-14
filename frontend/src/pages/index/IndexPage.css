@@ -213,6 +213,7 @@
 }
 
 .ov-tile {
+  position: relative;
   overflow: hidden;
 }
 
@@ -227,6 +228,14 @@
 .ov-tile-icon {
   display: inline-flex;
   font-size: 15px;
+}
+
+/* Floats over the head and value rows so the gauge adds no height to the tile. */
+.ov-tile-ring {
+  position: absolute;
+  top: 12px;
+  inset-inline-end: var(--ov-pad);
+  color: var(--ant-color-text);
 }
 
 .ov-tile-value {
@@ -386,6 +395,13 @@
 .ov-foot-part {
   display: inline-block;
   white-space: nowrap;
+}
+
+.ov-foot-unit {
+  margin-inline-start: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ov-label);
 }
 
 @media (max-width: 560px) {
