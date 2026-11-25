@@ -449,6 +449,23 @@ describe('InboundFormModal', () => {
     expect(post).not.toHaveBeenCalled();
   }, 20000);
 
+  it('refuses to save more lane ports than the core will listen on', async () => {
+    const post = vi.mocked(HttpUtil.post);
+    post.mockClear();
+    messageError.mockClear();
+    renderModal();
+    pickTransport('QUIC over TCP lanes');
+    await flushUi();
+
+    fireEvent.change(screen.getByLabelText('Lane Ports'), { target: { value: '20000-21024' } });
+    fireEvent.click(primaryButton());
+
+    await waitFor(() => {
+      expect(messageError).toHaveBeenCalledWith(expect.stringContaining('1024'));
+    });
+    expect(post).not.toHaveBeenCalledWith('/panel/api/inbounds/add', expect.anything());
+  }, 20000);
+
   it('offers the enable switch when adding an inbound but not when editing one', () => {
     renderModal();
     expect(document.getElementById('inbound-enable')).not.toBeNull();

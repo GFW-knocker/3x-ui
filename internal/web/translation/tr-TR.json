@@ -515,6 +515,8 @@
         "hyTransportAuth": "Taşıma parolası",
         "hyTransportAuthDesc": "Hysteria taşıması bunu VLESS, VMess veya Trojan bağlantıyı görmeden önce denetler. Bu gelen bağlantının tüm istemcileri paylaşır ve paylaşım bağlantıları da içerir.",
         "hyTransportAuthRequired": "Bir taşıma parolası belirleyin: Xray bu gelen bağlantıyı parolasız başlatamaz",
+        "lanePortsInvalid": "Şerit portları 3000-3010,4000 gibi port veya aralık olmalıdır",
+        "lanePortsTooMany": "Xray en fazla 1024 şerit portunu dinler; daha kısa bir aralık kullanın",
         "masquerade": "Gizleme (Masquerade)",
         "type": "Tip",
         "upstreamUrl": "Üst Sunucu URL (Upstream)",

@@ -538,6 +538,8 @@
         "hyTransportAuth": "Mật khẩu transport",
         "hyTransportAuthDesc": "Transport Hysteria kiểm tra mật khẩu này trước khi VLESS, VMess hoặc Trojan thấy kết nối. Mọi client của inbound này dùng chung, và liên kết chia sẻ có chứa nó.",
         "hyTransportAuthRequired": "Hãy đặt mật khẩu transport: Xray không thể khởi động inbound này nếu thiếu",
+        "lanePortsInvalid": "Cổng lane phải là cổng hoặc dải cổng, ví dụ 3000-3010,4000",
+        "lanePortsTooMany": "Xray chỉ lắng nghe tối đa 1024 cổng lane; hãy dùng dải ngắn hơn",
         "masquerade": "Masquerade",
         "type": "Loại",
         "upstreamUrl": "Upstream URL",

@@ -517,6 +517,8 @@
         "hyTransportAuth": "Transport password",
         "hyTransportAuthDesc": "The Hysteria transport checks this before VLESS, VMess or Trojan sees a connection. Every client of this inbound shares it, and share links carry it.",
         "hyTransportAuthRequired": "Set a transport password: Xray cannot start this inbound without one",
+        "lanePortsInvalid": "Lane ports must be ports or ranges such as 3000-3010,4000",
+        "lanePortsTooMany": "Xray listens on at most 1024 lane ports; use a shorter range",
         "masquerade": "Masquerade",
         "type": "Type",
         "upstreamUrl": "Upstream URL",

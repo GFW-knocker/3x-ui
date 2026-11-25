@@ -106,7 +106,7 @@ func TestCheckTuicSocksConflict(t *testing.T) {
 		Port:     relayPort,
 	}
 
-	detail, err := checkTuicSocksConflict(database.GetDB(), newIb, 0, transportTCP)
+	detail, err := checkTuicSocksConflict(database.GetDB(), rowPortClaims(newIb), 0)
 	if err != nil {
 		t.Fatalf("checkTuicSocksConflict error: %v", err)
 	}
@@ -244,7 +244,7 @@ func TestCheckTuicSocksConflict_DisabledInboundRetainsReservation(t *testing.T) 
 		Enable:   true,
 	}
 
-	conflict, err := checkTuicSocksConflict(database.GetDB(), testIb, 0, transportTCP)
+	conflict, err := checkTuicSocksConflict(database.GetDB(), rowPortClaims(testIb), 0)
 	if err != nil {
 		t.Fatalf("checkTuicSocksConflict: %v", err)
 	}

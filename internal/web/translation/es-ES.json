@@ -515,6 +515,8 @@
         "hyTransportAuth": "Contraseña de transporte",
         "hyTransportAuthDesc": "El transporte Hysteria la comprueba antes de que VLESS, VMess o Trojan vean la conexión. Todos los clientes de esta entrada la comparten y los enlaces la incluyen.",
         "hyTransportAuthRequired": "Define una contraseña de transporte: Xray no puede iniciar esta entrada sin ella",
+        "lanePortsInvalid": "Los puertos de carril deben ser puertos o rangos como 3000-3010,4000",
+        "lanePortsTooMany": "Xray escucha en 1024 puertos de carril como máximo; usa un rango más corto",
         "masquerade": "Masquerade",
         "type": "Tipo",
         "upstreamUrl": "URL Upstream",

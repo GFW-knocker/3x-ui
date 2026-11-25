@@ -515,6 +515,8 @@
         "hyTransportAuth": "Kata sandi transport",
         "hyTransportAuthDesc": "Transport Hysteria memeriksanya sebelum VLESS, VMess, atau Trojan melihat koneksi. Semua klien inbound ini memakainya bersama, dan tautan berbagi membawanya.",
         "hyTransportAuthRequired": "Atur kata sandi transport: Xray tidak dapat menjalankan inbound ini tanpanya",
+        "lanePortsInvalid": "Port lane harus berupa port atau rentang seperti 3000-3010,4000",
+        "lanePortsTooMany": "Xray mendengarkan paling banyak 1024 port lane; gunakan rentang yang lebih pendek",
         "masquerade": "Masquerade",
         "type": "Tipe",
         "upstreamUrl": "URL Upstream",

@@ -515,6 +515,8 @@
         "hyTransportAuth": "Пароль транспорту",
         "hyTransportAuthDesc": "Транспорт Hysteria перевіряє його раніше за VLESS, VMess чи Trojan. Він спільний для всіх клієнтів цього вхідного підключення і передається в посиланнях.",
         "hyTransportAuthRequired": "Задайте пароль транспорту: без нього Xray не запустить це вхідне підключення",
+        "lanePortsInvalid": "Порти ліній мають бути портами або діапазонами, наприклад 3000-3010,4000",
+        "lanePortsTooMany": "Xray слухає не більше 1024 портів ліній; вкажіть коротший діапазон",
         "masquerade": "Masquerade",
         "type": "Тип",
         "upstreamUrl": "Upstream URL",

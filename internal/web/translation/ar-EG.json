@@ -515,6 +515,8 @@
         "hyTransportAuth": "كلمة مرور النقل",
         "hyTransportAuthDesc": "يتحقق منها نقل Hysteria قبل أن يرى VLESS أو VMess أو Trojan الاتصال. يشترك فيها جميع عملاء هذا الوارد، وتحملها روابط المشاركة.",
         "hyTransportAuthRequired": "عيّن كلمة مرور النقل: لا يستطيع Xray تشغيل هذا الوارد بدونها",
+        "lanePortsInvalid": "يجب أن تكون منافذ المسارات منافذ أو نطاقات مثل 3000-3010,4000",
+        "lanePortsTooMany": "يستمع Xray إلى 1024 منفذ مسار كحد أقصى؛ استخدم نطاقًا أقصر",
         "masquerade": "Masquerade",
         "type": "النوع",
         "upstreamUrl": "Upstream URL",

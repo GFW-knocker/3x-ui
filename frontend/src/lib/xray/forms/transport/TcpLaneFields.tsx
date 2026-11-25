@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Divider, Input, InputNumber } from 'antd';
 
-import { FormField } from '@/components/form/rhf';
+import { FormField, rhfZodValidate } from '@/components/form/rhf';
+import { TcpLanePortsSchema } from '@/schemas/protocols/stream/tcplane';
 
 export type TcpLaneSettingsKey = 'quictcpSettings' | 'hytcpSettings';
 
@@ -78,10 +79,11 @@ export default function TcpLaneFields({
         name={path('ports')}
         tooltip={
           side === 'server'
-            ? 'Extra TCP ports to listen on; empty = the inbound port'
-            : "Server ports to spread lanes over; empty = the outbound's port"
+            ? 'TCP ports to listen on instead of the inbound port, up to 1024; empty = the inbound port. A client that ignores lanePorts in a share link dials the inbound port, so list it here too for such clients.'
+            : "Server ports to spread lanes over, up to 1024; empty = the outbound's port"
         }
         transform={EMPTY_TO_UNDEFINED}
+        rules={{ validate: rhfZodValidate(TcpLanePortsSchema) }}
       >
         <Input placeholder="3000-3010,4000" />
       </FormField>

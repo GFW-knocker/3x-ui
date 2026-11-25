@@ -1196,6 +1196,9 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, boo
 	if err := validateHysteriaTransport(inbound.Protocol, inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
+	if err := validateTcpLanePorts(inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
@@ -1838,6 +1841,9 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, 
 		return inbound, false, err
 	}
 	if err := validateHysteriaTransport(inbound.Protocol, inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
+	if err := validateTcpLanePorts(inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {

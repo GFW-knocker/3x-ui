@@ -515,6 +515,8 @@
         "hyTransportAuth": "傳輸密碼",
         "hyTransportAuthDesc": "Hysteria 傳輸會在 VLESS / VMess / Trojan 之前驗證它。此入站的所有用戶端共用，分享連結中也會包含。",
         "hyTransportAuthRequired": "請設定傳輸密碼：缺少它 Xray 無法啟動此入站",
+        "lanePortsInvalid": "通道連接埠須為連接埠或範圍，例如 3000-3010,4000",
+        "lanePortsTooMany": "Xray 最多監聽 1024 個通道連接埠，請縮短範圍",
         "masquerade": "偽裝",
         "type": "類型",
         "upstreamUrl": "Upstream URL",

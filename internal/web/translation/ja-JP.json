@@ -538,6 +538,8 @@
         "hyTransportAuth": "トランスポートパスワード",
         "hyTransportAuthDesc": "Hysteria トランスポートが VLESS / VMess / Trojan より先に検証します。このインバウンドの全クライアントで共有され、共有リンクにも含まれます。",
         "hyTransportAuthRequired": "トランスポートパスワードを設定してください。未設定では Xray がこのインバウンドを起動できません",
+        "lanePortsInvalid": "レーンポートは 3000-3010,4000 のようなポートまたは範囲で指定してください",
+        "lanePortsTooMany": "Xray が待ち受けられるレーンポートは最大 1024 個です。範囲を短くしてください",
         "masquerade": "Masquerade",
         "type": "種類",
         "upstreamUrl": "Upstream URL",

@@ -5,6 +5,7 @@ import { genHysteriaLink, genVlessLink, genVmessLink } from '@/lib/xray/inbound-
 import { parseOutboundLink } from '@/lib/xray/outbound-link-parser';
 import { retargetHyTcpTls } from '@/lib/xray/protocol-capabilities';
 import { InboundSchema } from '@/schemas/api/inbound';
+import { TcpLanePortsSchema } from '@/schemas/protocols/stream/tcplane';
 
 // quictcp/hytcp links carry what the Go generator does: the quic or hysteria fields plus
 // lanePassword/lanePorts, the lane options a client must match; the rest stay one-sided.
@@ -207,5 +208,36 @@ describe('retargetHyTcpTls', () => {
   it('leaves an h3 ALPN the user chose on another transport alone', () => {
     const stream = { network: 'xhttp', security: 'tls', tlsSettings: { alpn: ['h3'] } };
     expect(retargetHyTcpTls(stream, 'tcp', newTls)).toBe(stream);
+  });
+});
+
+// The core parses lane ports as a PortList and opens one listener per port, refusing
+// more than 1024; a bad value fails the whole config, not just the one inbound.
+describe('TcpLanePortsSchema', () => {
+  const issue = (value: unknown) => {
+    const result = TcpLanePortsSchema.safeParse(value);
+    return result.success ? null : result.error.issues[0]?.message;
+  };
+
+  it('accepts ports and ranges up to 1024 listeners', () => {
+    for (const value of [
+      undefined,
+      '',
+      4000,
+      '3000-3010,4000',
+      ' 3000 , 3002-3003 ',
+      '20000-21023',
+    ])
+      expect(issue(value)).toBeNull();
+  });
+
+  it('refuses a list the core cannot parse', () => {
+    for (const value of ['3000-abc', '70000', 'abc', '3000-3001-3002'])
+      expect(issue(value)).toBe('pages.inbounds.form.lanePortsInvalid');
+  });
+
+  it('refuses more than 1024 ports, counting the way the core expands them', () => {
+    expect(issue('20000-21024')).toBe('pages.inbounds.form.lanePortsTooMany');
+    expect(issue('20000-20600,20000-20600')).toBe('pages.inbounds.form.lanePortsTooMany');
   });
 });

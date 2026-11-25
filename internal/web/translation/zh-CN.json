@@ -537,6 +537,8 @@
         "hyTransportAuth": "传输密码",
         "hyTransportAuthDesc": "Hysteria 传输会在 VLESS / VMess / Trojan 之前校验它。此入站的所有客户端共用，分享链接中也会包含。",
         "hyTransportAuthRequired": "请设置传输密码：缺少它 Xray 无法启动此入站",
+        "lanePortsInvalid": "通道端口须为端口或范围，例如 3000-3010,4000",
+        "lanePortsTooMany": "Xray 最多监听 1024 个通道端口，请缩短范围",
         "masquerade": "伪装",
         "type": "类型",
         "upstreamUrl": "Upstream URL",

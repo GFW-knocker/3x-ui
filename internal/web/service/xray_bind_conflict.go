@@ -52,11 +52,17 @@ func rawBindConflicts(cfg *xray.Config) []bindConflict {
 	if cfg == nil {
 		return nil
 	}
-	byPort := make(map[int][]*xray.InboundConfig, len(cfg.InboundConfigs))
+	type boundInbound struct {
+		ib   *xray.InboundConfig
+		bits transportBits
+	}
+	byPort := make(map[int][]boundInbound, len(cfg.InboundConfigs))
 	for i := range cfg.InboundConfigs {
 		ib := &cfg.InboundConfigs[i]
-		if ib.Port > 0 {
-			byPort[ib.Port] = append(byPort[ib.Port], ib)
+		for port, bits := range configPortClaims(ib) {
+			if port > 0 {
+				byPort[port] = append(byPort[port], boundInbound{ib: ib, bits: bits})
+			}
 		}
 	}
 
@@ -64,7 +70,7 @@ func rawBindConflicts(cfg *xray.Config) []bindConflict {
 	for port, group := range byPort {
 		for i := range group {
 			for j := i + 1; j < len(group); j++ {
-				left, right := group[i], group[j]
+				left, right := group[i].ib, group[j].ib
 				listenLeft, listenRight := configListen(left.Listen), configListen(right.Listen)
 				bindLeft := bindAddr{listen: listenLeft, v6only: streamV6Only(string(left.StreamSettings))}
 				bindRight := bindAddr{listen: listenRight, v6only: streamV6Only(string(right.StreamSettings))}
@@ -73,7 +79,7 @@ func rawBindConflicts(cfg *xray.Config) []bindConflict {
 				}
 				// One port carrying tcp on one inbound and udp on another is a
 				// supported deployment (vless/tcp + hysteria2/udp), never a clash.
-				shared := configTransports(left) & configTransports(right)
+				shared := group[i].bits & group[j].bits
 				if shared == 0 {
 					continue
 				}
@@ -137,13 +143,14 @@ func configListen(raw json_util.RawMessage) string {
 	return listen
 }
 
-// configTransports reads a generated inbound's transports through the same rule
-// the save-time guards use, so the two cannot drift apart.
-func configTransports(ib *xray.InboundConfig) transportBits {
+// configPortClaims reads a generated inbound's ports and transports through the same
+// rule the save-time guards use, so the two cannot drift apart.
+func configPortClaims(ib *xray.InboundConfig) portClaims {
 	// "socks" is the panel's own bridge shape (injectAmneziawgnetSocks and
 	// friends): its udp flag lives in settings like a mixed inbound's.
+	protocol := model.Protocol(ib.Protocol)
 	if ib.Protocol == "socks" {
-		return inboundTransports(model.Mixed, string(ib.StreamSettings), string(ib.Settings))
+		protocol = model.Mixed
 	}
-	return inboundTransports(model.Protocol(ib.Protocol), string(ib.StreamSettings), string(ib.Settings))
+	return inboundPortClaims(protocol, ib.Port, string(ib.StreamSettings), string(ib.Settings))
 }

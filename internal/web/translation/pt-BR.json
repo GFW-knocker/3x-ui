@@ -538,6 +538,8 @@
         "hyTransportAuth": "Senha do transporte",
         "hyTransportAuthDesc": "O transporte Hysteria a verifica antes que o VLESS, VMess ou Trojan veja a conexão. Todos os clientes deste inbound a compartilham, e os links a incluem.",
         "hyTransportAuthRequired": "Defina uma senha do transporte: o Xray não consegue iniciar este inbound sem ela",
+        "lanePortsInvalid": "As portas de lane devem ser portas ou intervalos como 3000-3010,4000",
+        "lanePortsTooMany": "O Xray escuta no máximo 1024 portas de lane; use um intervalo menor",
         "masquerade": "Masquerade",
         "type": "Tipo",
         "upstreamUrl": "URL Upstream",
