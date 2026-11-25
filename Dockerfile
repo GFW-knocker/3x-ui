@@ -1,3 +1,7 @@
+# APP_FILES picks where the panel and its binaries come from: app-source compiles them,
+# app-release repackages the release tarballs docker.yml unpacks into docker-dist/.
+ARG APP_FILES=app-source
+
 # ========================================================
 # Stage: Frontend (Vite)
 # ========================================================
@@ -10,9 +14,9 @@ COPY internal/web/translation /src/internal/web/translation
 RUN npm run build
 
 # ========================================================
-# Stage: Builder
+# Stage: Builder (compiles under emulation on non-native platforms)
 # ========================================================
-FROM golang:1.27-alpine AS builder
+FROM golang:1.27-alpine AS app-source
 WORKDIR /app
 ARG TARGETARCH
 ARG TARGETVARIANT
@@ -33,6 +37,34 @@ RUN go build -ldflags "-w -s" -o build/x-ui main.go
 RUN ./DockerInit.sh "$TARGETARCH" "$TARGETVARIANT"
 
 # ========================================================
+# Stage: Release binaries (runs natively, no compiling)
+# ========================================================
+FROM --platform=$BUILDPLATFORM alpine AS app-release
+ARG TARGETARCH
+ARG TARGETVARIANT
+COPY docker-dist/ /dist/
+# Release tarballs use install.sh's arch names; the panel wants xray-linux-arm32 and mtg-linux-arm.
+RUN set -e; \
+  case "$TARGETARCH/${TARGETVARIANT:-}" in \
+    amd64/*) arch=amd64 ;; \
+    arm64/*) arch=arm64 ;; \
+    arm/v7 | arm/) arch=armv7 ;; \
+    arm/v6) arch=armv6 ;; \
+    386/*) arch=386 ;; \
+    *) echo "no release tarball for $TARGETARCH/${TARGETVARIANT:-}" >&2; exit 1 ;; \
+  esac; \
+  tar -xzf "/dist/x-ui-linux-$arch.tar.gz" -C /tmp; \
+  mkdir -p /app/build; \
+  mv /tmp/x-ui/x-ui /tmp/x-ui/bin /app/build/; \
+  case "$arch" in \
+    armv*) \
+      mv "/app/build/bin/xray-linux-$arch" /app/build/bin/xray-linux-arm32; \
+      mv "/app/build/bin/mtg-linux-$arch" /app/build/bin/mtg-linux-arm ;; \
+  esac
+
+FROM ${APP_FILES} AS app-files
+
+# ========================================================
 # Stage: Final Image of 3x-ui
 # ========================================================
 FROM alpine
@@ -47,10 +79,10 @@ RUN apk add --no-cache --update \
   curl \
   openssl
 
-COPY --from=builder /app/build/ /app/
-COPY --from=builder /app/DockerEntrypoint.sh /app/
-COPY --from=builder /app/x-ui.sh /usr/bin/x-ui
-COPY --from=builder /app/internal/web/translation /app/internal/web/translation
+COPY --from=app-files /app/build/ /app/
+COPY DockerEntrypoint.sh /app/
+COPY x-ui.sh /usr/bin/x-ui
+COPY internal/web/translation /app/internal/web/translation
 
 
 # Configure fail2ban

@@ -5,7 +5,8 @@ permissions:
   packages: write
 
 # Called by the release workflow for every versioned release; run it by hand to
-# rebuild the image of a tag that already exists.
+# rebuild the image of a tag that already exists. The image repackages that release's
+# Linux tarballs instead of compiling again under QEMU (an hour for five platforms).
 on:
   workflow_call:
     inputs:
@@ -36,6 +37,21 @@ jobs:
         with:
           ref: refs/tags/${{ inputs.version }}
           submodules: true
+
+      - name: Download release binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -e
+          mkdir docker-dist
+          cd docker-dist
+          # One tarball per platform built below; a missing one fails here, not mid-build.
+          for arch in amd64 arm64 armv7 armv6 386; do
+            gh release download "$VERSION" --repo "$GITHUB_REPOSITORY" \
+              --pattern "x-ui-linux-$arch.tar.gz" --pattern "x-ui-linux-$arch.tar.gz.sha256"
+          done
+          sha256sum -c ./*.sha256
 
       - name: Docker meta
         id: meta
@@ -68,6 +84,8 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
+          build-args: |
+            APP_FILES=app-release
           push: true
           provenance: mode=max
           sbom: true
