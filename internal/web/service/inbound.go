@@ -667,8 +667,8 @@ func (s *InboundService) normalizeStreamSettings(inbound *model.Inbound) {
 	inbound.StreamSettings = canonicalizeLegacyXdnsMasks(inbound.StreamSettings)
 }
 
-// canonicalizeLegacyXdnsMasks stores an xdns mask posted in the pre-26.9.30 string
-// lists in the object shape the core parses, as GetXrayConfig would heal it anyway.
+// canonicalizeLegacyXdnsMasks stores an xdns mask posted in a pre-26.10.10 shape in
+// the names/addrs lists the core reads, as GetXrayConfig would heal it anyway.
 func canonicalizeLegacyXdnsMasks(streamSettings string) string {
 	if streamSettings == "" {
 		return streamSettings
@@ -826,6 +826,28 @@ func validateRealityTransport(streamSettings string) error {
 		return nil
 	}
 	return common.NewErrorf("REALITY only works over RAW (TCP), XHTTP or gRPC, not %s. Switch security to tls/none or change the transport.", network)
+}
+
+// validateHysteriaTransport: outside the hysteria protocol (no user list) the core's hysteria
+// listener needs TLS and its own auth, or it fails to listen and takes every inbound down.
+func validateHysteriaTransport(protocol model.Protocol, streamSettings string) error {
+	var stream map[string]any
+	if protocol == model.Hysteria || json.Unmarshal([]byte(streamSettings), &stream) != nil {
+		return nil
+	}
+	network, _ := stream["network"].(string)
+	network = strings.ToLower(network)
+	if network != "hysteria" && network != "hytcp" {
+		return nil
+	}
+	if security, _ := stream["security"].(string); !strings.EqualFold(security, "tls") {
+		return common.NewErrorf("The %s transport only works over TLS. Switch security to TLS.", network)
+	}
+	settings, _ := stream[network+"Settings"].(map[string]any)
+	if auth, _ := settings["auth"].(string); strings.TrimSpace(auth) == "" {
+		return common.NewErrorf("The %s transport needs a transport password (auth) on %s inbounds. Set one before saving.", network, protocol)
+	}
+	return nil
 }
 
 var xmcProfileUsernamePattern = regexp.MustCompile(`^[A-Za-z0-9_]{3,16}$`)
@@ -1169,6 +1191,9 @@ func (s *InboundService) AddInbound(inbound *model.Inbound) (*model.Inbound, boo
 		return inbound, false, err
 	}
 	if err := validateRealityTransport(inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
+	if err := validateHysteriaTransport(inbound.Protocol, inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {
@@ -1810,6 +1835,9 @@ func (s *InboundService) UpdateInbound(inbound *model.Inbound) (*model.Inbound, 
 		return inbound, false, err
 	}
 	if err := validateRealityTransport(inbound.StreamSettings); err != nil {
+		return inbound, false, err
+	}
+	if err := validateHysteriaTransport(inbound.Protocol, inbound.StreamSettings); err != nil {
 		return inbound, false, err
 	}
 	if err := validateFinalMaskXmcProfiles(inbound.StreamSettings); err != nil {

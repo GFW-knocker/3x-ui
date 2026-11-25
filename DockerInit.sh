@@ -19,7 +19,7 @@ if [ "$GO_ARCH" = "arm" ]; then
 fi
 mkdir -p build/bin
 cd build/bin
-curl -sfLRO "https://github.com/GFW-knocker/Xray-core/releases/download/v1.26.10-mahsa-r2/Xray-linux-${XRAY_ZIP}.zip"
+curl -sfLRO "https://github.com/GFW-knocker/Xray-core/releases/download/v1.26.11-mahsa-r2/Xray-linux-${XRAY_ZIP}.zip"
 unzip "Xray-linux-${XRAY_ZIP}.zip"
 rm -f "Xray-linux-${XRAY_ZIP}.zip" geoip.dat geosite.dat
 mv xray "xray-linux-${XRAY_NAME}"

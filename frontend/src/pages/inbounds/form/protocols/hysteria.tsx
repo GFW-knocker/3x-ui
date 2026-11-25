@@ -5,29 +5,32 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { HeaderMapEditor } from '@/components/form';
 import { FormField } from '@/components/form/rhf';
 
-const MASQ_PATH = ['streamSettings', 'hysteriaSettings', 'masquerade'];
-
-export default function HysteriaFields() {
+export default function HysteriaFields({
+  settingsKey = 'hysteriaSettings',
+}: {
+  settingsKey?: 'hysteriaSettings' | 'hytcpSettings';
+}) {
   const { t } = useTranslation();
+  const MASQ_PATH = ['streamSettings', settingsKey, 'masquerade'];
   const { control, setValue } = useFormContext();
-  const masq = useWatch({ control, name: 'streamSettings.hysteriaSettings.masquerade' }) as
+  const masq = useWatch({ control, name: `streamSettings.${settingsKey}.masquerade` }) as
     | { type?: string }
     | undefined;
   const masqType = useWatch({
     control,
-    name: 'streamSettings.hysteriaSettings.masquerade.type',
+    name: `streamSettings.${settingsKey}.masquerade.type`,
   }) as string | undefined;
   return (
     <>
       <FormField
         label={t('pages.inbounds.form.version')}
-        name={['streamSettings', 'hysteriaSettings', 'version']}
+        name={['streamSettings', settingsKey, 'version']}
       >
         <InputNumber min={2} max={2} disabled />
       </FormField>
       <FormField
         label={t('pages.inbounds.form.udpIdleTimeout')}
-        name={['streamSettings', 'hysteriaSettings', 'udpIdleTimeout']}
+        name={['streamSettings', settingsKey, 'udpIdleTimeout']}
       >
         <InputNumber min={2} max={600} style={{ width: '100%' }} />
       </FormField>
@@ -37,7 +40,7 @@ export default function HysteriaFields() {
           checked={!!masq}
           onChange={(checked) =>
             setValue(
-              'streamSettings.hysteriaSettings.masquerade',
+              `streamSettings.${settingsKey}.masquerade`,
               checked
                 ? {
                     type: '',

@@ -135,11 +135,13 @@ const NETWORK_SETTINGS_KEY: Record<string, string> = {
   tcp: 'tcpSettings',
   kcp: 'kcpSettings',
   quic: 'quicSettings',
+  quictcp: 'quictcpSettings',
   ws: 'wsSettings',
   grpc: 'grpcSettings',
   httpupgrade: 'httpupgradeSettings',
   xhttp: 'xhttpSettings',
   hysteria: 'hysteriaSettings',
+  hytcp: 'hytcpSettings',
 };
 
 function healStreamNetworkKey(stream: Record<string, unknown>): void {
@@ -339,9 +341,11 @@ export function dropLegacyOptionalEmpties(
     // streamSettings.hysteriaSettings.auth slot is a holdover from older
     // hysteria builds and serves no purpose on the inbound side, so an
     // empty value shouldn't ride along in the JSON payload.
-    const hs = stream.hysteriaSettings as { auth?: string } | undefined;
-    if (hs && typeof hs === 'object' && (hs.auth === '' || hs.auth == null)) {
-      delete hs.auth;
+    for (const key of ['hysteriaSettings', 'hytcpSettings']) {
+      const hs = stream[key] as { auth?: string } | undefined;
+      if (hs && typeof hs === 'object' && (hs.auth === '' || hs.auth == null)) {
+        delete hs.auth;
+      }
     }
   }
 }

@@ -405,6 +405,9 @@ func (s *SubClashService) buildProxy(subReq *SubService, inbound *model.Inbound,
 	// Hysteria has its own transport + TLS model, applyTransport /
 	// applySecurity don't fit.
 	if inbound.Protocol == model.Hysteria {
+		if network, _ := stream["network"].(string); network == "hytcp" {
+			return nil
+		}
 		return s.buildHysteriaProxy(subReq, inbound, client, ep)
 	}
 	if inbound.Protocol == model.WireGuard {

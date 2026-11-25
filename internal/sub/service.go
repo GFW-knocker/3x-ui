@@ -1516,6 +1516,12 @@ func (s *SubService) genHysteriaLink(inbound *model.Inbound, email string) strin
 	if hopPorts := hysteriaHopPorts(stream); hopPorts != "" {
 		params["mport"] = hopPorts
 	}
+	if network, _ := stream["network"].(string); network == "hytcp" {
+		params["type"] = network
+		for k, v := range laneShareFields(stream, "hytcpSettings") {
+			params[k] = v
+		}
+	}
 
 	// Fan out one link per External Proxy entry if any. Previously this
 	// generator ignored `externalProxy` entirely, so the link kept the
@@ -1752,9 +1758,16 @@ func applyShareNetworkParams(stream map[string]any, streamNetwork string, params
 		}
 	case "kcp":
 		applyKcpShareParams(stream, params)
-	case "quic":
-		security, key, header := quicShareFields(stream)
+	case "quic", "quictcp":
+		security, key, header := quicShareFields(stream, streamNetwork+"Settings")
 		params["quicSecurity"], params["key"], params["headerType"] = security, key, header
+		if streamNetwork == "quictcp" {
+			for k, v := range laneShareFields(stream, "quictcpSettings") {
+				params[k] = v
+			}
+		}
+	case "hytcp":
+		maps.Copy(params, hyTCPShareFields(stream))
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]any)
 		applyPathAndHostParams(ws, params)
@@ -1774,10 +1787,10 @@ func applyShareNetworkParams(stream map[string]any, streamNetwork string, params
 	}
 }
 
-// quicShareFields reads Mahsa-Core's quicSettings; an absent header shares as "none",
-// which is what the core assumes for it.
-func quicShareFields(stream map[string]any) (security, key, header string) {
-	quic, _ := stream["quicSettings"].(map[string]any)
+// quicShareFields reads Mahsa-Core's quicSettings (or quictcpSettings); an absent header
+// shares as "none", which is what the core assumes for it.
+func quicShareFields(stream map[string]any, settingsKey string) (security, key, header string) {
+	quic, _ := stream[settingsKey].(map[string]any)
 	security, _ = quic["security"].(string)
 	key, _ = quic["key"].(string)
 	headerSettings, _ := quic["header"].(map[string]any)
@@ -1788,6 +1801,38 @@ func quicShareFields(stream map[string]any) (security, key, header string) {
 		security = "none"
 	}
 	return security, key, header
+}
+
+// laneShareFields returns the tcplane options a client must match the server on; the
+// others (lanes, budgets, server limits) tune one side and keep the client's defaults.
+func laneShareFields(stream map[string]any, settingsKey string) map[string]string {
+	lane, _ := stream[settingsKey].(map[string]any)
+	fields := map[string]string{}
+	if password, _ := lane["password"].(string); password != "" {
+		fields["lanePassword"] = password
+	}
+	switch ports := lane["ports"].(type) {
+	case string:
+		if ports = strings.TrimSpace(ports); ports != "" {
+			fields["lanePorts"] = ports
+		}
+	case float64:
+		if ports > 0 {
+			fields["lanePorts"] = strconv.Itoa(int(ports))
+		}
+	}
+	return fields
+}
+
+// hyTCPShareFields: vless/vmess/trojan over hytcp share the lanes plus the hysteria transport's
+// own auth, which stands in for the user list only the hysteria protocol has.
+func hyTCPShareFields(stream map[string]any) map[string]string {
+	fields := laneShareFields(stream, "hytcpSettings")
+	settings, _ := stream["hytcpSettings"].(map[string]any)
+	if auth, _ := settings["auth"].(string); auth != "" {
+		fields["auth"] = auth
+	}
+	return fields
 }
 
 // applyXhttpExtraObj copies the bidirectional xhttp settings into the
@@ -1828,8 +1873,17 @@ func applyVmessNetworkParams(stream map[string]any, network string, obj map[stri
 		}
 	case "kcp":
 		applyKcpShareObj(stream, obj)
-	case "quic":
-		obj["host"], obj["path"], obj["type"] = quicShareFields(stream)
+	case "quic", "quictcp":
+		obj["host"], obj["path"], obj["type"] = quicShareFields(stream, network+"Settings")
+		if network == "quictcp" {
+			for k, v := range laneShareFields(stream, "quictcpSettings") {
+				obj[k] = v
+			}
+		}
+	case "hytcp":
+		for k, v := range hyTCPShareFields(stream) {
+			obj[k] = v
+		}
 	case "ws":
 		ws, _ := stream["wsSettings"].(map[string]any)
 		applyPathAndHostObj(ws, obj)

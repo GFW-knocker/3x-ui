@@ -986,7 +986,11 @@ func (s *SubJsonService) genHy(inbound *model.Inbound, newStream map[string]any,
 	}
 
 	_ = json.Unmarshal([]byte(inbound.StreamSettings), &stream)
-	hyStream, _ := stream["hysteriaSettings"].(map[string]any)
+	network, settingsKey := "hysteria", "hysteriaSettings"
+	if n, _ := stream["network"].(string); n == "hytcp" {
+		network, settingsKey = "hytcp", "hytcpSettings"
+	}
+	hyStream, _ := stream[settingsKey].(map[string]any)
 	outHyStream := map[string]any{
 		"version": int(version),
 		"auth":    client.Auth,
@@ -997,13 +1001,22 @@ func (s *SubJsonService) genHy(inbound *model.Inbound, newStream map[string]any,
 	if masquerade, ok := hyStream["masquerade"].(map[string]any); ok {
 		outHyStream["masquerade"] = masquerade
 	}
-	newStream["hysteriaSettings"] = outHyStream
+	if network == "hytcp" {
+		for _, key := range []string{"password", "ports"} {
+			if value, ok := hyStream[key]; ok {
+				outHyStream[key] = value
+			}
+		}
+	}
+	delete(newStream, "hysteriaSettings")
+	delete(newStream, "hytcpSettings")
+	newStream[settingsKey] = outHyStream
 
 	if finalmask, ok := hyStream["finalmask"].(map[string]any); ok {
 		newStream["finalmask"] = mergeFinalMask(newStream["finalmask"], finalmask)
 	}
 
-	newStream["network"] = "hysteria"
+	newStream["network"] = network
 	newStream["security"] = "tls"
 
 	outbound.StreamSettings, _ = json.MarshalIndent(newStream, "", "  ")

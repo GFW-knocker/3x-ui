@@ -24,16 +24,6 @@ const (
 )
 
 func inboundTransports(protocol model.Protocol, streamSettings, settings string) transportBits {
-	// protocols that ignore streamSettings entirely.
-	switch protocol {
-	case model.Hysteria, model.WireGuard, model.AmneziaWG, model.TUIC:
-		return transportUDP
-	case model.MTProto:
-		return transportTCP
-	}
-
-	var bits transportBits
-
 	// peek at streamSettings.network to spot udp-based transports.
 	// parse errors are non-fatal: missing or weird streamSettings just
 	// keeps the default tcp bit below.
@@ -46,6 +36,22 @@ func inboundTransports(protocol model.Protocol, streamSettings, settings string)
 			}
 		}
 	}
+
+	// protocols that ignore streamSettings entirely, except hysteria's "hytcp",
+	// which carries its datagrams over TCP lanes on the inbound port.
+	switch protocol {
+	case model.Hysteria:
+		if network == "hytcp" {
+			return transportTCP
+		}
+		return transportUDP
+	case model.WireGuard, model.AmneziaWG, model.TUIC:
+		return transportUDP
+	case model.MTProto:
+		return transportTCP
+	}
+
+	var bits transportBits
 	switch network {
 	case "kcp", "quic":
 		bits |= transportUDP

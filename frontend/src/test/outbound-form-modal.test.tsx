@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { act, fireEvent, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 
 import { ThemeProvider } from '@/hooks/useTheme';
@@ -24,14 +24,40 @@ function renderModal(outbound: Record<string, unknown> | null = null) {
   );
 }
 
-function toggleSockoptsSwitch() {
+function toggleSwitch(label: string) {
   const item = Array.from(document.querySelectorAll('.ant-form-item')).find(
-    (el) =>
-      (el.querySelector('.ant-form-item-label label')?.textContent ?? '').trim() === 'Sockopts',
+    (el) => (el.querySelector('.ant-form-item-label label')?.textContent ?? '').trim() === label,
   );
   const control = item?.querySelector('.ant-switch');
-  if (!control) throw new Error('Sockopts switch not found');
+  if (!control) throw new Error(`${label} switch not found`);
   fireEvent.click(control);
+}
+
+function selectInFormItem(label: string): HTMLElement {
+  const item = Array.from(document.querySelectorAll('.ant-form-item')).find(
+    (el) => (el.querySelector('.ant-form-item-label label')?.textContent ?? '').trim() === label,
+  );
+  const select = item?.querySelector('.ant-select') as HTMLElement | null;
+  if (!select) throw new Error(`${label} select not found`);
+  return select;
+}
+
+function openFormItemOptions(label: string): Element[] {
+  const select = selectInFormItem(label);
+  fireEvent.mouseDown((select.querySelector('.ant-select-selector') ?? select) as HTMLElement);
+  return Array.from(
+    document.querySelectorAll(
+      '.ant-select-dropdown:not(.ant-select-dropdown-hidden) .ant-select-item-option',
+    ),
+  );
+}
+
+const optionText = (o: Element) => (o.getAttribute('title') ?? o.textContent ?? '').trim();
+
+async function flushUi() {
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 0));
+  });
 }
 
 describe('OutboundFormModal', () => {
@@ -74,7 +100,7 @@ describe('OutboundFormModal', () => {
   // sockopt.domainStrategy, so freedom must show only one control for it.
   it('hides the Transport sockopt strategy for freedom', () => {
     renderModal({ protocol: 'freedom', tag: 'direct', settings: {} });
-    toggleSockoptsSwitch();
+    toggleSwitch('Sockopts');
 
     expect(fieldLabels()).toContain('Sockopts');
     expect(fieldLabels()).not.toContain('Domain Strategy');
@@ -83,7 +109,7 @@ describe('OutboundFormModal', () => {
 
   it('keeps the Transport sockopt strategy for protocols without a card field', () => {
     renderModal({ protocol: 'vless', tag: 'proxy', settings: {} });
-    toggleSockoptsSwitch();
+    toggleSwitch('Sockopts');
 
     expect(fieldLabels()).toContain('Domain Strategy');
   });
@@ -153,9 +179,9 @@ describe('OutboundFormModal', () => {
     expect(payload.settings.reverse?.tag).toBe('r1');
   });
 
-  // xray-core 26.9.30 no longer parses xdns's string lists, so the mask editor lifts
-  // them into objects on open rather than saving a config the core would refuse.
-  it('saves a legacy xdns mask in the object shape', async () => {
+  // xray-core 26.10.10 reads a 26.9.30 xdns mask as no domain at all, so the mask editor
+  // lifts it to names/addrs on open and must keep those keys registered through the save.
+  it('saves a legacy xdns mask in the names/addrs shape', async () => {
     const onConfirm = vi.fn();
     const queryClient = makeTestQueryClient();
     const outbound = {
@@ -175,7 +201,15 @@ describe('OutboundFormModal', () => {
         security: 'none',
         kcpSettings: { mtu: 130, tti: 50 },
         finalmask: {
-          udp: [{ type: 'xdns', settings: { resolvers: ['t.example.com+udp://8.8.8.8:53'] } }],
+          udp: [
+            {
+              type: 'xdns',
+              settings: {
+                domains: [{ name: 't.example.com', types: [16], edns0: 1232 }],
+                resolvers: [{ type: 'udp', settings: { addr: '8.8.8.8:53' } }],
+              },
+            },
+          ],
         },
       },
     };
@@ -216,10 +250,241 @@ describe('OutboundFormModal', () => {
       {
         type: 'xdns',
         settings: {
-          domains: [{ name: 't.example.com', types: [16], edns0: 1232 }],
-          resolvers: [{ type: 'udp', settings: { addr: '8.8.8.8:53' } }],
+          domains: [{ names: ['t.example.com'], types: [16], edns0: 1232 }],
+          resolvers: [{ addrs: ['udp://8.8.8.8:53'] }],
         },
       },
     ]);
+  });
+
+  // The mask editor drops every xdns key without a registered field, so the DoH resolver
+  // options (#7140) and Mahsa-Core's alphabet would vanish on the next save.
+  it('keeps xdns DoH resolver options and alphabet through a save', async () => {
+    const onConfirm = vi.fn();
+    const queryClient = makeTestQueryClient();
+    const xdns = {
+      type: 'xdns',
+      settings: {
+        domains: [
+          {
+            names: ['t.example.com'],
+            types: [1],
+            edns0: 1232,
+            alphabet: 'zyxwvutsrqponmlkjihgfedcba765432',
+          },
+        ],
+        resolvers: [
+          {
+            addrs: ['https://dns.google/dns-query'],
+            worker: 8,
+            tlsConfig: { serverName: 'dns.google' },
+            quicConfig: { congestion: 'bbr' },
+          },
+        ],
+        extraPoll: 1,
+      },
+    };
+    const outbound = {
+      protocol: 'vless',
+      tag: 'dns-tunnel',
+      settings: {
+        vnext: [
+          {
+            address: 'example.com',
+            port: 53,
+            users: [{ id: 'c9f0c2d0-0000-4000-8000-000000000000', encryption: 'none' }],
+          },
+        ],
+      },
+      streamSettings: {
+        network: 'kcp',
+        security: 'none',
+        kcpSettings: { mtu: 130, tti: 50 },
+        finalmask: { udp: [xdns] },
+      },
+    };
+    const tree = (open: boolean) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <OutboundFormModal
+            open={open}
+            outbound={outbound}
+            existingTags={[]}
+            onClose={() => {}}
+            onConfirm={onConfirm}
+          />
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+    const { rerender } = render(tree(false));
+    rerender(tree(true));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    const ok = document.querySelector('.ant-modal-footer .ant-btn-primary') as HTMLElement;
+    await act(async () => {
+      fireEvent.click(ok);
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    const payload = onConfirm.mock.calls[0][0] as {
+      streamSettings: { finalmask: { udp: unknown[] } };
+    };
+    expect(payload.streamSettings.finalmask.udp).toEqual([xdns]);
+  });
+
+  // xray-core 26.10.10 verifies TLS against its bundled roots, not the OS store, so an
+  // outbound to a server signed by a privately installed CA needs useSystemCA set.
+  // A vless outbound dials the hysteria transport with its own auth over TLS on h3;
+  // its old h2 ALPN would fail the HTTP/3 handshake with the server.
+  it('moves a vless outbound onto hytcp keeping its SNI and switching ALPN to h3', async () => {
+    const onConfirm = vi.fn();
+    const queryClient = makeTestQueryClient();
+    const outbound = {
+      protocol: 'vless',
+      tag: 'hy-out',
+      settings: {
+        vnext: [
+          {
+            address: 'example.com',
+            port: 443,
+            users: [{ id: 'c9f0c2d0-0000-4000-8000-000000000000', encryption: 'none' }],
+          },
+        ],
+      },
+      streamSettings: {
+        network: 'tcp',
+        security: 'tls',
+        tlsSettings: { serverName: 'example.com', alpn: ['h2', 'http/1.1'] },
+      },
+    };
+    const tree = (open: boolean) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <OutboundFormModal
+            open={open}
+            outbound={outbound}
+            existingTags={[]}
+            onClose={() => {}}
+            onConfirm={onConfirm}
+          />
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+    const { rerender } = render(tree(false));
+    rerender(tree(true));
+    await flushUi();
+
+    const hytcp = openFormItemOptions('Transmission').find(
+      (o) => optionText(o) === 'Hysteria over TCP lanes',
+    );
+    if (!hytcp) throw new Error('vless outbound offers no hytcp transport');
+    fireEvent.click(hytcp);
+    await flushUi();
+    fireEvent.change(screen.getByLabelText('Auth password'), { target: { value: 'hyauth' } });
+    await act(async () => {
+      fireEvent.click(document.querySelector('.ant-modal-footer .ant-btn-primary') as HTMLElement);
+    });
+    await flushUi();
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    const payload = onConfirm.mock.calls[0][0] as { streamSettings: Record<string, unknown> };
+    expect(payload.streamSettings).toMatchObject({
+      network: 'hytcp',
+      security: 'tls',
+      hytcpSettings: { auth: 'hyauth' },
+      tlsSettings: { serverName: 'example.com', alpn: ['h3'] },
+    });
+  });
+
+  it('offers trojan both lane transports', async () => {
+    renderModal({
+      protocol: 'trojan',
+      tag: 't-out',
+      settings: { servers: [{ address: 'example.com', port: 443, password: 'p' }] },
+      streamSettings: { network: 'tcp', security: 'none' },
+    });
+    await flushUi();
+    const options = openFormItemOptions('Transmission').map(optionText);
+    expect(options).toContain('QUIC over TCP lanes');
+    expect(options).toContain('Hysteria over TCP lanes');
+  });
+
+  it('keeps hytcp off the shadowsocks transport list', async () => {
+    renderModal({
+      protocol: 'shadowsocks',
+      tag: 'ss-out',
+      settings: {
+        servers: [{ address: 'example.com', port: 443, method: 'aes-128-gcm', password: 'p' }],
+      },
+      streamSettings: { network: 'tcp', security: 'none' },
+    });
+    await flushUi();
+    const options = openFormItemOptions('Transmission').map(optionText);
+    expect(options).toContain('QUIC over TCP lanes');
+    expect(options).not.toContain('Hysteria over TCP lanes');
+  });
+
+  it('saves useSystemCA from the TLS switch', async () => {
+    const onConfirm = vi.fn();
+    const queryClient = makeTestQueryClient();
+    const outbound = {
+      protocol: 'vless',
+      tag: 'tls-out',
+      settings: {
+        vnext: [
+          {
+            address: 'example.com',
+            port: 443,
+            users: [{ id: 'c9f0c2d0-0000-4000-8000-000000000000', encryption: 'none' }],
+          },
+        ],
+      },
+      streamSettings: {
+        network: 'tcp',
+        security: 'tls',
+        tlsSettings: { serverName: 'example.com' },
+      },
+    };
+    const tree = (open: boolean) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <OutboundFormModal
+            open={open}
+            outbound={outbound}
+            existingTags={[]}
+            onClose={() => {}}
+            onConfirm={onConfirm}
+          />
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+    const { rerender } = render(tree(false));
+    rerender(tree(true));
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    toggleSwitch('Use system CA');
+    const ok = document.querySelector('.ant-modal-footer .ant-btn-primary') as HTMLElement;
+    await act(async () => {
+      fireEvent.click(ok);
+    });
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    const payload = onConfirm.mock.calls[0][0] as {
+      streamSettings: { tlsSettings: { serverName?: string; useSystemCA?: boolean } };
+    };
+    expect(payload.streamSettings.tlsSettings).toMatchObject({
+      serverName: 'example.com',
+      useSystemCA: true,
+    });
   });
 });

@@ -6,7 +6,21 @@
 // fixture without the caller projecting a whole object.
 
 const TLS_ELIGIBLE_PROTOCOLS = ['vmess', 'vless', 'mvless', 'trojan', 'shadowsocks'];
-const TLS_NETWORKS = ['tcp', 'ws', 'http', 'grpc', 'httpupgrade', 'xhttp', 'quic'];
+const TLS_NETWORKS = [
+  'tcp',
+  'ws',
+  'http',
+  'grpc',
+  'httpupgrade',
+  'xhttp',
+  'quic',
+  'quictcp',
+  'hytcp',
+];
+// Outside the hysteria protocol, hytcp authenticates with its own transport password.
+const HYTCP_PROTOCOLS = ['vless', 'mvless', 'vmess', 'trojan'];
+// The core's ALPN when none is set (tls/config.go), offered again when h3 stops fitting.
+const CORE_DEFAULT_ALPN = ['h2', 'http/1.1'];
 const REALITY_ELIGIBLE_PROTOCOLS = ['vless', 'mvless', 'trojan'];
 const REALITY_NETWORKS = ['tcp', 'http', 'grpc', 'xhttp'];
 const STREAM_PROTOCOLS = [
@@ -41,6 +55,35 @@ export function canEnableTls(values: CapabilityProtocolSlice): boolean {
   if (values.protocol === 'hysteria') return true;
   if (!TLS_ELIGIBLE_PROTOCOLS.includes(values.protocol)) return false;
   return TLS_NETWORKS.includes(values.streamSettings?.network ?? '');
+}
+
+export function canUseHyTcp(protocol: string): boolean {
+  return HYTCP_PROTOCOLS.includes(protocol);
+}
+
+// hytcp's hysteria listener serves HTTP/3, so the stream moves onto TLS offering h3; leaving
+// it for a non-hysteria transport, an h3-only ALPN would turn away h2/http/1.1 clients.
+export function retargetHyTcpTls<T extends Record<string, unknown>>(
+  stream: T,
+  prevNetwork: string | undefined,
+  newTls: () => Record<string, unknown>,
+): T {
+  const tls = stream.tlsSettings as Record<string, unknown> | undefined;
+  if (stream.network === 'hytcp') {
+    const base = stream.security === 'tls' && tls ? tls : newTls();
+    const moved: Record<string, unknown> = {
+      ...stream,
+      security: 'tls',
+      tlsSettings: { ...base, alpn: ['h3'] },
+    };
+    delete moved.realitySettings;
+    return moved as T;
+  }
+  const alpn = tls?.alpn;
+  const h3Only = Array.isArray(alpn) && alpn.length === 1 && alpn[0] === 'h3';
+  const leavesForNonHysteria = prevNetwork === 'hytcp' && stream.network !== 'hysteria';
+  if (!leavesForNonHysteria || !tls || !h3Only) return stream;
+  return { ...stream, tlsSettings: { ...tls, alpn: [...CORE_DEFAULT_ALPN] } };
 }
 
 export function canEnableReality(values: CapabilityProtocolSlice): boolean {

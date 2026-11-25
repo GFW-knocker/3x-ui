@@ -42,15 +42,20 @@ export const NETWORK_OPTIONS: { value: string; label: string }[] = [
   { value: 'tcp', label: 'RAW' },
   { value: 'kcp', label: 'mKCP' },
   { value: 'quic', label: 'QUIC' },
+  { value: 'quictcp', label: 'QUIC over TCP lanes' },
   { value: 'ws', label: 'WebSocket' },
   { value: 'grpc', label: 'gRPC' },
   { value: 'httpupgrade', label: 'HTTPUpgrade' },
   { value: 'xhttp', label: 'XHTTP' },
 ];
 
-// The hysteria protocol is locked to its own QUIC transport: the selector
-// shows only this option when the parent protocol is hysteria.
-export const HYSTERIA_NETWORK_OPTION = { value: 'hysteria', label: 'Hysteria' };
+export const HYTCP_NETWORK_OPTION = { value: 'hytcp', label: 'Hysteria over TCP lanes' };
+
+// The hysteria protocol runs only on its own transport, over UDP or over TCP lanes.
+export const HYSTERIA_NETWORK_OPTIONS: { value: string; label: string }[] = [
+  { value: 'hysteria', label: 'Hysteria (UDP)' },
+  HYTCP_NETWORK_OPTION,
+];
 
 // Protocols whose form schema carries a flat connect target — these all
 // get the shared "server" sub-block (address + port) at the top of the

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Form, Input, InputNumber, Modal, Radio, Select, Space, Tabs, message } from 'antd';
 import { Controller, FormProvider, useForm, useWatch } from 'react-hook-form';
 import { FinalMaskField, SniffingField } from '@/lib/xray/forms/fields';
+import TcpLaneFields from '@/lib/xray/forms/transport/TcpLaneFields';
 import { FormField, rhfZodValidate } from '@/components/form/rhf';
 import { JsonEditor } from '@/components/form';
 import { Wireguard } from '@/utils';
@@ -15,11 +16,13 @@ import {
   canEnableStream,
   canEnableTls,
   canEnableTlsFlow,
+  canUseHyTcp,
 } from '@/lib/xray/protocol-capabilities';
 
 import {
   FLOW_OPTIONS,
-  HYSTERIA_NETWORK_OPTION,
+  HYSTERIA_NETWORK_OPTIONS,
+  HYTCP_NETWORK_OPTION,
   NETWORK_OPTIONS,
   PROTOCOL_OPTIONS,
   SERVER_PROTOCOLS,
@@ -164,10 +167,12 @@ export default function OutboundFormModal({
 
   useEffect(() => {
     if (protocol !== 'hysteria') return;
-    if (network === 'hysteria' && security === 'tls') return;
+    const onHysteriaNetwork = network === 'hysteria' || network === 'hytcp';
+    if (onHysteriaNetwork && security === 'tls') return;
     const existing = (methods.getValues('streamSettings') ?? {}) as Record<string, unknown>;
-    const slice = hysteriaStreamSlice();
+    const slice = hysteriaStreamSlice(network === 'hytcp' ? 'hytcp' : 'hysteria');
     if (existing.hysteriaSettings) slice.hysteriaSettings = existing.hysteriaSettings;
+    if (existing.hytcpSettings) slice.hytcpSettings = existing.hytcpSettings;
     if (existing.tlsSettings) slice.tlsSettings = existing.tlsSettings;
     methods.setValue('streamSettings', slice as StreamValue);
   }, [protocol, network, security, methods]);
@@ -194,9 +199,11 @@ export default function OutboundFormModal({
       const nextProtocol = methods.getValues('protocol');
       const next = rawOutboundToFormValues({ protocol: nextProtocol });
       methods.setValue('settings', next.settings);
+      const currentNetwork = methods.getValues('streamSettings.network') ?? '';
+      const keepsHyTcp = currentNetwork === 'hytcp' && canUseHyTcp(nextProtocol);
       if (nextProtocol === 'hysteria') {
         methods.setValue('streamSettings', hysteriaStreamSlice() as StreamValue);
-      } else if ((methods.getValues('streamSettings.network') ?? '') === 'hysteria') {
+      } else if (['hysteria', 'hytcp'].includes(currentNetwork) && !keepsHyTcp) {
         methods.setValue('streamSettings', {
           ...newStreamSlice('tcp'),
           security: 'none',
@@ -469,8 +476,10 @@ export default function OutboundFormModal({
                               onChange={onNetworkChange}
                               options={
                                 protocol === 'hysteria'
-                                  ? [HYSTERIA_NETWORK_OPTION]
-                                  : NETWORK_OPTIONS
+                                  ? HYSTERIA_NETWORK_OPTIONS
+                                  : canUseHyTcp(protocol)
+                                    ? [...NETWORK_OPTIONS, HYTCP_NETWORK_OPTION]
+                                    : NETWORK_OPTIONS
                               }
                             />
                           </Form.Item>
@@ -481,6 +490,13 @@ export default function OutboundFormModal({
 
                           {network === 'quic' && <QuicForm />}
 
+                          {network === 'quictcp' && (
+                            <>
+                              <QuicForm settingsKey="quictcpSettings" />
+                              <TcpLaneFields settingsKey="quictcpSettings" side="client" />
+                            </>
+                          )}
+
                           {network === 'ws' && <WsForm />}
 
                           {network === 'grpc' && <GrpcForm />}
@@ -490,6 +506,13 @@ export default function OutboundFormModal({
                           {network === 'xhttp' && <XhttpForm onXmuxToggle={onXmuxToggle} />}
 
                           {network === 'hysteria' && <HysteriaForm />}
+
+                          {network === 'hytcp' && (
+                            <>
+                              <HysteriaForm settingsKey="hytcpSettings" />
+                              <TcpLaneFields settingsKey="hytcpSettings" side="client" />
+                            </>
+                          )}
                         </>
                       )}
 
@@ -532,7 +555,7 @@ export default function OutboundFormModal({
                             buttonStyle="solid"
                             onChange={(e) => onSecurityChange(e.target.value as string)}
                           >
-                            {network !== 'hysteria' && (
+                            {network !== 'hysteria' && network !== 'hytcp' && (
                               <Radio.Button value="none">{t('none')}</Radio.Button>
                             )}
                             {tlsAllowed && <Radio.Button value="tls">TLS</Radio.Button>}

@@ -22,6 +22,7 @@ import (
 	wgutil "github.com/GFW-knocker/3x-ui/v3/internal/util/wireguard"
 
 	"github.com/GFW-knocker/Xray-core/app/proxyman/command"
+	"github.com/GFW-knocker/Xray-core/app/router"
 	routerService "github.com/GFW-knocker/Xray-core/app/router/command"
 	statsService "github.com/GFW-knocker/Xray-core/app/stats/command"
 	xnet "github.com/GFW-knocker/Xray-core/common/net"
@@ -263,16 +264,7 @@ func (x *XrayAPI) ApplyRoutingConfig(routing []byte) error {
 		return common.NewError("xray RoutingServiceClient is not initialized")
 	}
 
-	// Rules referencing geoip:/geosite: need the dat files; point xray-core's
-	// in-process loader at the panel's bin folder where they live.
-	ensureXrayAssetLocation()
-
-	routerConf := new(conf.RouterConfig)
-	if err := json.Unmarshal(routing, routerConf); err != nil {
-		logger.Debug("Failed to unmarshal routing config:", err)
-		return err
-	}
-	config, err := routerConf.Build()
+	config, err := buildReloadableRouting(routing)
 	if err != nil {
 		logger.Debug("Failed to build routing config:", err)
 		return err
@@ -286,6 +278,21 @@ func (x *XrayAPI) ApplyRoutingConfig(routing []byte) error {
 		Config:       serial.ToTypedMessage(config),
 	})
 	return err
+}
+
+// buildReloadableRouting builds the rules and balancers RoutingService.AddRule swaps in.
+// The Lua routing script is fixed at core start, so its file is never resolved here.
+func buildReloadableRouting(routing []byte) (*router.Config, error) {
+	// Rules referencing geoip:/geosite: need the dat files; point xray-core's
+	// in-process loader at the panel's bin folder where they live.
+	ensureXrayAssetLocation()
+
+	routerConf := new(conf.RouterConfig)
+	if err := json.Unmarshal(routing, routerConf); err != nil {
+		return nil, err
+	}
+	routerConf.Script = ""
+	return routerConf.Build()
 }
 
 // BalancerInfo is the live state of one balancer inside the running core.

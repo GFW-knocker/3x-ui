@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   AutoComplete,
   Button,
@@ -9,6 +9,7 @@ import {
   Select,
   Space,
   Switch,
+  Typography,
 } from 'antd';
 import { DeleteOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -37,6 +38,10 @@ export interface FinalMaskFormProps {
 }
 
 const TCP_NETWORKS = ['raw', 'tcp', 'httpupgrade', 'ws', 'grpc', 'xhttp'];
+// Mahsa-Core runs udp masks and quicParams on its quic transport, and on quictcp/hytcp
+// ahead of the tcplane mask the network itself appends.
+const UDP_MASK_NETWORKS = ['kcp', 'quic', 'quictcp', 'hytcp'];
+const QUIC_PARAMS_NETWORKS = ['xhttp', 'quic', 'quictcp', 'hytcp'];
 const DEFAULT_GECKO_PACKET_SIZE = { min: 512, max: 1200 };
 // Xray-core caps the Gecko output packet size at its internal buffer (2048)
 // and needs 1 <= min <= max; mirror those bounds so the panel rejects what
@@ -246,7 +251,7 @@ export default function FinalMaskForm({
   const base = asPath(name);
 
   // Migrate legacy mask shapes once on mount so configs saved before #6334 (fragment
-  // ranges), #6487 (xmc profiles) and #6718 (xdns objects) render in the list UI.
+  // ranges), #6487 (xmc profiles) and #7090 (xdns names/addrs) render in the list UI.
   const migratedRef = useRef(false);
   useEffect(() => {
     if (migratedRef.current) return;
@@ -282,8 +287,8 @@ export default function FinalMaskForm({
   // wrap anything even though the leftover network value may be 'tcp'.
   const isWireguard = protocol === 'wireguard';
   const showTcp = showAll || (!isWireguard && TCP_NETWORKS.includes(network));
-  const showUdp = showAll || isHysteria || isWireguard || network === 'kcp';
-  const showQuic = showAll || isHysteria || network === 'xhttp';
+  const showUdp = showAll || isHysteria || isWireguard || UDP_MASK_NETWORKS.includes(network);
+  const showQuic = showAll || isHysteria || QUIC_PARAMS_NETWORKS.includes(network);
   const quicParams = Form.useWatch([...base, 'quicParams'], { form, preserve: true });
   const hasQuicParams = quicParams != null;
 
@@ -1280,7 +1285,7 @@ function XdnsSettings({ udpFieldName }: { udpFieldName: number }) {
                 size="small"
                 icon={<PlusOutlined />}
                 aria-label={t('add')}
-                onClick={() => add({ name: '', types: [16], edns0: XDNS_LEGACY_EDNS0 })}
+                onClick={() => add({ names: [], edns0: XDNS_LEGACY_EDNS0 })}
               />
             </Form.Item>
             {domains.map((domain, di) => (
@@ -1296,15 +1301,20 @@ function XdnsSettings({ udpFieldName }: { udpFieldName: number }) {
                     onKeyDown={activateOnKey(() => remove(domain.name))}
                   />
                 </Divider>
-                <Form.Item label="Name" name={[domain.name, 'name']}>
-                  <Input placeholder="t.example.com" />
+                <Form.Item label="Names" name={[domain.name, 'names']}>
+                  <Select
+                    mode="tags"
+                    style={{ width: '100%' }}
+                    tokenSeparators={[',']}
+                    placeholder="t.example.com"
+                  />
                 </Form.Item>
-                <Form.Item
-                  label="Record Types"
-                  name={[domain.name, 'types']}
-                  rules={[{ required: true, type: 'array', min: 1 }]}
-                >
-                  <Select mode="multiple" options={XDNS_RECORD_TYPE_OPTIONS} />
+                <Form.Item label="Record Types" name={[domain.name, 'types']}>
+                  <Select
+                    mode="multiple"
+                    options={XDNS_RECORD_TYPE_OPTIONS}
+                    placeholder="TXT (client), all (server)"
+                  />
                 </Form.Item>
                 <Form.Item label="EDNS0" name={[domain.name, 'edns0']}>
                   <InputNumber min={512} max={4096} placeholder="off" />
@@ -1314,6 +1324,14 @@ function XdnsSettings({ udpFieldName }: { udpFieldName: number }) {
                 </Form.Item>
                 <Form.Item label="Label Limit" name={[domain.name, 'labelLimit']}>
                   <InputNumber min={0} max={63} placeholder="63" />
+                </Form.Item>
+                <Form.Item
+                  label="Alphabet"
+                  name={[domain.name, 'alphabet']}
+                  rules={[{ validator: validateXdnsAlphabet }]}
+                  tooltip="32 distinct letters/digits for the base32 labels; both ends must match"
+                >
+                  <Input placeholder="abcdefghijklmnopqrstuvwxyz234567" />
                 </Form.Item>
               </div>
             ))}
@@ -1329,31 +1347,48 @@ function XdnsSettings({ udpFieldName }: { udpFieldName: number }) {
                 size="small"
                 icon={<PlusOutlined />}
                 aria-label={t('add')}
-                onClick={() => add({ type: 'udp', settings: { addr: '' } })}
+                onClick={() => add({ addrs: [] })}
               />
             </Form.Item>
             {resolvers.map((resolver, ri) => (
-              <Form.Item key={resolver.key} label={`Resolver ${ri + 1}`}>
-                <Space.Compact block>
-                  <Form.Item name={[resolver.name, 'type']} noStyle>
-                    <Select
-                      style={{ width: 80 }}
-                      options={[
-                        { value: 'udp', label: 'UDP' },
-                        { value: 'tcp', label: 'TCP' },
-                      ]}
-                    />
-                  </Form.Item>
-                  <Form.Item name={[resolver.name, 'settings', 'addr']} noStyle>
-                    <Input placeholder="8.8.8.8:53" />
-                  </Form.Item>
-                  <Button
-                    icon={<DeleteOutlined />}
+              <div key={resolver.key}>
+                <Divider style={{ margin: 0 }}>
+                  Resolver {ri + 1}
+                  <DeleteOutlined
+                    className="danger-icon"
+                    role="button"
+                    tabIndex={0}
                     aria-label={t('remove')}
                     onClick={() => remove(resolver.name)}
+                    onKeyDown={activateOnKey(() => remove(resolver.name))}
                   />
-                </Space.Compact>
-              </Form.Item>
+                </Divider>
+                <Form.Item label="Addresses" name={[resolver.name, 'addrs']}>
+                  <Select
+                    mode="tags"
+                    style={{ width: '100%' }}
+                    tokenSeparators={[',', ' ']}
+                    placeholder="udp://8.8.8.8:53, https://dns.google/dns-query"
+                  />
+                </Form.Item>
+                <Form.Item label="Workers" name={[resolver.name, 'worker']}>
+                  <InputNumber min={1} placeholder="32" />
+                </Form.Item>
+                <Form.Item
+                  label="DoH TLS"
+                  name={[resolver.name, 'tlsConfig']}
+                  tooltip="tlsSettings for the https:// addresses, e.g. a serverName to front the domain"
+                >
+                  <JsonObjectInput placeholder='{"serverName": "dns.google", "fingerprint": "chrome"}' />
+                </Form.Item>
+                <Form.Item
+                  label="DoH QUIC"
+                  name={[resolver.name, 'quicConfig']}
+                  tooltip="QUIC parameters for an https:// address reached over h3"
+                >
+                  <JsonObjectInput placeholder='{"congestion": "bbr"}' />
+                </Form.Item>
+              </div>
             ))}
           </>
         )}
@@ -1361,6 +1396,56 @@ function XdnsSettings({ udpFieldName }: { udpFieldName: number }) {
       <Form.Item label="Extra Poll (client)" name={[udpFieldName, 'settings', 'extraPoll']}>
         <InputNumber min={0} max={3} placeholder="0" />
       </Form.Item>
+    </>
+  );
+}
+
+// Mahsa-Core's xdns.NewDomain rule: 32 distinct a-z/0-9 characters, case-insensitive.
+function validateXdnsAlphabet(_: unknown, value: unknown) {
+  if (typeof value !== 'string' || value === '') return Promise.resolve();
+  const lower = value.toLowerCase();
+  if (lower.length === 32 && /^[a-z0-9]+$/.test(lower) && new Set(lower).size === 32) {
+    return Promise.resolve();
+  }
+  return Promise.reject(new Error('Must be 32 distinct letters or digits'));
+}
+
+function JsonObjectInput({
+  value,
+  onChange,
+  placeholder,
+}: {
+  value?: Record<string, unknown>;
+  onChange?: (next: Record<string, unknown> | undefined) => void;
+  placeholder?: string;
+}) {
+  const [text, setText] = useState(() => (value ? JSON.stringify(value) : ''));
+  const [invalid, setInvalid] = useState(false);
+  return (
+    <>
+      <Input.TextArea
+        value={text}
+        autoSize={{ minRows: 2, maxRows: 8 }}
+        placeholder={placeholder}
+        onChange={(e) => {
+          const next = e.target.value;
+          setText(next);
+          if (next.trim() === '') {
+            setInvalid(false);
+            onChange?.(undefined);
+            return;
+          }
+          try {
+            const parsed: unknown = JSON.parse(next);
+            const isObject = !!parsed && typeof parsed === 'object' && !Array.isArray(parsed);
+            setInvalid(!isObject);
+            if (isObject) onChange?.(parsed as Record<string, unknown>);
+          } catch {
+            setInvalid(true);
+          }
+        }}
+      />
+      {invalid && <Typography.Text type="danger">Must be a JSON object</Typography.Text>}
     </>
   );
 }

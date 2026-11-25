@@ -30,6 +30,11 @@ describe('composeInboundTag transport suffix parity', () => {
       base({ protocol: 'hysteria', streamSettings: { network: 'tcp' } }),
       'in-443-udp',
     ],
+    [
+      'hysteria hytcp listens on tcp lanes',
+      base({ protocol: 'hysteria', streamSettings: { network: 'hytcp' } }),
+      'in-443-tcp',
+    ],
     ['wireguard forced udp', base({ protocol: 'wireguard' }), 'in-443-udp'],
     [
       'tuic forced udp',

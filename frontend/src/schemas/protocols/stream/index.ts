@@ -9,6 +9,7 @@ import { KcpStreamSettingsSchema } from './kcp';
 import { QuicStreamSettingsSchema } from './quic';
 import { SockoptStreamSettingsSchema } from './sockopt';
 import { TcpStreamSettingsSchema } from './tcp';
+import { HyTcpStreamSettingsSchema, QuicTcpStreamSettingsSchema } from './tcplane';
 import { WsStreamSettingsSchema } from './ws';
 import { XHttpStreamSettingsSchema } from './xhttp';
 
@@ -21,6 +22,7 @@ export * from './kcp';
 export * from './quic';
 export * from './sockopt';
 export * from './tcp';
+export * from './tcplane';
 export * from './ws';
 export * from './xhttp';
 
@@ -28,11 +30,13 @@ export const NetworkSchema = z.enum([
   'tcp',
   'kcp',
   'quic',
+  'quictcp',
   'ws',
   'grpc',
   'httpupgrade',
   'xhttp',
   'hysteria',
+  'hytcp',
 ]);
 export type Network = z.infer<typeof NetworkSchema>;
 
@@ -42,13 +46,14 @@ export type Network = z.infer<typeof NetworkSchema>;
 // class flattens via toJson. Each branch carries only the matching key so
 // fixtures round-trip byte-identical.
 //
-// `hysteria` is only valid when the parent protocol is hysteria — the
+// `hysteria` and `hytcp` are only valid when the parent protocol is hysteria — the
 // network selector hides it for other protocols. xray-core enforces
 // the constraint server-side too.
 const TransportNetworkSettingsSchema = z.discriminatedUnion('network', [
   z.object({ network: z.literal('tcp'), tcpSettings: TcpStreamSettingsSchema }),
   z.object({ network: z.literal('kcp'), kcpSettings: KcpStreamSettingsSchema }),
   z.object({ network: z.literal('quic'), quicSettings: QuicStreamSettingsSchema }),
+  z.object({ network: z.literal('quictcp'), quictcpSettings: QuicTcpStreamSettingsSchema }),
   z.object({ network: z.literal('ws'), wsSettings: WsStreamSettingsSchema }),
   z.object({ network: z.literal('grpc'), grpcSettings: GrpcStreamSettingsSchema }),
   z.object({
@@ -57,6 +62,7 @@ const TransportNetworkSettingsSchema = z.discriminatedUnion('network', [
   }),
   z.object({ network: z.literal('xhttp'), xhttpSettings: XHttpStreamSettingsSchema }),
   z.object({ network: z.literal('hysteria'), hysteriaSettings: HysteriaStreamSettingsSchema }),
+  z.object({ network: z.literal('hytcp'), hytcpSettings: HyTcpStreamSettingsSchema }),
 ]);
 
 // Wireguard (always a UDP listener) and Tunnel (dokodemo-door) expose no

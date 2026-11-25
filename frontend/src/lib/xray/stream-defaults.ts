@@ -2,8 +2,10 @@ import {
   GrpcStreamSettingsSchema,
   HttpUpgradeStreamSettingsSchema,
   HysteriaStreamSettingsSchema,
+  HyTcpStreamSettingsSchema,
   KcpStreamSettingsSchema,
   QuicStreamSettingsSchema,
+  QuicTcpStreamSettingsSchema,
   TcpStreamSettingsSchema,
   WsStreamSettingsSchema,
   XHttpStreamSettingsSchema,
@@ -14,11 +16,13 @@ const NETWORK_KEY_MAP = {
   tcp: 'tcpSettings',
   kcp: 'kcpSettings',
   quic: 'quicSettings',
+  quictcp: 'quictcpSettings',
   ws: 'wsSettings',
   grpc: 'grpcSettings',
   httpupgrade: 'httpupgradeSettings',
   xhttp: 'xhttpSettings',
   hysteria: 'hysteriaSettings',
+  hytcp: 'hytcpSettings',
 } as const;
 
 type SchemaWithParse = { safeParse: (v: unknown) => { success: boolean; data?: unknown } };
@@ -38,6 +42,8 @@ function networkSchemaFor(network: string): SchemaWithParse | null {
       return KcpStreamSettingsSchema;
     case 'quic':
       return QuicStreamSettingsSchema;
+    case 'quictcp':
+      return QuicTcpStreamSettingsSchema;
     case 'ws':
       return WsStreamSettingsSchema;
     case 'grpc':
@@ -48,6 +54,8 @@ function networkSchemaFor(network: string): SchemaWithParse | null {
       return XHttpStreamSettingsSchema;
     case 'hysteria':
       return HysteriaStreamSettingsSchema;
+    case 'hytcp':
+      return HyTcpStreamSettingsSchema;
     default:
       return null;
   }

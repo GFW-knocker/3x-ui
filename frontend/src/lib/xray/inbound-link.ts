@@ -283,11 +283,14 @@ export function genVmessLink(input: GenVmessLinkInput): string {
     const kcp = stream.kcpSettings;
     obj.mtu = kcp.mtu;
     obj.tti = kcp.tti;
-  } else if (stream.network === 'quic') {
-    const quic = stream.quicSettings;
+  } else if (stream.network === 'quic' || stream.network === 'quictcp') {
+    const quic = stream.network === 'quic' ? stream.quicSettings : stream.quictcpSettings;
     obj.type = quic.header.type;
     obj.host = quic.security;
     obj.path = quic.key;
+    if (stream.network === 'quictcp') Object.assign(obj, laneShareFields(stream.quictcpSettings));
+  } else if (stream.network === 'hytcp') {
+    Object.assign(obj, hyTcpShareFields(stream.hytcpSettings));
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     obj.path = ws.path;
@@ -451,11 +454,17 @@ export function genVlessLink(input: GenVlessLinkInput): string {
     const kcp = stream.kcpSettings;
     params.set('mtu', String(kcp.mtu));
     params.set('tti', String(kcp.tti));
-  } else if (stream.network === 'quic') {
-    const quic = stream.quicSettings;
+  } else if (stream.network === 'quic' || stream.network === 'quictcp') {
+    const quic = stream.network === 'quic' ? stream.quicSettings : stream.quictcpSettings;
     params.set('quicSecurity', quic.security);
     params.set('key', quic.key);
     params.set('headerType', quic.header.type);
+    if (stream.network === 'quictcp') {
+      for (const [k, v] of Object.entries(laneShareFields(stream.quictcpSettings)))
+        params.set(k, v);
+    }
+  } else if (stream.network === 'hytcp') {
+    for (const [k, v] of Object.entries(hyTcpShareFields(stream.hytcpSettings))) params.set(k, v);
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     params.set('path', ws.path);
@@ -563,11 +572,17 @@ function writeNetworkParams(
     const kcp = stream.kcpSettings;
     params.set('mtu', String(kcp.mtu));
     params.set('tti', String(kcp.tti));
-  } else if (stream.network === 'quic') {
-    const quic = stream.quicSettings;
+  } else if (stream.network === 'quic' || stream.network === 'quictcp') {
+    const quic = stream.network === 'quic' ? stream.quicSettings : stream.quictcpSettings;
     params.set('quicSecurity', quic.security);
     params.set('key', quic.key);
     params.set('headerType', quic.header.type);
+    if (stream.network === 'quictcp') {
+      for (const [k, v] of Object.entries(laneShareFields(stream.quictcpSettings)))
+        params.set(k, v);
+    }
+  } else if (stream.network === 'hytcp') {
+    for (const [k, v] of Object.entries(hyTcpShareFields(stream.hytcpSettings))) params.set(k, v);
   } else if (stream.network === 'ws') {
     const ws = stream.wsSettings;
     params.set('path', ws.path);
@@ -882,11 +897,40 @@ export function genHysteriaLink(input: GenHysteriaLinkInput): string {
   if (hopPorts.length > 0) {
     params.set('mport', hopPorts);
   }
+  if (stream.network === 'hytcp') {
+    params.set('type', 'hytcp');
+    for (const [k, v] of Object.entries(laneShareFields(stream.hytcpSettings))) params.set(k, v);
+  }
 
   const url = new URL(`${scheme}://${clientAuth}@${formatUrlHost(address)}:${port}`);
   for (const [key, value] of params) url.searchParams.set(key, value);
   url.hash = encodeURIComponent(remark);
   return url.toString();
+}
+
+// The tcplane options a client must match the server on, as the Go sub's laneShareFields
+// emits them; lanes, budgets and server limits tune one side and stay out of links.
+function laneShareFields(lane: {
+  password?: string;
+  ports?: string | number;
+}): Record<string, string> {
+  const fields: Record<string, string> = {};
+  if (lane.password) fields.lanePassword = lane.password;
+  const ports = String(lane.ports ?? '').trim();
+  if (ports !== '' && ports !== '0') fields.lanePorts = ports;
+  return fields;
+}
+
+// vless/vmess/trojan over hytcp also share the hysteria transport's own auth, which stands in
+// for the user list only the hysteria protocol has (the Go sub's hyTCPShareFields).
+function hyTcpShareFields(hytcp: {
+  auth?: string;
+  password?: string;
+  ports?: string | number;
+}): Record<string, string> {
+  const fields = laneShareFields(hytcp);
+  if (hytcp.auth) fields.auth = hytcp.auth;
+  return fields;
 }
 
 export interface GenMtprotoLinkInput {

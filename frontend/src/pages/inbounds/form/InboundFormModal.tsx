@@ -32,8 +32,10 @@ import {
   canEnableSniffing,
   canEnableStream,
   canEnableTls,
+  canUseHyTcp,
   dropUnsupportedSecurity,
   isSS2022,
+  retargetHyTcpTls,
 } from '@/lib/xray/protocol-capabilities';
 import {
   InboundDbFieldsSchema,
@@ -52,12 +54,19 @@ import { SniffingSchema } from '@/schemas/primitives/sniffing';
 import { TcpStreamSettingsSchema } from '@/schemas/protocols/stream/tcp';
 import { KcpStreamSettingsSchema } from '@/schemas/protocols/stream/kcp';
 import { QuicStreamSettingsSchema } from '@/schemas/protocols/stream/quic';
+import {
+  HyTcpStreamSettingsSchema,
+  HyTcpTransportAuthSchema,
+  QuicTcpStreamSettingsSchema,
+  TcpLaneSettingsShape,
+} from '@/schemas/protocols/stream/tcplane';
 import { WsStreamSettingsSchema } from '@/schemas/protocols/stream/ws';
 import { GrpcStreamSettingsSchema } from '@/schemas/protocols/stream/grpc';
 import { HttpUpgradeStreamSettingsSchema } from '@/schemas/protocols/stream/httpupgrade';
 import { XHttpStreamSettingsSchema } from '@/schemas/protocols/stream/xhttp';
 import { DateTimePicker } from '@/components/form';
 import { FinalMaskField } from '@/lib/xray/forms/fields';
+import TcpLaneFields from '@/lib/xray/forms/transport/TcpLaneFields';
 import './InboundFormModal.css';
 
 import { AdvancedAllEditor, AdvancedSliceEditor } from './advanced-editors';
@@ -211,6 +220,10 @@ function newStreamSlice(n: string): Record<string, unknown> {
       return KcpStreamSettingsSchema.parse({});
     case 'quic':
       return QuicStreamSettingsSchema.parse({});
+    case 'quictcp':
+      return QuicTcpStreamSettingsSchema.parse({});
+    case 'hytcp':
+      return HyTcpStreamSettingsSchema.parse({ auth: RandomUtil.randomLowerAndNum(16) });
     case 'ws':
       return WsStreamSettingsSchema.parse({});
     case 'grpc':
@@ -556,8 +569,16 @@ export default function InboundFormModal({
       } else if (next === Protocols.WIREGUARD || next === Protocols.TUNNEL) {
         setV('streamSettings', { security: 'none' });
       } else {
-        const current = getV('streamSettings') as { network?: string } | undefined;
-        if (current?.network === 'hysteria' || !current?.network) {
+        const current = getV('streamSettings') as
+          | { network?: string; hytcpSettings?: { auth?: string } }
+          | undefined;
+        // A hytcp stream that carries its own auth moves between the protocols that take it.
+        const keepsHyTcp =
+          current?.network === 'hytcp' && canUseHyTcp(next) && !!current.hytcpSettings?.auth;
+        if (
+          (current?.network === 'hysteria' || current?.network === 'hytcp' || !current?.network) &&
+          !keepsHyTcp
+        ) {
           setV('streamSettings', { network: 'tcp', security: 'none', tcpSettings: {} });
         } else if (canEnableStream({ protocol: next })) {
           setV('streamSettings', dropUnsupportedSecurity(next, current));
@@ -869,6 +890,8 @@ export default function InboundFormModal({
       'tcpSettings',
       'kcpSettings',
       'quicSettings',
+      'quictcpSettings',
+      'hytcpSettings',
       'wsSettings',
       'grpcSettings',
       'httpupgradeSettings',
@@ -902,7 +925,31 @@ export default function InboundFormModal({
         cleaned.finalmask = { ...fm, udp };
       }
     }
-    setV('streamSettings', dropUnsupportedSecurity(protocol, cleaned));
+    setV(
+      'streamSettings',
+      dropUnsupportedSecurity(
+        protocol,
+        retargetHyTcpTls(cleaned, network, createHysteriaTlsSettingsWithDefaultCert),
+      ),
+    );
+  };
+
+  // Hysteria keeps its version/udpIdleTimeout/masquerade across the swap; only the
+  // settings key moves, and the lane options leave with "hytcp".
+  const onHysteriaNetworkChange = (next: string) => {
+    const current = (getV('streamSettings') as Record<string, unknown>) ?? {};
+    const fromKey = network === 'hytcp' ? 'hytcpSettings' : 'hysteriaSettings';
+    const cleaned: Record<string, unknown> = { ...current, network: next };
+    const carried = { ...((current[fromKey] as Record<string, unknown>) ?? {}) };
+    delete cleaned.hysteriaSettings;
+    delete cleaned.hytcpSettings;
+    if (next === 'hytcp') {
+      cleaned.hytcpSettings = HyTcpStreamSettingsSchema.parse(carried);
+    } else {
+      for (const key of Object.keys(TcpLaneSettingsShape)) delete carried[key];
+      cleaned.hysteriaSettings = HysteriaStreamSettingsSchema.parse(carried);
+    }
+    setV('streamSettings', cleaned);
   };
 
   const streamTab = (
@@ -917,19 +964,40 @@ export default function InboundFormModal({
               { value: 'tcp', label: 'RAW' },
               { value: 'kcp', label: 'mKCP' },
               { value: 'quic', label: 'QUIC' },
+              { value: 'quictcp', label: 'QUIC over TCP lanes' },
               { value: 'ws', label: 'WebSocket' },
               { value: 'grpc', label: 'gRPC' },
               { value: 'httpupgrade', label: 'HTTPUpgrade' },
               { value: 'xhttp', label: 'XHTTP' },
+              ...(canUseHyTcp(protocol)
+                ? [{ value: 'hytcp', label: 'Hysteria over TCP lanes' }]
+                : []),
             ]}
           />
         </Form.Item>
       )}
 
-      {/* Inbound Hysteria stream sub-form. The transport for hysteria
-          isn't user-selectable (always 'hysteria'), so the network
-          dropdown is hidden above. */}
-      {protocol === Protocols.HYSTERIA && <HysteriaFields />}
+      {/* Hysteria picks between its own two transports here, so the generic
+          network dropdown above stays hidden for it. */}
+      {protocol === Protocols.HYSTERIA && (
+        <>
+          <Form.Item label={t('transmission')}>
+            <Select
+              style={{ width: '75%' }}
+              value={network === 'hytcp' ? 'hytcp' : 'hysteria'}
+              onChange={onHysteriaNetworkChange}
+              options={[
+                { value: 'hysteria', label: 'Hysteria (UDP)' },
+                { value: 'hytcp', label: 'Hysteria over TCP lanes' },
+              ]}
+            />
+          </Form.Item>
+          <HysteriaFields
+            settingsKey={network === 'hytcp' ? 'hytcpSettings' : 'hysteriaSettings'}
+          />
+          {network === 'hytcp' && <TcpLaneFields settingsKey="hytcpSettings" side="server" />}
+        </>
+      )}
 
       {hasSelectableTransport && (
         <>
@@ -946,6 +1014,28 @@ export default function InboundFormModal({
           {network === 'kcp' && <KcpForm />}
 
           {network === 'quic' && <QuicForm />}
+
+          {network === 'quictcp' && (
+            <>
+              <QuicForm settingsKey="quictcpSettings" />
+              <TcpLaneFields settingsKey="quictcpSettings" side="server" />
+            </>
+          )}
+
+          {network === 'hytcp' && (
+            <>
+              <FormField
+                label={t('pages.inbounds.form.hyTransportAuth')}
+                tooltip={t('pages.inbounds.form.hyTransportAuthDesc')}
+                name={['streamSettings', 'hytcpSettings', 'auth']}
+                rules={{ validate: rhfZodValidate(HyTcpTransportAuthSchema) }}
+              >
+                <Input />
+              </FormField>
+              <HysteriaFields settingsKey="hytcpSettings" />
+              <TcpLaneFields settingsKey="hytcpSettings" side="server" />
+            </>
+          )}
         </>
       )}
 
@@ -977,7 +1067,7 @@ export default function InboundFormModal({
 
   const tlsOk = canEnableTls({ protocol, streamSettings: { network, security } });
   const realityOk = canEnableReality({ protocol, streamSettings: { network, security } });
-  const tlsOnly = protocol === Protocols.HYSTERIA;
+  const tlsOnly = protocol === Protocols.HYSTERIA || network === 'hytcp';
 
   const securityTab = (
     <>

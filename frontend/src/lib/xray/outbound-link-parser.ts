@@ -133,6 +133,23 @@ function applyXhttpStringFromJson(xhttp: Raw, json: Record<string, unknown>): vo
   }
 }
 
+// The two tcplane options a share link carries; absent ones keep the core's defaults.
+function withLaneShare(settings: Raw, password: unknown, ports: unknown): Raw {
+  if (typeof password === 'string' && password !== '') settings.password = password;
+  if (typeof ports === 'string' && ports !== '') settings.ports = ports;
+  return settings;
+}
+
+// hytcpSettings for vless/vmess/trojan, which have no hysteria user list: the transport's own auth.
+function hyTcpSettings(auth: unknown, password: unknown, ports: unknown): Raw {
+  const settings: Raw = {
+    version: 2,
+    auth: typeof auth === 'string' ? auth : '',
+    udpIdleTimeout: 60,
+  };
+  return withLaneShare(settings, password, ports);
+}
+
 // Mahsa-Core's quicSettings; an unnamed cipher or header is none, as the core assumes.
 function quicSettings(security: unknown, key: unknown, header: unknown): Raw {
   const text = (v: unknown) => (typeof v === 'string' ? v : '');
@@ -161,6 +178,12 @@ function buildStream(network: string, security: string): Raw {
       break;
     case 'quic':
       stream.quicSettings = quicSettings('', '', '');
+      break;
+    case 'quictcp':
+      stream.quictcpSettings = quicSettings('', '', '');
+      break;
+    case 'hytcp':
+      stream.hytcpSettings = hyTcpSettings('', null, null);
       break;
     case 'ws':
       stream.wsSettings = { path: '/', host: '', headers: {}, heartbeatPeriod: 0 };
@@ -239,6 +262,20 @@ function applyTransportParams(stream: Raw, params: URLSearchParams): void {
         params.get('quicSecurity'),
         params.get('key'),
         params.get('headerType'),
+      );
+      break;
+    case 'quictcp':
+      stream.quictcpSettings = withLaneShare(
+        quicSettings(params.get('quicSecurity'), params.get('key'), params.get('headerType')),
+        params.get('lanePassword'),
+        params.get('lanePorts'),
+      );
+      break;
+    case 'hytcp':
+      stream.hytcpSettings = hyTcpSettings(
+        params.get('auth'),
+        params.get('lanePassword'),
+        params.get('lanePorts'),
       );
       break;
     case 'kcp': {
@@ -555,6 +592,14 @@ export function parseVmessLink(link: string): Raw | null {
       (stream.grpcSettings as Raw).multiMode = json.type === 'multi';
     } else if (network === 'quic') {
       stream.quicSettings = quicSettings(json.host, json.path, json.type);
+    } else if (network === 'quictcp') {
+      stream.quictcpSettings = withLaneShare(
+        quicSettings(json.host, json.path, json.type),
+        json.lanePassword,
+        json.lanePorts,
+      );
+    } else if (network === 'hytcp') {
+      stream.hytcpSettings = hyTcpSettings(json.auth, json.lanePassword, json.lanePorts);
     } else if (network === 'httpupgrade') {
       (stream.httpupgradeSettings as Raw).host = json.host ?? '';
       (stream.httpupgradeSettings as Raw).path = json.path ?? '/';
@@ -757,14 +802,15 @@ export function parseHysteria2Link(link: string): Raw | null {
   const port = Number(url.port) || 443;
   const params = url.searchParams;
   const alpn = params.get('alpn');
+  const network = params.get('type') === 'hytcp' ? 'hytcp' : 'hysteria';
+  const hysteria: Raw = { version: 2, auth, udpIdleTimeout: 60 };
+  if (network === 'hytcp') {
+    withLaneShare(hysteria, params.get('lanePassword'), params.get('lanePorts'));
+  }
   const stream: Raw = {
-    network: 'hysteria',
+    network,
     security: 'tls',
-    hysteriaSettings: {
-      version: 2,
-      auth,
-      udpIdleTimeout: 60,
-    },
+    [`${network}Settings`]: hysteria,
     tlsSettings: {
       serverName: params.get('sni') ?? '',
       alpn: alpn ? alpn.split(',') : ['h3'],

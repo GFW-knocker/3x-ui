@@ -1,5 +1,5 @@
 import { rawOutboundToFormValues } from '@/lib/xray/outbound-form-adapter';
-import { canEnableReality, canEnableTls } from '@/lib/xray/protocol-capabilities';
+import { canEnableReality, canEnableTls, retargetHyTcpTls } from '@/lib/xray/protocol-capabilities';
 import type { OutboundFormValues } from '@/schemas/forms/outbound-form';
 
 import { MUX_PROTOCOLS } from './outbound-form-constants';
@@ -33,6 +33,11 @@ export function newStreamSlice(network: string): Record<string, unknown> {
       return {
         network: 'quic',
         quicSettings: { security: 'none', key: '', header: { type: 'none' } },
+      };
+    case 'quictcp':
+      return {
+        network: 'quictcp',
+        quictcpSettings: { security: 'none', key: '', header: { type: 'none' } },
       };
     case 'ws':
       return {
@@ -69,6 +74,11 @@ export function newStreamSlice(network: string): Record<string, unknown> {
           udpIdleTimeout: 60,
         },
       };
+    case 'hytcp':
+      return {
+        network: 'hytcp',
+        hytcpSettings: { version: 2, auth: '', udpIdleTimeout: 60 },
+      };
     default:
       return { network: 'tcp', tcpSettings: { header: { type: 'none' } } };
   }
@@ -76,9 +86,11 @@ export function newStreamSlice(network: string): Record<string, unknown> {
 
 // Hysteria2 always rides its own QUIC transport with TLS — the panel never
 // offers another transport or 'none' security for it.
-export function hysteriaStreamSlice(): Record<string, unknown> {
+export function hysteriaStreamSlice(
+  network: 'hysteria' | 'hytcp' = 'hysteria',
+): Record<string, unknown> {
   return {
-    ...newStreamSlice('hysteria'),
+    ...newStreamSlice(network),
     security: 'tls',
     tlsSettings: {
       serverName: '',
@@ -101,8 +113,12 @@ export function applyNetworkChange(
   prevStream: Record<string, unknown> | undefined,
   next: string,
 ): Record<string, unknown> {
-  if (next === 'hysteria') return hysteriaStreamSlice();
   const stream = prevStream ?? {};
+  const prevNetwork = stream.network as string | undefined;
+  const hysteriaTls = () => hysteriaStreamSlice('hytcp').tlsSettings as Record<string, unknown>;
+  if (next === 'hysteria' || next === 'hytcp') {
+    return retargetHyTcpTls(switchHysteriaNetwork(stream, next), prevNetwork, hysteriaTls);
+  }
   const currentSecurity = (stream.security as string) ?? 'none';
   const stillTls = canEnableTls({
     protocol,
@@ -122,7 +138,26 @@ export function applyNetworkChange(
   if (newSecurity === 'tls' && stream.tlsSettings) newStream.tlsSettings = stream.tlsSettings;
   else if (newSecurity === 'reality' && stream.realitySettings)
     newStream.realitySettings = stream.realitySettings;
-  return newStream;
+  return retargetHyTcpTls(newStream, prevNetwork, hysteriaTls);
+}
+
+// Auth, idle timeout, masquerade and TLS survive a swap between the two hysteria
+// transports; the lane options belong to hytcp alone.
+function switchHysteriaNetwork(
+  stream: Record<string, unknown>,
+  next: 'hysteria' | 'hytcp',
+): Record<string, unknown> {
+  const slice = hysteriaStreamSlice(next);
+  const prev = (stream.hytcpSettings ?? stream.hysteriaSettings) as
+    | Record<string, unknown>
+    | undefined;
+  if (prev) {
+    const { auth, udpIdleTimeout, masquerade } = prev;
+    const key = `${next}Settings`;
+    slice[key] = { ...(slice[key] as Record<string, unknown>), auth, udpIdleTimeout, masquerade };
+  }
+  if (stream.tlsSettings) slice.tlsSettings = stream.tlsSettings;
+  return slice;
 }
 
 export function buildAddModeValues(): OutboundFormValues {

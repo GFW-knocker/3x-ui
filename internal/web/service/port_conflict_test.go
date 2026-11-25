@@ -73,6 +73,7 @@ func TestInboundTransports(t *testing.T) {
 		{"trojan grpc is tcp", model.Trojan, `{"network":"grpc"}`, ``, transportTCP},
 
 		{"hysteria forced udp", model.Hysteria, `{"network":"tcp"}`, ``, transportUDP},
+		{"hysteria hytcp listens on tcp lanes", model.Hysteria, `{"network":"hytcp"}`, ``, transportTCP},
 		{"wireguard forced udp", model.WireGuard, ``, ``, transportUDP},
 
 		{"shadowsocks tcp,udp", model.Shadowsocks, ``, `{"network":"tcp,udp"}`, transportTCP | transportUDP},
