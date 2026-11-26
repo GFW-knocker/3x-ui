@@ -287,13 +287,6 @@ func (s *XrayService) GetXrayConfig() (*xray.Config, error) {
 					c.AllowedIPs = inboundClient.AllowedIPs
 					c.PreSharedKey = inboundClient.PreSharedKey
 					c.PublicKey = inboundClient.PublicKey
-					// #6731: a nil settings keepalive must not keep the other tunnel's value.
-					if inboundClient.KeepAlive == nil {
-						c.KeepAlive = nil
-					} else {
-						keepalive := *inboundClient.KeepAlive
-						c.KeepAlive = &keepalive
-					}
 				}
 				wgPeers = append(wgPeers, model.WireguardPeerFromClient(c))
 				continue

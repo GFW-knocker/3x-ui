@@ -450,9 +450,8 @@ func WireguardPeerFromClient(c Client) map[string]any {
 	if c.PreSharedKey != "" {
 		peer["preSharedKey"] = c.PreSharedKey
 	}
-	if ka := c.KeepAliveSeconds(); ka > 0 {
-		peer["keepAlive"] = ka
-	}
+	// No keepAlive: it is the client's NAT keepalive. On the server it re-handshakes a
+	// departed client every ~5 s forever (a 25 s keepalive restarts each 90 s retry chain).
 	return peer
 }
 

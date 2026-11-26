@@ -52,8 +52,9 @@ func TestWireguardClientsToPeers(t *testing.T) {
 	if peer["preSharedKey"] != "cHNr" {
 		t.Errorf("peer preSharedKey = %v, want cHNr", peer["preSharedKey"])
 	}
-	if peer["keepAlive"].(float64) != 25 {
-		t.Errorf("peer keepAlive = %v, want 25", peer["keepAlive"])
+	// A server-side PersistentKeepalive re-handshakes a departed client forever.
+	if ka, has := peer["keepAlive"]; has {
+		t.Errorf("server peer keepAlive = %v, want absent (the client's 25 belongs in its own config)", ka)
 	}
 	ips, ok := peer["allowedIPs"].([]any)
 	if !ok || len(ips) != 1 || ips[0] != "10.0.0.2/32" {

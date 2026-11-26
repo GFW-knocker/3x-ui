@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -304,7 +303,6 @@ func (l *Local) AddClient(ctx context.Context, ib *model.Inbound, client model.C
 		"publicKey":    client.PublicKey,
 		"allowedIPs":   client.AllowedIPs,
 		"preSharedKey": client.PreSharedKey,
-		"keepAlive":    wgKeepAlive(client.KeepAliveSeconds()),
 	}
 	return l.AddUser(ctx, ib, user)
 }
@@ -345,16 +343,8 @@ func (l *Local) UpdateUser(ctx context.Context, ib *model.Inbound, oldEmail stri
 		"publicKey":    payload.PublicKey,
 		"allowedIPs":   payload.AllowedIPs,
 		"preSharedKey": payload.PreSharedKey,
-		"keepAlive":    wgKeepAlive(payload.KeepAliveSeconds()),
 	}
 	return l.AddUser(ctx, ib, user)
-}
-
-func wgKeepAlive(seconds int) string {
-	if seconds <= 0 {
-		return ""
-	}
-	return strconv.Itoa(seconds)
 }
 
 func (l *Local) RestartXray(_ context.Context) error {

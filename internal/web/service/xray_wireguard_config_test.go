@@ -166,6 +166,10 @@ func TestGetXrayConfigWireGuardPeers(t *testing.T) {
 			t.Fatalf("peer missing allowedIPs: %v", p)
 		}
 		ips[allowed[0].(string)] = true
+		// alice's keepAlive 25 is for her own config; on the server it retries her forever once she leaves.
+		if ka, has := p["keepAlive"]; has {
+			t.Errorf("server peer %v keepAlive = %v, want absent", p["email"], ka)
+		}
 	}
 	if len(ips) != 2 {
 		t.Errorf("peers must have distinct allowedIPs, got %v", ips)
@@ -217,32 +221,6 @@ func TestGetXrayConfigWireGuardUsesInboundLocalTunnelFields(t *testing.T) {
 	}
 	if peers[0]["publicKey"] != "pub-wg" {
 		t.Fatalf("WireGuard peer publicKey = %v, want pub-wg", peers[0]["publicKey"])
-	}
-	if peers[0]["keepAlive"] != float64(15) {
-		t.Fatalf("WireGuard peer keepAlive = %v, want 15", peers[0]["keepAlive"])
-	}
-}
-
-func TestGetXrayConfigWireGuardOmitsKeepAliveAbsentFromSettings(t *testing.T) {
-	email := seedDualTunnelClient(t, true, nil)
-
-	var shared model.ClientRecord
-	if err := database.GetDB().Where("email = ?", email).First(&shared).Error; err != nil {
-		t.Fatalf("read shared client: %v", err)
-	}
-	if shared.PublicKey != "pub-awg" || shared.KeepAlive != 25 {
-		t.Fatalf("test setup did not persist AmneziaWG identity: publicKey=%q keepAlive=%d", shared.PublicKey, shared.KeepAlive)
-	}
-
-	peers := wgPeerList(t, wgInboundEmittedSettings(t, "wg-dual"))
-	if len(peers) != 1 {
-		t.Fatalf("expected 1 peer, got %d: %v", len(peers), peers)
-	}
-	if peers[0]["publicKey"] != "pub-wg" {
-		t.Fatalf("WireGuard peer publicKey = %v, want pub-wg", peers[0]["publicKey"])
-	}
-	if _, ok := peers[0]["keepAlive"]; ok {
-		t.Fatalf("WireGuard peer keepAlive = %v, want absent", peers[0]["keepAlive"])
 	}
 }
 

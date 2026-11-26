@@ -614,7 +614,6 @@ func (s *ClientService) AddInboundClient(inboundSvc *InboundService, data *model
 					"publicKey":    client.PublicKey,
 					"allowedIPs":   client.AllowedIPs,
 					"preSharedKey": client.PreSharedKey,
-					"keepAlive":    keepAliveStr(client.KeepAliveSeconds()),
 					"reverse":      client.Reverse,
 				})
 				if err1 == nil {
@@ -1058,7 +1057,6 @@ func (s *ClientService) UpdateInboundClient(inboundSvc *InboundService, data *mo
 						"publicKey":    clients[0].PublicKey,
 						"allowedIPs":   clients[0].AllowedIPs,
 						"preSharedKey": clients[0].PreSharedKey,
-						"keepAlive":    keepAliveStr(clients[0].KeepAliveSeconds()),
 						"reverse":      clients[0].Reverse,
 					})
 					if err1 == nil {

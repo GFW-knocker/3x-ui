@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/netip"
-	"strconv"
 	"strings"
 
 	"github.com/GFW-knocker/3x-ui/v3/internal/database/model"
@@ -47,13 +46,6 @@ func explicitWireguardSubnetBase(settingsJSON string) string {
 		return ""
 	}
 	return base
-}
-
-func keepAliveStr(seconds int) string {
-	if seconds <= 0 {
-		return ""
-	}
-	return strconv.Itoa(seconds)
 }
 
 func wireguardHostAddr(s string) netip.Addr {

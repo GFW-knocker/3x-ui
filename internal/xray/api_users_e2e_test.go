@@ -137,7 +137,6 @@ func panelUser(email string, fields map[string]any) map[string]any {
 		"publicKey":    "",
 		"allowedIPs":   nil,
 		"preSharedKey": "",
-		"keepAlive":    "",
 	}
 	maps.Copy(user, fields)
 	return user

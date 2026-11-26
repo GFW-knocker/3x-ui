@@ -51,7 +51,6 @@ func TestBuildUserAccountWireGuardHexConversion(t *testing.T) {
 		"publicKey":    pub,
 		"preSharedKey": psk,
 		"allowedIPs":   []any{"10.0.0.2/32", "fd00::2/128"},
-		"keepAlive":    "25",
 	}
 
 	pc := decodeWgAccount(t, user)
@@ -67,8 +66,18 @@ func TestBuildUserAccountWireGuardHexConversion(t *testing.T) {
 	if len(pc.AllowedIps) != 2 || pc.AllowedIps[0] != "10.0.0.2/32" || pc.AllowedIps[1] != "fd00::2/128" {
 		t.Fatalf("AllowedIps = %v, want [10.0.0.2/32 fd00::2/128]", pc.AllowedIps)
 	}
-	if pc.KeepAlive != "25" {
-		t.Fatalf("KeepAlive = %q, want %q", pc.KeepAlive, "25")
+}
+
+// A live-added peer with a PersistentKeepalive re-handshakes its client forever after it leaves.
+func TestBuildUserAccountWireGuardNeverSetsServerKeepAlive(t *testing.T) {
+	user := map[string]any{
+		"email":      "ka@example.test",
+		"publicKey":  b64Key(4),
+		"allowedIPs": []any{"10.0.0.6/32"},
+		"keepAlive":  "25",
+	}
+	if pc := decodeWgAccount(t, user); pc.KeepAlive != "" {
+		t.Fatalf("server peer KeepAlive = %q, want empty", pc.KeepAlive)
 	}
 }
 
@@ -81,9 +90,6 @@ func TestBuildUserAccountWireGuardNoPSK(t *testing.T) {
 	pc := decodeWgAccount(t, user)
 	if pc.PreSharedKey != "" {
 		t.Fatalf("PreSharedKey = %q, want empty", pc.PreSharedKey)
-	}
-	if pc.KeepAlive != "" {
-		t.Fatalf("KeepAlive = %q, want empty", pc.KeepAlive)
 	}
 }
 

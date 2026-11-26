@@ -705,16 +705,12 @@ func buildUserAccount(protocolName string, user map[string]any) (*serial.TypedMe
 			return nil, common.NewError("wireguard: allowedIPs required")
 		}
 
-		keepAlive, err := getOptionalUserString(user, "keepAlive")
-		if err != nil {
-			return nil, err
-		}
-
+		// keepAlive is never set here, as in model.WireguardPeerFromClient: a server-side
+		// PersistentKeepalive keeps re-handshaking a client long after it disconnects.
 		return serial.ToTypedMessage(&wireguard.PeerConfig{
 			PublicKey:    pubHex,
 			PreSharedKey: pskHex,
 			AllowedIps:   allowed,
-			KeepAlive:    keepAlive,
 		}), nil
 	default:
 		return nil, nil
